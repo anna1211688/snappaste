@@ -12,11 +12,13 @@ from PySide6.QtGui import QPixmap
 from ...core import annotation as A
 from ..theme import SPACING
 from ..components import PrimaryButton, SecondaryButton, GhostButton
+from ...core.i18n import tr
 
 TOOL_LABELS = [
-    ("矩形", "rect"), ("椭圆", "ellipse"), ("箭头", "arrow"), ("直线", "line"),
-    ("画笔", "pen"), ("文字", "text"), ("序号", "seq"),
-    ("马赛克", "mosaic"), ("模糊", "blur"),
+    ("anno.rect", "rect"), ("anno.ellipse", "ellipse"),
+    ("anno.arrow", "arrow"), ("anno.line", "line"),
+    ("anno.pen", "pen"), ("anno.text", "text"), ("anno.seq", "seq"),
+    ("anno.mosaic", "mosaic"), ("anno.blur", "blur"),
 ]
 MAX_DISPLAY_W, MAX_DISPLAY_H = 1500, 880
 
@@ -60,7 +62,7 @@ class AnnotationEditor(QDialog):
         self._points = []
         self._cur_end = None
 
-        self.setWindowTitle("标注 - 画完点「完成并钉图」")
+        self.setWindowTitle(tr("anno.window_title"))
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
         self._build_ui()
         self._refresh()
@@ -75,8 +77,8 @@ class AnnotationEditor(QDialog):
         bar = QHBoxLayout()
         bar.setSpacing(6)
         self.tool_group = QButtonGroup(self)
-        for label, key in TOOL_LABELS:
-            b = QPushButton(label)
+        for label_key, key in TOOL_LABELS:
+            b = QPushButton(tr(label_key))
             b.setObjectName("annoTool")
             b.setCheckable(True)
             b.setChecked(key == self.current_tool)
@@ -100,7 +102,7 @@ class AnnotationEditor(QDialog):
             bar.addWidget(sw)
 
         bar.addSpacing(8)
-        bar.addWidget(QLabel("线宽"))
+        bar.addWidget(QLabel(tr("anno.line_width")))
         self.width_spin = QSpinBox()
         self.width_spin.setRange(A.WIDTH_MIN, A.WIDTH_MAX)
         self.width_spin.setValue(A.DEFAULT_WIDTH)
@@ -119,30 +121,30 @@ class AnnotationEditor(QDialog):
 
         bottom = QHBoxLayout()
         bottom.setSpacing(6)
-        self.undo_btn = SecondaryButton("撤销", icon_name="undo")
+        self.undo_btn = SecondaryButton(tr("anno.undo"), icon_name="undo")
         self.undo_btn.clicked.connect(self._undo)
-        self.redo_btn = SecondaryButton("重做")
+        self.redo_btn = SecondaryButton(tr("anno.redo"))
         self.redo_btn.clicked.connect(self._redo)
-        self.clear_btn = GhostButton("清空标注", icon_name="trash")
+        self.clear_btn = GhostButton(tr("anno.clear"), icon_name="trash")
         self.clear_btn.clicked.connect(self._clear)
-        self.ocr_btn = GhostButton("OCR 识别文字")
+        self.ocr_btn = GhostButton(tr("anno.ocr"))
         self.ocr_btn.clicked.connect(lambda: self._invoke("ocr"))
-        self.code_btn = GhostButton("扫二维码/条码", icon_name="qr")
+        self.code_btn = GhostButton(tr("anno.scan"), icon_name="qr")
         self.code_btn.clicked.connect(lambda: self._invoke("code"))
         for b in (self.undo_btn, self.redo_btn, self.clear_btn,
                   self.ocr_btn, self.code_btn):
             bottom.addWidget(b)
         bottom.addStretch()
 
-        self.discard_btn = GhostButton("放弃", icon_name="close")
+        self.discard_btn = GhostButton(tr("anno.discard"), icon_name="close")
         self.discard_btn.clicked.connect(self._discard)
-        self.save_only_btn = SecondaryButton("只保存不钉图", icon_name="save")
+        self.save_only_btn = SecondaryButton(tr("anno.save_only"), icon_name="save")
         self.save_only_btn.clicked.connect(lambda: self._finish("save"))
-        self.save_as_btn = SecondaryButton("另存为", icon_name="save")
+        self.save_as_btn = SecondaryButton(tr("anno.save_as"), icon_name="save")
         self.save_as_btn.clicked.connect(lambda: self._finish("save_as"))
-        self.copy_btn = SecondaryButton("复制到剪贴板", icon_name="copy")
+        self.copy_btn = SecondaryButton(tr("anno.copy"), icon_name="copy")
         self.copy_btn.clicked.connect(lambda: self._finish("copy"))
-        self.pin_btn = PrimaryButton("完成并钉图", icon_name="check")
+        self.pin_btn = PrimaryButton(tr("anno.pin"), icon_name="check")
         self.pin_btn.clicked.connect(lambda: self._finish("pin"))
         for b in (self.discard_btn, self.save_only_btn, self.save_as_btn,
                   self.copy_btn, self.pin_btn):
@@ -180,7 +182,8 @@ class AnnotationEditor(QDialog):
         self._points = [self._start]
         self._cur_end = self._start
         if self.current_tool == "text":
-            text, ok = QInputDialog.getText(self, "文字标注", "输入文字:")
+            text, ok = QInputDialog.getText(
+                self, tr("anno.text_title"), tr("anno.text_prompt"))
             if ok and text:
                 self.stack.add(A.make_text_op(
                     self._start, text, self.current_color,

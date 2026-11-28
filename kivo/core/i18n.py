@@ -708,6 +708,34 @@ _TABLE.update({
     "ts.saved": ("翻译服务已保存", "Translation service saved"),
 })
 
+# 标注编辑器
+_TABLE.update({
+    "anno.rect": ("矩形", "Rectangle"),
+    "anno.ellipse": ("椭圆", "Ellipse"),
+    "anno.arrow": ("箭头", "Arrow"),
+    "anno.line": ("直线", "Line"),
+    "anno.pen": ("画笔", "Pen"),
+    "anno.text": ("文字", "Text"),
+    "anno.seq": ("序号", "Number"),
+    "anno.mosaic": ("马赛克", "Mosaic"),
+    "anno.blur": ("模糊", "Blur"),
+    "anno.window_title": ("标注 - 画完点「完成并钉图」",
+                          "Annotation — click “Finish & Pin” when done"),
+    "anno.line_width": ("线宽", "Line width"),
+    "anno.undo": ("撤销", "Undo"),
+    "anno.redo": ("重做", "Redo"),
+    "anno.clear": ("清空标注", "Clear Annotations"),
+    "anno.ocr": ("OCR 识别文字", "OCR Text"),
+    "anno.scan": ("扫二维码/条码", "Scan QR/Barcode"),
+    "anno.discard": ("放弃", "Discard"),
+    "anno.save_only": ("只保存不钉图", "Save Without Pin"),
+    "anno.save_as": ("另存为", "Save As"),
+    "anno.copy": ("复制到剪贴板", "Copy to Clipboard"),
+    "anno.pin": ("完成并钉图", "Finish & Pin"),
+    "anno.text_title": ("文字标注", "Text Annotation"),
+    "anno.text_prompt": ("输入文字:", "Enter text:"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
