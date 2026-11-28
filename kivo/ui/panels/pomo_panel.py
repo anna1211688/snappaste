@@ -12,6 +12,7 @@ from ..components import PrimaryButton, SecondaryButton
 from ..icons import icon
 from ..dialogs.base import show_toast
 from ...core.pomo_store import PomoStore
+from ...core.i18n import tr
 
 
 class PomoPanel(QWidget):
@@ -47,7 +48,7 @@ class PomoPanel(QWidget):
         lay.setContentsMargins(30, 28, 30, 26)
         lay.setSpacing(12)
 
-        self.mode_lab = QLabel("专注中")
+        self.mode_lab = QLabel(tr("pomo.focus"))
         self.mode_lab.setObjectName("pomoMode")
         self.mode_lab.setAlignment(Qt.AlignCenter)
         lay.addWidget(self.mode_lab)
@@ -58,11 +59,11 @@ class PomoPanel(QWidget):
         lay.addWidget(self.time_lab)
 
         brow = QHBoxLayout()
-        self.main_btn = PrimaryButton("开始", icon_name="play")
+        self.main_btn = PrimaryButton(tr("common.start"), icon_name="play")
         self.main_btn.clicked.connect(self._toggle)
-        reset = SecondaryButton("重置", icon_name="refresh")
+        reset = SecondaryButton(tr("common.reset"), icon_name="refresh")
         reset.clicked.connect(self._reset)
-        skip = SecondaryButton("跳过", icon_name="skip")
+        skip = SecondaryButton(tr("common.skip"), icon_name="skip")
         skip.clicked.connect(self._advance)
         brow.addWidget(self.main_btn)
         brow.addWidget(reset)
@@ -70,15 +71,15 @@ class PomoPanel(QWidget):
         lay.addLayout(brow)
 
         srow = QHBoxLayout()
-        srow.addWidget(QLabel("专注(分钟)"))
+        srow.addWidget(QLabel(tr("pomo.focus_min")))
         self.focus_edit = QLineEdit(str(self.store.focus_min))
         self.focus_edit.setFixedWidth(60)
         srow.addWidget(self.focus_edit)
-        srow.addWidget(QLabel("休息(分钟)"))
+        srow.addWidget(QLabel(tr("pomo.break_min")))
         self.break_edit = QLineEdit(str(self.store.break_min))
         self.break_edit.setFixedWidth(60)
         srow.addWidget(self.break_edit)
-        apply = SecondaryButton("应用", icon_name="check")
+        apply = SecondaryButton(tr("common.apply"), icon_name="check")
         apply.clicked.connect(self._apply)
         srow.addWidget(apply)
         lay.addLayout(srow)
@@ -110,19 +111,19 @@ class PomoPanel(QWidget):
             f = int(self.focus_edit.text())
             b = int(self.break_edit.text())
         except ValueError:
-            show_toast(self, "请输入有效分钟数")
+            show_toast(self, tr("pomo.invalid"))
             return
         if not self.store.apply_settings(f, b):
-            show_toast(self, "请输入有效分钟数")
+            show_toast(self, tr("pomo.invalid"))
             return
-        show_toast(self, "已应用")
+        show_toast(self, tr("pomo.applied"))
         self._sync()
 
     def _on_advance(self, mode):
-        show_toast(self, "专注中" if mode == "focus" else "休息中")
+        show_toast(self, tr("pomo.focus") if mode == "focus" else tr("pomo.break"))
 
     def _sync(self):
         self.time_lab.setText(self.store.display())
-        self.mode_lab.setText("专注中" if self.store.mode == "focus" else "休息中")
-        self.main_btn.setText("暂停" if self.store.running else "开始")
+        self.mode_lab.setText(tr("pomo.focus") if self.store.mode == "focus" else tr("pomo.break"))
+        self.main_btn.setText(tr("common.pause") if self.store.running else tr("common.start"))
         self.main_btn.setIcon(icon("pause" if self.store.running else "play"))

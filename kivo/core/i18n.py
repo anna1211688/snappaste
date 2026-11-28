@@ -431,6 +431,16 @@ _TABLE.update({
     "winman.failed": ("操作失败", "Operation failed"),
 })
 
+# 番茄钟面板
+_TABLE.update({
+    "pomo.focus": ("专注中", "Focusing"),
+    "pomo.break": ("休息中", "On break"),
+    "pomo.focus_min": ("专注(分钟)", "Focus (min)"),
+    "pomo.break_min": ("休息(分钟)", "Break (min)"),
+    "pomo.invalid": ("请输入有效分钟数", "Enter valid minutes"),
+    "pomo.applied": ("已应用", "Applied"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
