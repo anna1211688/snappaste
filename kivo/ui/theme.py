@@ -140,6 +140,9 @@ QLabel#miniClose {{ background: transparent; color: {t['muted']}; font-size: {FO
 QLabel#miniStatus {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['xs']}px; }}
 QTextEdit#miniEdit {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; padding: 6px 8px; font-size: {FONT_SIZE['md']}px; color: {t['text']}; }}
 QTextEdit#qrInput {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; padding: 8px; font-size: {FONT_SIZE['md']}px; color: {t['text']}; }}
+QListWidget#promptList {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; outline: none; font-size: {FONT_SIZE['md']}px; }}
+QListWidget#promptList::item {{ padding: 8px 10px; border-radius: {RADIUS['sm']}px; color: {t['text']}; }}
+QListWidget#promptList::item:selected {{ background: {t['soft']}; color: {t['accent']}; }}
 QLabel#calcTrail {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['md']}px; }}
 QLabel#calcDisplay {{ background: transparent; color: {t['text']}; font-size: 40px; font-weight: 700; }}
 QPushButton#calcDigit {{ background: {t['stripe']}; color: {t['text']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
