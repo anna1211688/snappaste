@@ -636,6 +636,56 @@ _TABLE.update({
     "role.analyst": ("数据分析师", "Data Analyst"),
 })
 
+# 热键设置弹窗
+_TABLE.update({
+    "hk.none": ("无", "None"),
+    "hkdlg.press": ("请按键…", "Press a key…"),
+    "hkdlg.title": ("热键设置", "Hotkey Settings"),
+    "hkdlg.hint": ("点「录入」后直接按组合键，Esc 取消；留空或「无」= 不启用。同一键设给多个功能时，后设生效、先设自动清空。",
+                   "Click “Capture”, then press a combination; Esc cancels. Blank or “None” disables it. If one key is assigned to multiple actions, the latest wins and earlier ones are cleared."),
+    "hkdlg.capture": ("录入", "Capture"),
+    "hkdlg.clear": ("清除", "Clear"),
+    "hkdlg.restore": ("恢复预设", "Restore Defaults"),
+    "hkdlg.restored": ("已恢复预设，点应用生效",
+                       "Defaults restored; click Apply to take effect"),
+    "hkdlg.confirm_conflict": ("确认冲突，后设生效",
+                               "Confirm conflict; latest wins"),
+    "hkdlg.dup": ("存在重复热键，再点一次确认",
+                  "Duplicate hotkeys; click again to confirm"),
+    "hkdlg.saved": ("热键已保存并立即生效", "Hotkeys saved and active now"),
+})
+
+# 热键动作名
+_TABLE.update({
+    "hk.show_main": ("唤出主窗口", "Show Main Window"),
+    "hk.quick_panel": ("快捷面板", "Quick Panel"),
+    "hk.select_ai": ("划词 AI", "Word AI"),
+    "hk.select_all": ("全选", "Select All"),
+    "hk.cut": ("剪切", "Cut"),
+    "hk.copy": ("复制", "Copy"),
+    "hk.paste": ("粘贴", "Paste"),
+    "hk.power_paste": ("强力粘贴", "Power Paste"),
+    "hk.multi_cut": ("多次剪切", "Multi-Cut"),
+    "hk.multi_copy": ("多次复制", "Multi-Copy"),
+    "hk.seq_paste": ("顺序粘贴", "Sequential Paste"),
+    "hk.paste_all": ("全部粘贴", "Paste All"),
+    "hk.del_last": ("删除最后一条", "Delete Last Entry"),
+    "hk.del_all": ("删除全部记录", "Delete All Records"),
+    "hk.snip": ("区域截图", "Region Screenshot"),
+    "hk.pin": ("贴剪贴板", "Pin Clipboard"),
+    "hk.snip_copy": ("截图并复制", "Screenshot & Copy"),
+    "hk.snip_trans": ("截图翻译", "Screenshot Translate"),
+    "hk.reply": ("智能回复", "Smart Reply"),
+    "hk.mini_trans": ("迷你翻译", "Mini Translate"),
+    "hk.copy_trans": ("复制即译", "Quick Translate"),
+    "hk.delay_snip": ("延时截图", "Delayed Screenshot"),
+    "hk.close_pins": ("关闭所有贴图", "Close All Pins"),
+    "hk.toggle_pins": ("隐藏/显示所有贴图", "Hide/Show All Pins"),
+    "hk.restore_pin": ("恢复上次关闭的贴图", "Restore Last Closed Pin"),
+    "hk.click_through": ("贴图鼠标穿透开关", "Pin Click-Through Toggle"),
+    "hk.global_toggle": ("全局切换热键", "Global Toggle Hotkey"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

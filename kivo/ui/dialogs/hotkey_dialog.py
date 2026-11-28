@@ -12,6 +12,7 @@ from ..theme import Theme
 from ..components import PrimaryButton, SecondaryButton, MutedLabel
 from .base import Dialog, show_toast
 from ...core import hotkey_store as hs
+from ...core.i18n import tr
 
 _SPECIAL_KEYS = {
     Qt.Key_Space: "space", Qt.Key_Return: "enter", Qt.Key_Enter: "enter",
@@ -33,7 +34,7 @@ class HotkeyEdit(QLineEdit):
     def start_capture(self):
         self._capturing = True
         self._old = self.text()
-        self.setText("请按键…")
+        self.setText(tr("hkdlg.press"))
         self.setFocus()
 
     def keyPressEvent(self, e):
@@ -76,16 +77,14 @@ class HotkeyEdit(QLineEdit):
 
 class HotkeyDialog(Dialog):
     def __init__(self, parent, theme: Theme, config, on_applied=None):
-        super().__init__(parent, "热键设置", width=520)
+        super().__init__(parent, tr("hkdlg.title"), width=520)
         self.theme = theme
         self.config = config
         self.on_applied = on_applied
         self.editors = {}
         self._confirming = False
 
-        hint = MutedLabel(
-            "点「录入」后直接按组合键，Esc 取消；留空或「无」= 不启用。"
-            "同一键设给多个功能时，后设生效、先设自动清空。")
+        hint = MutedLabel(tr("hkdlg.hint"))
         hint.setWordWrap(True)
         self.body.addWidget(hint)
 
@@ -99,26 +98,28 @@ class HotkeyDialog(Dialog):
         grid.setHorizontalSpacing(8)
         grid.setVerticalSpacing(6)
 
-        for row, (section, key, label) in enumerate(hs.HOTKEY_ACTIONS):
-            grid.addWidget(QLabel(label), row, 0)
-            edit = HotkeyEdit(hs.current_value(self.config, section, key))
+        for row, (section, key, label_key) in enumerate(hs.HOTKEY_ACTIONS):
+            grid.addWidget(QLabel(tr(label_key)), row, 0)
+            cur = hs.current_value(self.config, section, key)
+            edit = HotkeyEdit(tr("hk.none") if cur == hs.NONE else cur)
             edit.setFixedWidth(150)
             self.editors[(section, key)] = edit
             grid.addWidget(edit, row, 1)
-            rec = QPushButton("录入")
+            rec = QPushButton(tr("hkdlg.capture"))
             rec.clicked.connect(edit.start_capture)
             grid.addWidget(rec, row, 2)
-            clr = QPushButton("清除")
-            clr.clicked.connect(lambda _f=False, e=edit: e.setText(hs.NONE))
+            clr = QPushButton(tr("hkdlg.clear"))
+            clr.clicked.connect(
+                lambda _f=False, e=edit: e.setText(tr("hk.none")))
             grid.addWidget(clr, row, 3)
         scroll.setWidget(host)
         self.body.addWidget(scroll)
 
-        restore = SecondaryButton("恢复预设", icon_name="refresh")
+        restore = SecondaryButton(tr("hkdlg.restore"), icon_name="refresh")
         restore.clicked.connect(self._restore_defaults)
         self.add_button(restore)
 
-        self.apply_btn = PrimaryButton("应用", icon_name="check")
+        self.apply_btn = PrimaryButton(tr("common.apply"), icon_name="check")
         self.apply_btn.clicked.connect(self._apply)
         self.add_button(self.apply_btn)
 
@@ -127,8 +128,9 @@ class HotkeyDialog(Dialog):
 
     def _restore_defaults(self):
         for ak, val in hs.default_mapping().items():
-            self.editors[ak].setText(val)
-        show_toast(self, "已恢复预设，点应用生效")
+            self.editors[ak].setText(
+                tr("hk.none") if val == hs.NONE else val)
+        show_toast(self, tr("hkdlg.restored"))
 
     def _apply(self):
         mapping = self._current_mapping()
@@ -136,8 +138,8 @@ class HotkeyDialog(Dialog):
         conflicts = hs.find_conflicts(normalized)
         if conflicts and not self._confirming:
             self._confirming = True
-            self.apply_btn.setText("确认冲突，后设生效")
-            show_toast(self, "存在重复热键，再点一次确认")
+            self.apply_btn.setText(tr("hkdlg.confirm_conflict"))
+            show_toast(self, tr("hkdlg.dup"))
             QTimer.singleShot(3000, self._reset_confirm)
             return
         self._reset_confirm()
@@ -145,9 +147,9 @@ class HotkeyDialog(Dialog):
         self.config.save()
         if self.on_applied:
             self.on_applied()
-        show_toast(self, "热键已保存并立即生效")
+        show_toast(self, tr("hkdlg.saved"))
         self.accept()
 
     def _reset_confirm(self):
         self._confirming = False
-        self.apply_btn.setText("应用")
+        self.apply_btn.setText(tr("common.apply"))
