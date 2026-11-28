@@ -31,11 +31,11 @@ class AiMemoryDialog(Dialog):
         self.entry.returnPressed.connect(self._add)
         self.body.addWidget(self.entry)
 
-        add_b = PrimaryButton("添加")
+        add_b = PrimaryButton("添加", icon_name="plus")
         add_b.clicked.connect(self._add)
-        del_b = SecondaryButton("删除选中")
+        del_b = SecondaryButton("删除选中", icon_name="trash")
         del_b.clicked.connect(self._delete)
-        self.clear_b = DangerButton("清空全部")
+        self.clear_b = DangerButton("清空全部", icon_name="trash")
         self.clear_b.clicked.connect(self._clear)
         self.add_button(self.clear_b); self.add_button(del_b); self.add_button(add_b)
 

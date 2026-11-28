@@ -19,7 +19,7 @@ class ColorPickerDialog(Dialog):
         self.config = config
         self.pick_screen_callback = pick_screen_callback
 
-        pick = PrimaryButton("屏幕取色")
+        pick = PrimaryButton("屏幕取色", icon_name="droplet")
         pick.clicked.connect(self._pick_screen)
         self.body.addWidget(pick)
 
@@ -77,7 +77,7 @@ class ColorPickerDialog(Dialog):
         for key in ("hex", "rgb", "hsl"):
             r = QHBoxLayout()
             lab = QLabel(fmts[key])
-            cp = SecondaryButton("复制")
+            cp = SecondaryButton("复制", icon_name="copy")
             cp.clicked.connect(lambda checked, v=fmts[key]: self._copy(v))
             r.addWidget(lab); r.addWidget(cp); r.addStretch()
             col.addLayout(r)

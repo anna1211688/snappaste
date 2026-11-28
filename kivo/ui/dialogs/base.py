@@ -6,16 +6,14 @@ Toast:  自动消失的轻提示。
 """
 from __future__ import annotations
 
-from typing import Optional
-
-from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QPoint
+from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
 from PySide6.QtWidgets import (
     QDialog, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QWidget,
     QGraphicsOpacityEffect,
 )
 
-from ..theme import add_shadow, RADIUS, SPACING
-from ..components import GhostButton
+from ..theme import add_shadow
+from ..icons import icon
 
 
 class Dialog(QDialog):
@@ -48,10 +46,11 @@ class Dialog(QDialog):
         self.title_label.setObjectName("title")
         head.addWidget(self.title_label)
         head.addStretch()
-        close = QPushButton("✕")
+        close = QPushButton()
         close.setObjectName("iconBtn")
         close.setFixedSize(30, 30)
         close.setCursor(Qt.PointingHandCursor)
+        close.setIcon(icon("close"))
         close.clicked.connect(self.reject)
         head.addWidget(close)
         ml.addLayout(head)

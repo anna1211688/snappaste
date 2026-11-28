@@ -35,11 +35,11 @@ class QrDialog(Dialog):
         self.preview.setFixedHeight(240)
         self.body.addWidget(self.preview)
 
-        gen = PrimaryButton("生成二维码")
+        gen = PrimaryButton("生成二维码", icon_name="qr")
         gen.clicked.connect(self._make)
-        copy = SecondaryButton("复制图片")
+        copy = SecondaryButton("复制图片", icon_name="copy")
         copy.clicked.connect(self._copy)
-        save = SecondaryButton("保存图片")
+        save = SecondaryButton("保存图片", icon_name="save")
         save.clicked.connect(self._save)
         self.add_button(save); self.add_button(copy); self.add_button(gen)
 

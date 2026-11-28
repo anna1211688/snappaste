@@ -119,30 +119,30 @@ class AnnotationEditor(QDialog):
 
         bottom = QHBoxLayout()
         bottom.setSpacing(6)
-        self.undo_btn = SecondaryButton("撤销")
+        self.undo_btn = SecondaryButton("撤销", icon_name="undo")
         self.undo_btn.clicked.connect(self._undo)
         self.redo_btn = SecondaryButton("重做")
         self.redo_btn.clicked.connect(self._redo)
-        self.clear_btn = GhostButton("清空标注")
+        self.clear_btn = GhostButton("清空标注", icon_name="trash")
         self.clear_btn.clicked.connect(self._clear)
         self.ocr_btn = GhostButton("OCR 识别文字")
         self.ocr_btn.clicked.connect(lambda: self._invoke("ocr"))
-        self.code_btn = GhostButton("扫二维码/条码")
+        self.code_btn = GhostButton("扫二维码/条码", icon_name="qr")
         self.code_btn.clicked.connect(lambda: self._invoke("code"))
         for b in (self.undo_btn, self.redo_btn, self.clear_btn,
                   self.ocr_btn, self.code_btn):
             bottom.addWidget(b)
         bottom.addStretch()
 
-        self.discard_btn = GhostButton("放弃")
+        self.discard_btn = GhostButton("放弃", icon_name="close")
         self.discard_btn.clicked.connect(self._discard)
-        self.save_only_btn = SecondaryButton("只保存不钉图")
+        self.save_only_btn = SecondaryButton("只保存不钉图", icon_name="save")
         self.save_only_btn.clicked.connect(lambda: self._finish("save"))
-        self.save_as_btn = SecondaryButton("另存为")
+        self.save_as_btn = SecondaryButton("另存为", icon_name="save")
         self.save_as_btn.clicked.connect(lambda: self._finish("save_as"))
-        self.copy_btn = SecondaryButton("复制到剪贴板")
+        self.copy_btn = SecondaryButton("复制到剪贴板", icon_name="copy")
         self.copy_btn.clicked.connect(lambda: self._finish("copy"))
-        self.pin_btn = PrimaryButton("完成并钉图")
+        self.pin_btn = PrimaryButton("完成并钉图", icon_name="check")
         self.pin_btn.clicked.connect(lambda: self._finish("pin"))
         for b in (self.discard_btn, self.save_only_btn, self.save_as_btn,
                   self.copy_btn, self.pin_btn):

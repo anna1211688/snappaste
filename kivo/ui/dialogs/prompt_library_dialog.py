@@ -22,7 +22,7 @@ class PromptEditDialog(Dialog):
         self.prompt_in.setFixedHeight(180)
         self.body.addWidget(self.prompt_in)
 
-        save = PrimaryButton("保存")
+        save = PrimaryButton("保存", icon_name="save")
         save.clicked.connect(self.accept)
         self.add_button(save, accept=False)
 
@@ -44,13 +44,13 @@ class PromptLibraryDialog(Dialog):
         self.body.addWidget(self.list)
         self._refresh()
 
-        apply_b = PrimaryButton("选用角色")
+        apply_b = PrimaryButton("选用角色", icon_name="check")
         apply_b.clicked.connect(self._apply)
-        add_b = SecondaryButton("新增")
+        add_b = SecondaryButton("新增", icon_name="plus")
         add_b.clicked.connect(self._add)
-        del_b = DangerButton("删除选中")
+        del_b = DangerButton("删除选中", icon_name="trash")
         del_b.clicked.connect(self._delete)
-        clear_b = SecondaryButton("清除角色")
+        clear_b = SecondaryButton("清除角色", icon_name="trash")
         clear_b.clicked.connect(self._clear)
         self.add_button(clear_b); self.add_button(del_b)
         self.add_button(add_b); self.add_button(apply_b)

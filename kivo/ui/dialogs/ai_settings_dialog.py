@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, MutedLabel
+from ..icons import icon
 from .base import show_toast
 from ...core.ai import AIClient, AI_PRESETS
 from ...core import ai_settings_store as astore
@@ -51,9 +52,10 @@ class AiSettingsDialog(QDialog):
         title = QLabel("AI 模型中心")
         title.setObjectName("title")
         head.addWidget(title); head.addStretch()
-        close = QPushButton("✕")
+        close = QPushButton()
         close.setObjectName("iconBtn"); close.setFixedSize(30, 30)
         close.setCursor(Qt.PointingHandCursor)
+        close.setIcon(icon("close"))
         close.clicked.connect(self.reject)
         head.addWidget(close)
         cl.addLayout(head)
@@ -68,7 +70,7 @@ class AiSettingsDialog(QDialog):
 
         footer = QHBoxLayout()
         footer.addStretch()
-        save = PrimaryButton("保存全部设置")
+        save = PrimaryButton("保存全部设置", icon_name="save")
         save.clicked.connect(self._save_all)
         footer.addWidget(save)
         cl.addLayout(footer)
@@ -107,9 +109,11 @@ class AiSettingsDialog(QDialog):
         grid.addWidget(QLabel("模型"), 2, 0)
         grid.addWidget(self.model_edit, 2, 1)
         fetch = QPushButton("获取模型")
+        fetch.setIcon(icon("refresh"))
         fetch.clicked.connect(self._fetch_models)
         grid.addWidget(fetch, 2, 2)
         add = QPushButton("添加到模型列表")
+        add.setIcon(icon("plus"))
         add.clicked.connect(self._add_current_model)
         grid.addWidget(add, 2, 3)
         lay.addLayout(grid)
@@ -120,6 +124,7 @@ class AiSettingsDialog(QDialog):
         fetched_row.addWidget(QLabel("可用模型"))
         fetched_row.addWidget(self.model_combo, 1)
         use = QPushButton("选用")
+        use.setIcon(icon("check"))
         use.clicked.connect(self._use_fetched_model)
         fetched_row.addWidget(use)
         lay.addLayout(fetched_row)
@@ -201,10 +206,12 @@ class AiSettingsDialog(QDialog):
         lay.addWidget(self.model_list)
         btns = QHBoxLayout()
         default = QPushButton("设为默认")
+        default.setIcon(icon("star"))
         default.clicked.connect(self._set_selected_default)
         toggle = QPushButton("启用/停用")
         toggle.clicked.connect(self._toggle_selected)
         delete = QPushButton("删除模型")
+        delete.setIcon(icon("trash"))
         delete.clicked.connect(self._delete_selected)
         for b in (default, toggle, delete):
             btns.addWidget(b)
@@ -287,6 +294,7 @@ class AiSettingsDialog(QDialog):
         self.test_result.setObjectName("aiTestResult")
         lay.addWidget(self.test_result)
         btn = QPushButton("测试当前服务商")
+        btn.setIcon(icon("zap"))
         btn.clicked.connect(self._run_connection_test)
         lay.addWidget(btn)
         lay.addStretch()

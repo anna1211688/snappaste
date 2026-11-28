@@ -114,11 +114,11 @@ class HotkeyDialog(Dialog):
         scroll.setWidget(host)
         self.body.addWidget(scroll)
 
-        restore = SecondaryButton("恢复预设")
+        restore = SecondaryButton("恢复预设", icon_name="refresh")
         restore.clicked.connect(self._restore_defaults)
         self.add_button(restore)
 
-        self.apply_btn = PrimaryButton("应用")
+        self.apply_btn = PrimaryButton("应用", icon_name="check")
         self.apply_btn.clicked.connect(self._apply)
         self.add_button(self.apply_btn)
 

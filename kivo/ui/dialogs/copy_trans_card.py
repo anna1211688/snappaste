@@ -86,9 +86,9 @@ class CopyTransCard(QDialog):
         row = QHBoxLayout()
         row.setContentsMargins(14, 4, 14, 0)
         row.addStretch()
-        both = SecondaryButton("复制双语")
+        both = SecondaryButton("复制双语", icon_name="copy")
         both.clicked.connect(self._copy_both)
-        one = PrimaryButton("复制译文")
+        one = PrimaryButton("复制译文", icon_name="copy")
         one.clicked.connect(self._copy_one)
         row.addWidget(both); row.addWidget(one)
         return row

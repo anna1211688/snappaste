@@ -69,10 +69,10 @@ class TranslateServiceDialog(Dialog):
         self.test_result.setWordWrap(True)
         self.body.addWidget(self.test_result)
 
-        test = SecondaryButton("测试")
+        test = SecondaryButton("测试", icon_name="zap")
         test.clicked.connect(self._do_test)
         self.add_button(test)
-        save = PrimaryButton("保存")
+        save = PrimaryButton("保存", icon_name="save")
         save.clicked.connect(self._do_save)
         self.add_button(save)
 
