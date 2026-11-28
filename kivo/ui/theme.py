@@ -128,6 +128,11 @@ QFrame#quickCard {{ background: {t['surface']}; border: 1px solid {t['border']};
 QListWidget#quickList {{ background: transparent; border: none; outline: none; font-size: {FONT_SIZE['md']}px; }}
 QListWidget#quickList::item {{ padding: 7px 8px; border-radius: {RADIUS['sm']}px; color: {t['text']}; }}
 QListWidget#quickList::item:selected {{ background: {t['soft']}; color: {t['accent']}; }}
+QLabel#cntAccent {{ background: transparent; color: {t['accent']}; font-size: {FONT_SIZE['sm']}px; font-weight: 600; }}
+QCheckBox#cityCheck {{ spacing: 10px; padding: 6px 8px; font-size: {FONT_SIZE['md']}px; color: {t['text']}; border-radius: {RADIUS['sm']}px; }}
+QCheckBox#cityCheck:hover {{ background: {t['soft']}; }}
+QCheckBox#cityCheck::indicator {{ width: 18px; height: 18px; border-radius: 9px; border: 2px solid {t['border_strong']}; background: transparent; }}
+QCheckBox#cityCheck::indicator:checked {{ background: #34C759; border-color: #34C759; image: none; }}
 QLabel#calcTrail {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['md']}px; }}
 QLabel#calcDisplay {{ background: transparent; color: {t['text']}; font-size: 40px; font-weight: 700; }}
 QPushButton#calcDigit {{ background: {t['stripe']}; color: {t['text']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}

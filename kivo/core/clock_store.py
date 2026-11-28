@@ -29,6 +29,51 @@ CLOCK_DEFAULT = ["Asia/Shanghai", "Asia/Tokyo", "Asia/Seoul", "Asia/Singapore",
 
 WEEKDAYS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
 
+MAX_CITIES = 15
+SEARCH_LIMIT = 100
+
+
+def offset_text(hours):
+    return f"UTC{hours:+g}" if hours else "UTC"
+
+
+def all_zones():
+    try:
+        from zoneinfo import available_timezones
+        return sorted(available_timezones())
+    except Exception:
+        return []
+
+
+def search_cities(query, limit=SEARCH_LIMIT):
+    """无查询返回精选目录；有查询匹配目录与全球时区，返回 (名称, tz, 偏移文本)。"""
+    q = (query or "").strip().lower()
+    rows = []
+    if not q:
+        return [(n, tz, offset_text(h)) for n, tz, h in CLOCK_CATALOG]
+
+    seen = set()
+    for n, tz, h in CLOCK_CATALOG:
+        if q in n.lower() or q in tz.lower():
+            rows.append((n, tz, offset_text(h))); seen.add(tz)
+    for tz in all_zones():
+        if tz in seen:
+            continue
+        nm = tz.rsplit("/", 1)[-1].replace("_", " ")
+        if q in tz.lower() or q in nm.lower():
+            rows.append((nm, tz, "")); seen.add(tz)
+        if len(rows) >= limit:
+            break
+    return rows
+
+
+def order_picked(selected):
+    """catalog 顺序优先，其余按字母序，截断到上限。"""
+    chosen = set(selected)
+    cat_order = [tz for _n, tz, _h in CLOCK_CATALOG if tz in chosen]
+    others = sorted(tz for tz in chosen if tz not in set(cat_order))
+    return (cat_order + others)[:MAX_CITIES]
+
 
 def make_tz(name, std_hours):
     try:
