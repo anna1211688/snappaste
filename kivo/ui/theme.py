@@ -129,6 +129,7 @@ QLabel#pomoMode {{ background: transparent; color: {t['accent']}; font-size: {FO
 QLabel#pomoTime {{ background: transparent; color: {t['text']}; font-size: 56px; font-weight: 700; font-family: 'Consolas', monospace; }}
 QLabel#swapIcon {{ background: transparent; font-size: 18px; color: {t['muted']}; padding: 0 4px; }}
 QLabel#mutedLabel {{ color: {t['text_2']}; background: transparent; }}
+QLabel#verLabel {{ color: {t['muted']}; background: transparent; font-size: 10px; padding: 6px 8px 0; }}
 QLabel#hero {{ font-size: {FONT_SIZE['hero']}px; font-weight: 700; background: transparent; }}
 QLabel#title {{ font-size: {FONT_SIZE['title']}px; font-weight: 700; background: transparent; }}
 

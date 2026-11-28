@@ -2,9 +2,8 @@
 """KIVO 主窗口: 侧边导航 + QStackedWidget 面板切换。各面板逐步替换占位实现。"""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QWidget, QFrame, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel, QScrollArea,
+    QWidget, QFrame, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel,
 )
 
 from .theme import Theme, add_shadow
@@ -111,8 +110,7 @@ class MainWindow(QWidget):
         sl.addWidget(settings_item)
 
         ver = QLabel(f"v{VERSION} · © KIVO")
-        ver.setObjectName("mutedLabel")
-        ver.setStyleSheet("font-size:10px; padding:6px 8px 0;")
+        ver.setObjectName("verLabel")
         sl.addWidget(ver)
         return side
 
@@ -137,5 +135,13 @@ class MainWindow(QWidget):
         for k, item in self._nav_items.items():
             item.setChecked(k == "settings")
         factory = self.services.get("settings_factory")
-        if factory:
-            factory()
+        if not factory:
+            return
+        if getattr(self, "_settings_win", None) is None:
+            win = factory()
+            win.setWindowTitle("设置")
+            win.resize(720, 780)
+            self._settings_win = win
+        self._settings_win.show()
+        self._settings_win.raise_()
+        self._settings_win.activateWindow()

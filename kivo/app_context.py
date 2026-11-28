@@ -31,6 +31,7 @@ from .ui.panels.pomo_panel import PomoPanel
 from .ui.panels.winman_panel import WinmanPanel
 from .ui.panels.batch_panel import BatchPanel
 from .ui.panels.dev_panel import DevPanel
+from .ui.panels.settings_panel import SettingsPanel
 
 
 class Services:
@@ -85,4 +86,4 @@ class Services:
     def make_main_services(self, theme):
         self._theme = theme
         return {"pane_factory": self.pane_factory,
-                "settings_factory": lambda: None}
+                "settings_factory": lambda: SettingsPanel(theme, self.config)}
