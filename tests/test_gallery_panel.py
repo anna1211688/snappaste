@@ -89,3 +89,25 @@ def test_delete_one_refreshes(qapp, tmp_path):
     p._delete_one("shot_001.png")
     qapp.processEvents()
     assert p.grid.count() == 1  # 只剩空态盒
+
+
+def test_thumbnails_load_async(qapp, tmp_path):
+    import time
+    d = str(tmp_path / "shots")
+    _make_png(d, "shot_001.png")
+    p = GalleryPanel(Theme(False), d)
+    p.show()
+    path = os.path.join(d, "shot_001.png")
+    label = p._thumb_labels[path]
+    # 等待后台线程把缩略图加载并经信号回主线程
+    end = time.time() + 3
+    while time.time() < end and label.pixmap().isNull():
+        qapp.processEvents()
+        time.sleep(0.02)
+    qapp.processEvents()
+    assert not label.pixmap().isNull()
+    # 第二次请求直接命中缓存, 不报错
+    p.loader.request(path, 160, 110)
+    qapp.processEvents()
+    p.loader.shutdown()
+

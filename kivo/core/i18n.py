@@ -68,6 +68,7 @@ for _k, _pair in _COMMON.items():
 # 导航 / 主窗口
 _TABLE.update({
     "app.title": ("KIVO 启沃", "KIVO"),
+    "splash.loading": ("正在启动…", "Loading…"),
     "nav.ai": ("AI 助手", "AI Assistant"),
     "nav.voice": ("语音翻译", "Voice Translate"),
     "nav.trans": ("翻译中心", "Translation"),

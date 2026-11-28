@@ -97,9 +97,12 @@ def test_stop_icon():
     assert p.icons[0].stopped is True
 
 
-def test_missing_pystray_degrades():
+def test_missing_pystray_degrades(monkeypatch):
+    # 模拟默认工厂找不到 pystray, 不依赖当前环境是否安装该库
+    import kivo.platform.tray as tray_mod
+    monkeypatch.setattr(tray_mod, "_default_factory", lambda: None)
     c = TrayController({}, Image.new("RGB", (16, 16)),
-                       invoke=lambda fn: fn(), factory=None)
+                       invoke=lambda fn: fn())
     assert c.available is False
     assert c.start() is False
 

@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QApplication
 
 from kivo.ui.theme import Theme
 from kivo.ui.main_window import MainWindow
+from kivo.ui.splash import create_splash, set_message
 from kivo.app_context import Services
 from kivo.core import i18n, data
 
@@ -21,6 +22,16 @@ def main() -> int:
     theme = Theme(dark=False)
     app.setStyleSheet(theme.base_qss())
 
+    is_shot = "--shot" in sys.argv
+    splash = None
+    if not is_shot:
+        splash = create_splash(theme)
+        splash.show()
+        app.processEvents()
+
+    if splash is not None:
+        set_message(splash, theme, i18n.tr("splash.loading"))
+        app.processEvents()
     services = Services()
     i18n.configure(services.config)
 
@@ -40,7 +51,10 @@ def main() -> int:
         win.select(sys.argv[i + 1])
     win.show()
 
-    if "--shot" in sys.argv:
+    if splash is not None:
+        splash.finish(win)
+
+    if is_shot:
         i = sys.argv.index("--shot")
         out = sys.argv[i + 1] if i + 1 < len(sys.argv) else "shot.png"
         app.processEvents()

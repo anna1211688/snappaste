@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
-"""截图历史画廊面板: 网格缩略图、钉图/删除、空状态。"""
+"""截图历史画廊面板: 网格缩略图、钉图/删除、空状态。
+
+缩略图在后台线程用 QImage 加载与缩放 (QImage 可在非主线程使用), 完成后经
+信号回主线程填充, 并按路径缓存, 避免大量图片同步加载卡顿。
+"""
 from __future__ import annotations
 
 import os
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
+from PySide6.QtCore import Qt, QObject, QThread, Signal
+from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
     QWidget, QFrame, QLabel, QPushButton, QScrollArea,
-    QVBoxLayout, QHBoxLayout, QGridLayout,
+    QVBoxLayout, QHBoxLayout, QGridLayout, QApplication,
 )
 
 from ..theme import Theme
@@ -20,6 +24,65 @@ THUMB_W, THUMB_H = 160, 110
 COLUMNS = 4
 
 
+class _ThumbWorker(QObject):
+    """后台加载器: 经队列信号在工作线程读取并缩放图片。"""
+
+    loaded = Signal(str, QImage)
+    _request = Signal(str, int, int)
+
+    def __init__(self):
+        super().__init__()
+        # 同对象内信号在 moveToThread 后变为跨线程队列连接
+        self._request.connect(self._load)
+
+    def submit(self, path: str, width: int, height: int):
+        self._request.emit(path, width, height)
+
+    def _load(self, path: str, width: int, height: int):
+        img = QImage(path)
+        if not img.isNull():
+            img = img.scaled(width, height,
+                             Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.loaded.emit(path, img)
+
+
+class ThumbnailLoader(QObject):
+    """管理后台线程与缩略图缓存, 重复请求直接命中。"""
+
+    ready = Signal(str, QImage)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._cache: dict[str, QImage] = {}
+        # 线程不挂 Qt parent: 避免加载器随面板被销毁时强删仍在运行的线程
+        self._thread = QThread()
+        self._worker = _ThumbWorker()
+        self._worker.moveToThread(self._thread)
+        self._worker.loaded.connect(self._on_loaded)
+        self._thread.start()
+
+    def request(self, path: str, width: int, height: int):
+        cached = self._cache.get(path)
+        if cached is not None:
+            self.ready.emit(path, cached)
+            return
+        self._worker.submit(path, width, height)
+
+    def _on_loaded(self, path: str, img: QImage):
+        self._cache[path] = img
+        self.ready.emit(path, img)
+
+    def shutdown(self):
+        thread = getattr(self, "_thread", None)
+        if thread is not None and thread.isRunning():
+            thread.quit()
+            thread.wait()
+
+    def __del__(self):
+        # 面板被回收（含测试结束）时确保后台线程已退出, 防止运行中线程被销毁
+        self.shutdown()
+
+
 class GalleryPanel(QWidget):
     def __init__(self, theme: Theme, shots_dir, pin_callback=None,
                  screenshot_callback=None):
@@ -29,6 +92,7 @@ class GalleryPanel(QWidget):
         self.shots_dir = shots_dir
         self.pin_callback = pin_callback
         self.screenshot_callback = screenshot_callback
+        self._thumb_labels: dict[str, QLabel] = {}
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(20, 16, 20, 16)
@@ -58,6 +122,13 @@ class GalleryPanel(QWidget):
         self.scroll.setWidget(self.container)
         outer.addWidget(self.scroll)
 
+        self.loader = ThumbnailLoader(self)
+        self.loader.ready.connect(self._on_thumb)
+        # 应用退出时确保后台线程被正确回收
+        app = QApplication.instance()
+        if app is not None:
+            app.aboutToQuit.connect(self.loader.shutdown)
+
         self.refresh()
 
     def refresh(self):
@@ -84,6 +155,7 @@ class GalleryPanel(QWidget):
             if w is not None:
                 w.setParent(None)
                 w.deleteLater()
+        self._thumb_labels.clear()
 
     def _build_empty(self):
         box = EmptyState(
@@ -104,10 +176,9 @@ class GalleryPanel(QWidget):
         img.setAlignment(Qt.AlignCenter)
         img.setObjectName("thumb")
         path = os.path.join(self.shots_dir, name)
-        pm = QPixmap(path)
-        if not pm.isNull():
-            img.setPixmap(pm.scaled(THUMB_W, THUMB_H,
-                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        # 异步加载: 先占位, 后台完成后再填充
+        self._thumb_labels[path] = img
+        self.loader.request(path, THUMB_W, THUMB_H)
         lay.addWidget(img)
 
         lab = QLabel(gallery_store.cell_label(name))
@@ -125,6 +196,11 @@ class GalleryPanel(QWidget):
         btn_row.addWidget(pin_btn); btn_row.addWidget(del_btn)
         lay.addLayout(btn_row)
         return cell
+
+    def _on_thumb(self, path: str, img: QImage):
+        label = self._thumb_labels.get(path)
+        if label is not None:
+            label.setPixmap(QPixmap.fromImage(img))
 
     def _pin(self, name):
         if self.pin_callback:
