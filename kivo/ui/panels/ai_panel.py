@@ -18,15 +18,16 @@ from ..components import (
     PrimaryButton, GhostButton, SectionHeader, MutedLabel, MessageActionBar,
     EmptyState,
 )
+from ...core.i18n import tr
 
-# 侧边功能入口 (动作键, 图标, 文案), 行为由组装层经 side_actions 注入
+# 侧边功能入口 (动作键, 图标, 文案 i18n key), 行为由组装层经 side_actions 注入
 SIDEBAR_ACTIONS = [
-    ("task", "edit", "工作任务"),
-    ("schedule", "clock", "定时任务"),
-    ("skills", "blocks", "提示词技能"),
-    ("project", "project", "项目"),
-    ("create", "ai", "AI 创作"),
-    ("cloud", "cloud", "云盘目录"),
+    ("task", "edit", "ai.side.task"),
+    ("schedule", "clock", "ai.side.schedule"),
+    ("skills", "blocks", "ai.side.skills"),
+    ("project", "project", "ai.side.project"),
+    ("create", "ai", "ai.side.create"),
+    ("cloud", "cloud", "ai.side.cloud"),
 ]
 
 
@@ -93,14 +94,14 @@ class AIPanel(QWidget):
         lay.setContentsMargins(14, 16, 14, 16)
         lay.setSpacing(10)
 
-        new = PrimaryButton("新对话", icon_name="plus")
+        new = PrimaryButton(tr("ai.new_chat"), icon_name="plus")
         new.clicked.connect(self.new_chat)
         lay.addWidget(new)
 
         # 功能入口 (参照豆包侧边菜单)
         self.side_menu = {}
         for key, icn, label in SIDEBAR_ACTIONS:
-            b = QPushButton(label)
+            b = QPushButton(tr(label))
             b.setObjectName("sideMenu")
             b.setIcon(iconlib.icon(icn))
             b.setIconSize(QSize(18, 18))
@@ -110,11 +111,11 @@ class AIPanel(QWidget):
             lay.addWidget(b)
 
         self.search = QLineEdit()
-        self.search.setPlaceholderText("搜索对话…")
+        self.search.setPlaceholderText(tr("ai.search_ph"))
         self.search.textChanged.connect(self.refresh_recent)
         lay.addWidget(self.search)
 
-        lay.addWidget(SectionHeader("最近对话"))
+        lay.addWidget(SectionHeader(tr("ai.recent")))
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         self.recent_holder = QWidget()
@@ -150,7 +151,7 @@ class AIPanel(QWidget):
             self.recent_lay.insertWidget(self.recent_lay.count() - 1, row)
             shown += 1
         if shown == 0:
-            empty = MutedLabel("没有匹配的对话" if q else "暂无对话，点击上方新建")
+            empty = MutedLabel(tr("ai.no_match") if q else tr("ai.no_chat"))
             empty.setWordWrap(True)
             self.recent_lay.insertWidget(self.recent_lay.count() - 1, empty)
 
@@ -167,11 +168,11 @@ class AIPanel(QWidget):
         top.setFixedHeight(54)
         tl = QHBoxLayout(top)
         tl.setContentsMargins(20, 10, 18, 10)
-        title = QLabel("AI 助手")
+        title = QLabel(tr("ai.title"))
         title.setObjectName("title")
         tl.addWidget(title)
         tl.addStretch()
-        clear = GhostButton("清空对话", icon_name="trash")
+        clear = GhostButton(tr("ai.clear"), icon_name="trash")
         clear.clicked.connect(self.new_chat)
         tl.addWidget(clear)
         outer.addWidget(top)
@@ -199,7 +200,7 @@ class AIPanel(QWidget):
 
     def _build_empty_state(self):
         return EmptyState(
-            "ai", "开始一段新对话", "在下方输入问题，或点击右侧建议快速开始")
+            "ai", tr("ai.empty_title"), tr("ai.empty_sub"))
 
     def _update_empty(self):
         self.empty_state.setVisible(not self.history)
@@ -262,13 +263,13 @@ class AIPanel(QWidget):
 
         self.input = QTextEdit()
         self.input.setObjectName("input")
-        self.input.setPlaceholderText("输入你的问题，Enter 发送，Shift+Enter 换行…")
+        self.input.setPlaceholderText(tr("ai.input_ph"))
         self.input.setFixedHeight(52)
         self.input.installEventFilter(self)
         cl.addWidget(self.input)
 
         bottom = QHBoxLayout()
-        self.send_btn = QPushButton("发送")
+        self.send_btn = QPushButton(tr("ai.send"))
         self.send_btn.setObjectName("send")
         self.send_btn.setFixedSize(72, 36)
         self.send_btn.setCursor(Qt.PointingHandCursor)
@@ -351,7 +352,7 @@ class AIPanel(QWidget):
 
     def request_reply(self):
         self.busy = True
-        self.send_btn.setText("停止")
+        self.send_btn.setText(tr("ai.stop"))
         self.send_btn.setIcon(iconlib.icon("stop"))
         self._cancel = threading.Event()
         self._stream_text = ""
@@ -385,7 +386,7 @@ class AIPanel(QWidget):
 
     def _on_finished(self, text):
         self.busy = False
-        self.send_btn.setText("发送")
+        self.send_btn.setText(tr("ai.send"))
         self.send_btn.setIcon(iconlib.icon("send"))
         if self._stream_bubble is not None:
             self._stream_bubble.setText(text)
@@ -397,17 +398,17 @@ class AIPanel(QWidget):
 
     def _on_failed(self, msg):
         self.busy = False
-        self.send_btn.setText("发送")
+        self.send_btn.setText(tr("ai.send"))
         self.send_btn.setIcon(iconlib.icon("send"))
         partial = self._stream_text.strip()
         if partial:
-            partial += "\n（生成中断）"
+            partial += "\n" + tr("ai.interrupted")
             if self._stream_bubble is not None:
                 self._stream_bubble.setText(partial)
             self.history.append({"role": "assistant", "content": partial})
             self.store.persist(self.cid, self.history)
         elif self._stream_bubble is not None:
-            self._stream_bubble.setText(f"（出错了）：{msg}")
+            self._stream_bubble.setText(tr("ai.error", msg=msg))
         self.refresh_recent()
 
     def stop(self):
@@ -457,20 +458,20 @@ class AIPanel(QWidget):
         wcl = QVBoxLayout(wcard)
         wcl.setContentsMargins(16, 14, 16, 16)
         wcl.setSpacing(4)
-        h = QLabel("你好，我是 KIVO")
+        h = QLabel(tr("ai.welcome"))
         h.setObjectName("title")
-        d = MutedLabel("你的 AI 助手，可以帮你写作、编程、搜索信息、分析数据。")
+        d = MutedLabel(tr("ai.welcome_sub"))
         d.setWordWrap(True)
         wcl.addWidget(h)
         wcl.addWidget(d)
         lay.addWidget(wcard)
 
-        lay.addWidget(SectionHeader("你可以这样做"))
+        lay.addWidget(SectionHeader(tr("ai.suggest_head")))
         for ti, sub in [
-            ("帮我写一份产品策划案", "包含用户分析和核心功能"),
-            ("Python 报错排查", "帮我看看这段代码哪里有问题"),
-            ("翻译这段英文", "并标注重点词汇"),
-            ("生成会议纪要", "提炼会议要点和待办"),
+            (tr("ai.sug1.t"), tr("ai.sug1.s")),
+            (tr("ai.sug2.t"), tr("ai.sug2.s")),
+            (tr("ai.sug3.t"), tr("ai.sug3.s")),
+            (tr("ai.sug4.t"), tr("ai.sug4.s")),
         ]:
             c = QFrame()
             c.setObjectName("sugCard")

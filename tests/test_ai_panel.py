@@ -87,7 +87,7 @@ def test_pin_rename_remove(store):
 
 def test_pin_sorted_first(store):
     c1 = store.persist(None, [{"role": "user", "content": "first"}])
-    c2 = store.persist(None, [{"role": "user", "content": "second"}])
+    store.persist(None, [{"role": "user", "content": "second"}])
     store.toggle_pin(c1)
     assert store.chats[0]["id"] == c1
 
@@ -278,9 +278,10 @@ def test_regenerate_ignored_when_busy(panel, qapp):
 # ---------- 侧边功能菜单 ----------
 def test_side_menu_entries(panel):
     from kivo.ui.panels.ai_panel import SIDEBAR_ACTIONS
+    from kivo.core.i18n import tr
     assert len(panel.side_menu) == len(SIDEBAR_ACTIONS)
     for key, _icn, label in SIDEBAR_ACTIONS:
-        assert panel.side_menu[key].text() == label
+        assert panel.side_menu[key].text() == tr(label)
 
 
 def test_side_menu_invokes_action(panel):
