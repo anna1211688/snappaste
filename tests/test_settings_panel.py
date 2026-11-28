@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """系统设置面板测试。"""
 import pytest
+from PySide6.QtWidgets import QPushButton
 
 from kivo.core import paths
 from kivo.core.config import ConfigManager
@@ -22,10 +23,10 @@ def sp(qapp):
 
 
 def test_sections_count(sp):
-    # 6 个分区卡片
+    # 7 个分区卡片
     from PySide6.QtWidgets import QFrame
     cards = [w for w in sp.findChildren(QFrame) if w.objectName() == "card"]
-    assert len(cards) == 6
+    assert len(cards) == 7
 
 
 def test_language_change(sp):
@@ -93,3 +94,60 @@ def test_shots_save_default(sp):
     sp.hist_max.setText("bad")
     sp._save_shots()
     assert sp.config.get("Snip", "HistoryMax") == "100"
+
+
+class _FakeClient:
+    def __init__(self, result=None, raise_msg=None):
+        self._result = result
+        self._raise = raise_msg
+
+    def fetch_latest_release(self):
+        if self._raise:
+            raise RuntimeError(self._raise)
+        return self._result
+
+
+def _wait_idle(qapp, sp, tries=100):
+    for _ in range(tries):
+        qapp.processEvents()
+        if not sp._upd_busy:
+            return
+        import time
+        time.sleep(0.01)
+    qapp.processEvents()
+
+
+def test_update_new_version(qapp):
+    client = _FakeClient(("v9.9.9", "https://example.com/r", "", "", ""))
+    p = SettingsPanel(Theme(False), ConfigManager(), update_client=client)
+    p._check_update()
+    _wait_idle(qapp, p)
+    assert "发现新版本" in p.upd_status.text()
+    assert p.upd_status.objectName() == "updGood"
+    btns = [b for b in p.findChildren(QPushButton) if b.text() == "查看发布页"]
+    assert btns
+
+
+def test_update_latest(qapp):
+    client = _FakeClient(("v0.0.1", "https://example.com/r", "", "", ""))
+    p = SettingsPanel(Theme(False), ConfigManager(), update_client=client)
+    p._check_update()
+    _wait_idle(qapp, p)
+    assert "已是最新版本" in p.upd_status.text()
+
+
+def test_update_fail(qapp):
+    client = _FakeClient(raise_msg="网络不通")
+    p = SettingsPanel(Theme(False), ConfigManager(), update_client=client)
+    p._check_update()
+    _wait_idle(qapp, p)
+    assert p.upd_status.objectName() == "updBad"
+    assert "网络不通" in p.upd_status.text()
+
+
+def test_update_busy_guard(qapp):
+    client = _FakeClient(("v9.9.9", "u", "", "", ""))
+    p = SettingsPanel(Theme(False), ConfigManager(), update_client=client)
+    p._upd_busy = True
+    p._check_update()  # 忙碌时直接返回，不抛错
+    assert p.upd_status.text() == "尚未检查"

@@ -2,22 +2,36 @@
 """系统设置面板: 可滚动分区卡片，改完即存。"""
 from __future__ import annotations
 
+from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import (
     QWidget, QFrame, QLabel, QLineEdit, QComboBox, QRadioButton, QButtonGroup,
     QPushButton, QVBoxLayout, QHBoxLayout, QScrollArea,
 )
 
 from ..theme import Theme, add_shadow
-from ..components import Switch, SectionHeader, MutedLabel
+from ..components import (
+    Switch, SectionHeader, MutedLabel, PrimaryButton, SecondaryButton,
+)
 from ..dialogs.base import show_toast
+from ...core.update import UpdateClient, is_newer
+from ...core.paths import VERSION
+
+
+class _UpdEvent(QEvent):
+    def __init__(self, res, err=None):
+        super().__init__(QEvent.User)
+        self.res = res
+        self.err = err
 
 
 class SettingsPanel(QWidget):
-    def __init__(self, theme: Theme, config):
+    def __init__(self, theme: Theme, config, update_client=None):
         super().__init__()
         self.setObjectName("panelRoot")
         self.theme = theme
         self.config = config
+        self.update_client = update_client or UpdateClient(config)
+        self._upd_busy = False
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(20, 18, 20, 18)
@@ -42,6 +56,7 @@ class SettingsPanel(QWidget):
         self._build_clipwatch()
         self._build_proxy()
         self._build_mirror()
+        self._build_update()
         self._build_shots()
         self.body.addStretch()
 
@@ -206,6 +221,92 @@ class SettingsPanel(QWidget):
         self.config.set("Network", "UpdateMirror", v)
         self._save()
         show_toast(self, "更新镜像已保存")
+
+    # ---------- 检查更新 ----------
+    def _build_update(self):
+        lay = self._section("检查更新")
+        self.upd_status = QLabel("尚未检查")
+        self.upd_status.setObjectName("updMuted")
+        row = QHBoxLayout()
+        check = PrimaryButton("检查更新")
+        check.clicked.connect(self._check_update)
+        row.addWidget(check)
+        row.addWidget(self.upd_status)
+        row.addStretch()
+        lay.addLayout(row)
+
+        self.upd_actions = QHBoxLayout()
+        self.upd_actions.addStretch()
+        lay.addLayout(self.upd_actions)
+
+    def _check_update(self):
+        if self._upd_busy:
+            return
+        self._upd_busy = True
+        self.upd_status.setText("正在检查更新…")
+        client = self.update_client
+
+        def work():
+            try:
+                res = client.fetch_latest_release()
+                self._on_upd_done(res)
+            except Exception as e:
+                self._on_upd_fail(str(e))
+
+        import threading
+        threading.Thread(target=work, daemon=True, name="kivo-update").start()
+
+    def _on_upd_done(self, res):
+        from PySide6.QtWidgets import QApplication
+        QApplication.instance().postEvent(self, _UpdEvent(res))
+
+    def _on_upd_fail(self, msg):
+        from PySide6.QtWidgets import QApplication
+        QApplication.instance().postEvent(self, _UpdEvent(None, msg))
+
+    def _apply_upd_result(self, res, err):
+        self._upd_busy = False
+        self._clear_upd_actions()
+        if err:
+            self.upd_status.setText(err or "检查失败，请检查网络后重试")
+            self.upd_status.setObjectName("updBad")
+            self._restyle(self.upd_status)
+            return
+        tag, html_url = res[0], res[1]
+        self._upd_html = html_url
+        if is_newer(tag, VERSION):
+            self.upd_status.setText(f"发现新版本：{tag}")
+            self.upd_status.setObjectName("updGood")
+            page = SecondaryButton("查看发布页")
+            page.clicked.connect(self._open_release_page)
+            self.upd_actions.addWidget(page)
+        else:
+            self.upd_status.setText("已是最新版本")
+            self.upd_status.setObjectName("updMuted")
+        self._restyle(self.upd_status)
+
+    def _clear_upd_actions(self):
+        while self.upd_actions.count():
+            it = self.upd_actions.takeAt(0)
+            w = it.widget()
+            if w:
+                w.setParent(None); w.deleteLater()
+        self.upd_actions.addStretch()
+
+    def _open_release_page(self):
+        from PySide6.QtGui import QDesktopServices
+        from PySide6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl(getattr(self, "_upd_html", "")))
+
+    @staticmethod
+    def _restyle(w):
+        w.style().unpolish(w); w.style().polish(w)
+
+    def customEvent(self, event):
+        if isinstance(event, _UpdEvent):
+            self._apply_upd_result(event.res, event.err)
+        else:
+            super().customEvent(event)
 
     # ---------- 截图历史 ----------
     def _build_shots(self):
