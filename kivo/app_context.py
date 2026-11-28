@@ -13,6 +13,7 @@ from .core.project_store import ProjectStore
 from .core.fx_store import FxStore
 from .core.clock_store import ClockStore
 from .core.calc_store import CalcStore
+from .core.download_store import DownloadStore
 from .ui.panels.ai_panel import AIPanel
 from .ui.panels.voice_panel import VoicePanel
 from .ui.panels.trans_panel import TranslatePanel
@@ -22,6 +23,7 @@ from .ui.panels.project_panel import ProjectPanel
 from .ui.panels.fx_panel import FxPanel
 from .ui.panels.clock_panel import ClockPanel
 from .ui.panels.calc_panel import CalcPanel
+from .ui.panels.download_panel import DownloadPanel
 
 
 class Services:
@@ -37,6 +39,7 @@ class Services:
         self.fx_store = FxStore()
         self.clock_store = ClockStore(self.config)
         self.calc_store = CalcStore()
+        self.download_store = DownloadStore(self.config)
 
     def pane_factory(self, key):
         if key == "ai":
@@ -57,6 +60,8 @@ class Services:
             return ClockPanel(self._theme, self.clock_store)
         if key == "calc":
             return CalcPanel(self._theme, self.calc_store)
+        if key == "dl":
+            return DownloadPanel(self._theme, self.download_store)
         return None
 
     def make_main_services(self, theme):
