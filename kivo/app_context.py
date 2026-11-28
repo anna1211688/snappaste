@@ -30,6 +30,7 @@ from .ui.panels.download_panel import DownloadPanel
 from .ui.panels.pomo_panel import PomoPanel
 from .ui.panels.winman_panel import WinmanPanel
 from .ui.panels.batch_panel import BatchPanel
+from .ui.panels.dev_panel import DevPanel
 
 
 class Services:
@@ -77,6 +78,8 @@ class Services:
             return WinmanPanel(self._theme, self.window_manager)
         if key == "batch":
             return BatchPanel(self._theme, self.batch_store)
+        if key == "dev":
+            return DevPanel(self._theme)
         return None
 
     def make_main_services(self, theme):
