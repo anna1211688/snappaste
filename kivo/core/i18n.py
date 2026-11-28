@@ -242,6 +242,32 @@ _TABLE.update({
     "trans.failed": ("（翻译失败）", "(Translation failed)"),
 })
 
+# 语音翻译面板
+_TABLE.update({
+    "voice.title": ("语音翻译", "Voice Translation"),
+    "voice.sub": ("选择聊天软件导出的语音消息，自动转写成文字再翻译成目标语言。",
+                  "Pick a voice message exported from a chat app; it is transcribed and translated."),
+    "voice.original": ("原文（转写）", "Original (transcript)"),
+    "voice.translated": ("译文", "Translation"),
+    "voice.pick": ("选择音频文件", "Choose audio file"),
+    "voice.no_file": ("未选择文件", "No file selected"),
+    "voice.fmt": ("支持 OGG/Opus、M4A/AAC、MP3、WAV、WEBM、FLAC、AAC 等，单个不超过 25 MB。",
+                  "Supports OGG/Opus, M4A/AAC, MP3, WAV, WEBM, FLAC, AAC; up to 25 MB each."),
+    "voice.target": ("目标语言", "Target language"),
+    "voice.model": ("转写模型", "Transcription model"),
+    "voice.source": ("源语言(可选)", "Source language (optional)"),
+    "voice.start": ("开始转写翻译", "Start transcription & translation"),
+    "voice.result_ph": ("结果将显示在这里", "Result will appear here"),
+    "voice.copied": ("已复制", "Copied"),
+    "voice.no_file_err": ("请先选择一个音频文件。", "Please choose an audio file first."),
+    "voice.uploading": ("正在上传并转写语音…", "Uploading and transcribing…"),
+    "voice.no_key": ("还没填 AI 接口的 API Key：到「设置 → AI 模型中心」选服务、填 key。",
+                     "No API key yet: go to Settings → AI Model Center, choose a service and enter the key."),
+    "voice.translating": ("正在翻译…", "Translating…"),
+    "voice.done": ("完成", "Done"),
+    "voice.failed": ("失败：", "Failed: "),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

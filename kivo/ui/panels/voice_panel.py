@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, SecondaryButton, MutedLabel
+from ...core.i18n import tr
 from ...core.voice import TRANS_TARGETS
 
 
@@ -35,15 +36,15 @@ class VoicePanel(QWidget):
         root.setContentsMargins(24, 22, 24, 20)
         root.setSpacing(14)
 
-        title = QLabel("语音翻译")
+        title = QLabel(tr("voice.title"))
         title.setObjectName("hero")
-        sub = MutedLabel("选择聊天软件导出的语音消息，自动转写成文字再翻译成目标语言。")
+        sub = MutedLabel(tr("voice.sub"))
         root.addWidget(title)
         root.addWidget(sub)
 
         root.addWidget(self._file_card())
-        self.original = self._result_block("原文（转写）")
-        self.translated = self._result_block("译文")
+        self.original = self._result_block(tr("voice.original"))
+        self.translated = self._result_block(tr("voice.translated"))
         root.addWidget(self.original, 1)
         root.addWidget(self.translated, 1)
 
@@ -61,31 +62,31 @@ class VoicePanel(QWidget):
         lay.setSpacing(10)
 
         r1 = QHBoxLayout()
-        pick = SecondaryButton("选择音频文件", icon_name="folder-open")
+        pick = SecondaryButton(tr("voice.pick"), icon_name="folder-open")
         pick.clicked.connect(self.choose)
-        self.file_label = QLabel("未选择文件")
+        self.file_label = QLabel(tr("voice.no_file"))
         self.file_label.setObjectName("mutedLabel")
         r1.addWidget(pick)
         r1.addWidget(self.file_label, 1)
         lay.addLayout(r1)
 
-        fmt = MutedLabel("支持 OGG/Opus、M4A/AAC、MP3、WAV、WEBM、FLAC、AAC 等，单个不超过 25 MB。")
+        fmt = MutedLabel(tr("voice.fmt"))
         fmt.setWordWrap(True)
         lay.addWidget(fmt)
 
         r2 = QHBoxLayout()
-        r2.addWidget(QLabel("目标语言"))
+        r2.addWidget(QLabel(tr("voice.target")))
         self.target = QComboBox()
         for name, _code in TRANS_TARGETS:
             self.target.addItem(name)
         r2.addWidget(self.target)
         r2.addSpacing(12)
-        r2.addWidget(QLabel("转写模型"))
+        r2.addWidget(QLabel(tr("voice.model")))
         self.model = QLineEdit(voice_stt_model(self.voice))
         self.model.setFixedWidth(180)
         r2.addWidget(self.model)
         r2.addSpacing(12)
-        r2.addWidget(QLabel("源语言(可选)"))
+        r2.addWidget(QLabel(tr("voice.source")))
         self.language = QLineEdit()
         self.language.setFixedWidth(90)
         r2.addWidget(self.language)
@@ -93,7 +94,7 @@ class VoicePanel(QWidget):
         lay.addLayout(r2)
 
         r3 = QHBoxLayout()
-        self.start_btn = PrimaryButton("开始转写翻译", icon_name="voice")
+        self.start_btn = PrimaryButton(tr("voice.start"), icon_name="voice")
         self.start_btn.clicked.connect(self.start)
         self.status_label = QLabel("")
         self.status_label.setObjectName("mutedLabel")
@@ -113,7 +114,7 @@ class VoicePanel(QWidget):
         top = QHBoxLayout()
         head = QLabel(title)
         head.setObjectName("blockHead")
-        copy = SecondaryButton("复制", icon_name="copy")
+        copy = SecondaryButton(tr("common.copy"), icon_name="copy")
         copy.clicked.connect(lambda: self._copy(card))
         top.addWidget(head)
         top.addStretch()
@@ -123,7 +124,7 @@ class VoicePanel(QWidget):
         box = QTextEdit()
         box.setObjectName("resultBox")
         box.setReadOnly(True)
-        box.setPlaceholderText("结果将显示在这里")
+        box.setPlaceholderText(tr("voice.result_ph"))
         lay.addWidget(box)
         card._box = box
         return card
@@ -133,11 +134,11 @@ class VoicePanel(QWidget):
         if text:
             from PySide6.QtWidgets import QApplication
             QApplication.clipboard().setText(text)
-            self.signals.status.emit("已复制")
+            self.signals.status.emit(tr("voice.copied"))
 
     # ---------- 交互 ----------
     def choose(self):
-        path, _ = QFileDialog.getOpenFileName(self, "选择音频文件")
+        path, _ = QFileDialog.getOpenFileName(self, tr("voice.pick"))
         if not path:
             return
         try:
@@ -153,11 +154,11 @@ class VoicePanel(QWidget):
         if self.busy:
             return
         if not self.path:
-            self.signals.failed.emit("请先选择一个音频文件。")
+            self.signals.failed.emit(tr("voice.no_file_err"))
             return
         self.busy = True
         self.start_btn.setEnabled(False)
-        self.status_label.setText("正在上传并转写语音…")
+        self.status_label.setText(tr("voice.uploading"))
         code = TRANS_TARGETS[self.target.currentIndex()][1]
         language = self.language.text().strip()[:10]
         self.voice.config.set("AI", "VoiceModel", self.model.text().strip())
@@ -167,9 +168,9 @@ class VoicePanel(QWidget):
             try:
                 cfg = self.ai.cfg_for("voice")
                 if not cfg.get("key"):
-                    raise RuntimeError("还没填 AI 接口的 API Key：到「设置 → AI 模型中心」选服务、填 key。")
+                    raise RuntimeError(tr("voice.no_key"))
                 original = self.voice.transcribe(self.path, cfg, language=language)
-                signals.status.emit("正在翻译…")
+                signals.status.emit(tr("voice.translating"))
                 translated = self.voice.translate_text(original, code)
                 signals.done.emit(original, translated)
             except Exception as e:
@@ -182,12 +183,12 @@ class VoicePanel(QWidget):
         self.start_btn.setEnabled(True)
         self.original._box.setPlainText(original)
         self.translated._box.setPlainText(translated)
-        self.status_label.setText("完成")
+        self.status_label.setText(tr("voice.done"))
 
     def _on_failed(self, msg):
         self.busy = False
         self.start_btn.setEnabled(True)
-        self.status_label.setText("失败：" + msg)
+        self.status_label.setText(tr("voice.failed") + msg)
 
 
 def voice_stt_model(voice_client):
