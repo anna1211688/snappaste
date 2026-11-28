@@ -80,6 +80,13 @@ QWidget#panelRoot {{ background: {t['bg']}; }}
 QFrame#softCard {{ background: {t['soft']}; border-radius: {RADIUS['lg']}px; }}
 QFrame#divider {{ background: {t['border']}; max-height: 1px; min-height:1px; }}
 QLabel#sectionHead {{ color: {t['muted']}; background: transparent; font-size: {FONT_SIZE['sm']}px; font-weight: 600; }}
+QLabel#blockHead {{ color: {t['text']}; background: transparent; font-size: {FONT_SIZE['md']}px; font-weight: 700; }}
+QTextEdit#resultBox {{
+    background: {t['stripe']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px;
+    font-size: {FONT_SIZE['md']}px; padding: 8px;
+}}
+QTextEdit#transBox {{ border: none; background: transparent; font-size: {FONT_SIZE['lg']}px; }}
+QLabel#swapIcon {{ background: transparent; font-size: 18px; color: {t['muted']}; padding: 0 4px; }}
 QLabel#mutedLabel {{ color: {t['text_2']}; background: transparent; }}
 QLabel#hero {{ font-size: {FONT_SIZE['hero']}px; font-weight: 700; background: transparent; }}
 QLabel#title {{ font-size: {FONT_SIZE['title']}px; font-weight: 700; background: transparent; }}
