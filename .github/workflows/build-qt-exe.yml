@@ -37,19 +37,21 @@ jobs:
               f.write(f"version={ver}\n")
           print("version:", ver, "ref:", ref)
       - run: pip install -r requirements.txt pyinstaller==6.22.3 pytest==9.2.0
-      - name: Source tests (offscreen)
-        continue-on-error: true  # 无头 Windows GUI 测试存在环境性访问冲突, 不阻塞打包; 质量门禁以本地全量为准
+      - name: Core logic tests (no QApplication)
+        # 无头 Windows 跑全量 GUI 测试会因 PySide6 环境性访问冲突中断整批,
+        # 故 CI 只跑不创建 QApplication 的核心逻辑测试作为必过门禁;
+        # 全量 613 项(含 GUI)以本地 offscreen 全绿为准。
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -m pytest -q --tb=short -rf
+        run: python -m pytest -q --tb=short -rf tests/test_core.py tests/test_ai.py tests/test_translate.py tests/test_voice.py tests/test_async_save.py tests/test_update.py tests/test_ai_settings_store.py tests/test_snip_geometry.py
       - name: Build onefile EXE
         run: pyinstaller --noconfirm --clean KIVO.spec
       - name: Verify EXE
-        shell: powershell
+        shell: pwsh
         run: |
-          if (-not (Test-Path dist/KIVO.exe)) { throw "EXE 未生成" }
+          if (-not (Test-Path dist/KIVO.exe)) { throw "EXE not found" }
           $size = (Get-Item dist/KIVO.exe).Length
-          if ($size -lt 10MB) { throw "EXE 异常过小: $size" }
+          if ($size -lt 10MB) { throw "EXE too small: $size" }
           Write-Host "KIVO.exe size: $size bytes"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
