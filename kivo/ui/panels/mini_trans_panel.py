@@ -14,6 +14,7 @@ from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, SecondaryButton
 from ..icons import icon
 from ...core.voice import TRANS_TARGETS
+from ...core.i18n import tr
 
 
 class _Signals(QObject):
@@ -67,7 +68,7 @@ class MiniTranslateWindow(QDialog):
         bar.setObjectName("miniTitleBar")
         lay = QHBoxLayout(bar)
         lay.setContentsMargins(14, 8, 10, 8)
-        title = QLabel("迷你翻译")
+        title = QLabel(tr("mini.title"))
         title.setObjectName("miniTitle")
         lay.addWidget(title)
         lay.addStretch()
@@ -93,7 +94,7 @@ class MiniTranslateWindow(QDialog):
     def _control(self):
         row = QHBoxLayout()
         row.setContentsMargins(12, 0, 12, 0)
-        row.addWidget(QLabel("目标语言"))
+        row.addWidget(QLabel(tr("mini.target")))
         self.target = QComboBox()
         for name, code in TRANS_TARGETS:
             self.target.addItem(name, code)
@@ -124,13 +125,13 @@ class MiniTranslateWindow(QDialog):
     def _buttons(self):
         row = QHBoxLayout()
         row.setContentsMargins(12, 0, 12, 0)
-        clear = SecondaryButton("清空", icon_name="trash")
+        clear = SecondaryButton(tr("common.clear"), icon_name="trash")
         clear.clicked.connect(self._clear)
         row.addWidget(clear)
         row.addStretch()
-        both = SecondaryButton("复制双语", icon_name="copy")
+        both = SecondaryButton(tr("trans.copy_both"), icon_name="copy")
         both.clicked.connect(self._copy_both)
-        one = PrimaryButton("复制译文", icon_name="copy")
+        one = PrimaryButton(tr("trans.copy_target"), icon_name="copy")
         one.clicked.connect(self._copy_one)
         row.addWidget(both); row.addWidget(one)
         return row
@@ -148,7 +149,7 @@ class MiniTranslateWindow(QDialog):
         if self.busy:
             return
         self.busy = True
-        self.status.setText("翻译中…")
+        self.status.setText(tr("mini.translating"))
         target = self.target.currentData()
         use_ai = (self.client.config.get("Translate", "TTUseAI", fallback="1") or "1") != "0"
         signals = self.signals
@@ -163,7 +164,7 @@ class MiniTranslateWindow(QDialog):
                 if r:
                     signals.result.emit(r)
                 else:
-                    signals.failed.emit("没拿到译文")
+                    signals.failed.emit(tr("mini.no_result"))
             except Exception as e:
                 signals.failed.emit(str(e))
 
@@ -188,7 +189,7 @@ class MiniTranslateWindow(QDialog):
 
     def _on_failed(self, msg):
         self.busy = False
-        self.status.setText("翻译失败")
+        self.status.setText(tr("mini.failed"))
 
     def _clear(self):
         self.source_edit.clear(); self.target_edit.clear(); self.status.setText("")
@@ -196,10 +197,10 @@ class MiniTranslateWindow(QDialog):
     def _copy_one(self):
         from PySide6.QtWidgets import QApplication
         QApplication.clipboard().setText(self.target_edit.toPlainText())
-        self.status.setText("译文已复制")
+        self.status.setText(tr("mini.one_copied"))
 
     def _copy_both(self):
         from PySide6.QtWidgets import QApplication
         m = self.source_edit.toPlainText() + "\n" + self.target_edit.toPlainText()
         QApplication.clipboard().setText(m)
-        self.status.setText("双语已复制")
+        self.status.setText(tr("mini.both_copied"))

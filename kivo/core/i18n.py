@@ -441,6 +441,16 @@ _TABLE.update({
     "pomo.applied": ("已应用", "Applied"),
 })
 
+# 迷你翻译窗
+_TABLE.update({
+    "mini.title": ("迷你翻译", "Mini Translate"),
+    "mini.translating": ("翻译中…", "Translating…"),
+    "mini.no_result": ("没拿到译文", "No translation returned"),
+    "mini.failed": ("翻译失败", "Translation failed"),
+    "mini.one_copied": ("译文已复制", "Translation copied"),
+    "mini.both_copied": ("双语已复制", "Both copied"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
