@@ -6,6 +6,8 @@ import urllib.request as ur
 import urllib.error as ue
 import urllib.parse as up
 
+from .i18n import tr
+
 _PROXY_CFG = {"mode": "system", "manual": ""}
 _PROXY_CACHE = {"sig": None, "strict": None, "loose": None}
 _LOOPBACK_HOSTS = ("localhost", "127.0.0.1", "::1")
@@ -61,7 +63,7 @@ def _build_net_opener(strict):
                 o = (old.scheme, (old.hostname or "").lower(), old.port or dflt.get(old.scheme))
                 n = (new.scheme, (new.hostname or "").lower(), new.port or dflt.get(new.scheme))
                 if o != n:
-                    raise ue.HTTPError(newurl, code, "接口要求跳转到其他地址, 为保护密钥已中止",
+                    raise ue.HTTPError(newurl, code, tr("net.redirect"),
                                        headers, fp)
                 return super().redirect_request(rq, fp, code, msg, headers, newurl)
         handlers.append(_SameHostRedirect)

@@ -6,6 +6,7 @@ import os
 import re
 
 from . import network
+from .i18n import tr
 
 _URL_RE = re.compile(r"https?://[^\s，。；]+")
 
@@ -61,7 +62,7 @@ class DownloadStore:
         try:
             import yt_dlp
         except ImportError as exc:
-            raise RuntimeError("缺少 yt-dlp 组件") from exc
+            raise RuntimeError(tr("dl.missing_yt")) from exc
         os.makedirs(outdir, exist_ok=True)
         opts = build_options(outdir, use_cookies, on_progress)
         with yt_dlp.YoutubeDL(opts) as ydl:
@@ -71,7 +72,7 @@ class DownloadStore:
     def friendly_error(msg):
         low = (msg or "").lower()
         if "login" in low or "cookies" in low or "sign in" in low:
-            return "该内容可能需要登录：勾选「使用 Chrome 登录状态」并关闭 Chrome 后重试。"
+            return tr("dl.need_login")
         if "unsupported url" in low:
-            return "该链接暂不支持，换一条帖子/视频的分享链接试试。"
+            return tr("dl.unsupported")
         return ""

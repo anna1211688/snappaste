@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from . import data
 from .paths import RECORDS_PATH
+from .i18n import tr
 
 MAX_RECORDS = 2000
 MAX_RECORD_CHARS = 200000
@@ -32,7 +33,7 @@ class ClipStore:
         if not text:
             return
         if len(text) > MAX_RECORD_CHARS:
-            text = text[:MAX_RECORD_CHARS] + "\n……(单条记录超长, 已截断)"
+            text = text[:MAX_RECORD_CHARS] + tr("clip.truncated")
         if dedupe and any(r["text"] == text for r in self.records):
             return
         self.records.append({"text": text, "locked": False})

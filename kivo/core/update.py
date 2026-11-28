@@ -11,6 +11,7 @@ import urllib.request
 
 from . import network
 from .paths import VERSION
+from .i18n import tr
 
 REPO = "anna1211688/KIVO"
 RELEASE_API = f"https://api.github.com/repos/{REPO}/releases/latest"
@@ -158,4 +159,4 @@ class UpdateClient:
                     return tag, page_url, "", "", ""
             except Exception:
                 pass
-        raise RuntimeError("无法连接更新服务器：开启代理或配置更新镜像后重试，或到发布页手动下载")
+        raise RuntimeError(tr("upd.unreachable"))

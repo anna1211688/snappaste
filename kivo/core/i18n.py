@@ -105,6 +105,8 @@ _TABLE.update({
     "clip.sep_enter": ("回车", "Enter"),
     "clip.sep_none": ("无分隔", "None"),
     "clip.interval": ("间隔(ms)", "Interval (ms)"),
+    "clip.truncated": ("\n……(单条记录超长, 已截断)",
+                       "\n……(record too long, truncated)"),
 })
 
 # 常用语面板
@@ -266,6 +268,22 @@ _TABLE.update({
     "voice.translating": ("正在翻译…", "Translating…"),
     "voice.done": ("完成", "Done"),
     "voice.failed": ("失败：", "Failed: "),
+    "voice.bad_mime": ("不支持这个音频格式 (支持 {fmts})。",
+                      "Unsupported audio format (supported: {fmts})."),
+    "voice.file_read": ("读不到这个音频文件: {err}",
+                       "Cannot read the audio file: {err}"),
+    "voice.empty_file": ("这个音频文件是空的 (0 字节)。",
+                        "The audio file is empty (0 bytes)."),
+    "voice.too_big": ("音频超过转写接口 25 MB 的上限，请先裁剪或压缩。",
+                     "The audio exceeds the 25 MB transcription limit; trim or compress it first."),
+    "voice.http_fail": ("语音转写失败 (HTTP {code}): {detail}",
+                      "Speech transcription failed (HTTP {code}): {detail}"),
+    "voice.unreachable": ("连不上语音转写服务: {reason}",
+                         "Cannot reach the speech transcription service: {reason}"),
+    "voice.bad_json": ("转写服务返回的内容不是有效 JSON。",
+                      "The transcription service returned invalid JSON."),
+    "voice.empty_result": ("转写结果为空: 可能没有可识别的人声，或模型不被支持。",
+                          "Empty transcription: no recognizable speech, or the model is not supported."),
 })
 
 # 计算器 / 快捷面板
@@ -481,6 +499,11 @@ _TABLE.update({
     "dl.untitled": ("(无标题)", "(Untitled)"),
     "dl.saved": ("已保存：", "Saved: "),
     "dl.failed": ("失败：", "Failed: "),
+    "dl.missing_yt": ("缺少 yt-dlp 组件", "yt-dlp component is missing"),
+    "dl.need_login": ("该内容可能需要登录：勾选「使用 Chrome 登录状态」并关闭 Chrome 后重试。",
+                     "This content may require login: enable “Use Chrome login state”, close Chrome, and retry."),
+    "dl.unsupported": ("该链接暂不支持，换一条帖子/视频的分享链接试试。",
+                      "This link is not supported yet; try another post/video share link."),
 })
 
 # 图片批量处理面板
@@ -593,6 +616,8 @@ _TABLE.update({
     "qr.copy_img": ("复制图片", "Copy Image"),
     "qr.save_img": ("保存图片", "Save Image"),
     "qr.save_title": ("保存二维码", "Save QR Code"),
+    "qr.missing": ("缺少 qrcode 库，请先 pip install qrcode",
+                  "The qrcode library is missing; run pip install qrcode first"),
 })
 
 # 划词翻译结果卡
@@ -858,6 +883,42 @@ _TABLE.update({
                    "Cannot connect to the AI API ({detail}); check your network and retry."),
     "aierr.bad_format": ("AI 接口返回的格式看不懂，换个模型或检查接口地址。",
                         "Unrecognized AI response format; try another model or check the base URL."),
+})
+
+# 附件读取
+_TABLE.update({
+    "att.read_fail": ("文件读不了 (只支持文本文件)",
+                      "Cannot read the file (only text files supported)"),
+    "att.too_large": ("文件超过 12MB，请拆分后再附加",
+                      "File exceeds 12 MB; split it before attaching"),
+    "att.unsupported": ("暂不支持这种格式，请转成 .docx/.xlsx/.pdf 或文本后再试",
+                       "This format is not supported; convert to .docx/.xlsx/.pdf or text first"),
+    "att.bomb": ("文件解压后体积远超正常范围 (疑似异常文件)，已中止解析",
+                "Decompressed size is far beyond the normal range (suspect file); parsing aborted"),
+    "att.no_text": ("没能从文件里提取到文字 (扫描版 PDF 请截图后用图片提问)",
+                   "No text could be extracted (for scanned PDFs, take a screenshot and ask with the image)"),
+})
+
+# 网络层
+_TABLE.update({
+    "net.redirect": ("接口要求跳转到其他地址，为保护密钥已中止",
+                    "The API requested a redirect to another address; aborted to protect the key"),
+})
+
+# 翻译引擎错误码
+_TABLE.update({
+    "trerr.baidu": ("百度翻译错误 {code}: {msg}",
+                   "Baidu Translate error {code}: {msg}"),
+    "trerr.youdao": ("有道翻译错误码 {code}",
+                    "Youdao Translate error code {code}"),
+    "trerr.google": ("谷歌翻译错误 {code}: {msg}",
+                    "Google Translate error {code}: {msg}"),
+})
+
+# 更新检查
+_TABLE.update({
+    "upd.unreachable": ("无法连接更新服务器：开启代理或配置更新镜像后重试，或到发布页手动下载",
+                       "Cannot reach the update server: enable a proxy or configure an update mirror, or download manually from the releases page"),
 })
 
 MESSAGES: dict[str, dict[str, str]] = {

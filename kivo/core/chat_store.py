@@ -6,6 +6,7 @@ import time
 
 from . import data
 from .paths import AI_CHATS_PATH
+from .i18n import tr
 
 MAX_CHATS = 30
 MAX_MESSAGES = 200
@@ -37,7 +38,8 @@ def _sanitize_chat(c):
         return None
     sp = c.get("system_prompt")
     return {
-        "id": c.get("id"), "title": str(c.get("title") or "新对话")[:200],
+        "id": c.get("id"), "title": str(
+            c.get("title") or tr("ai.new_chat"))[:200],
         "updated": c.get("updated") or 0, "pin": 1 if c.get("pin") else 0,
         "messages": msgs, "system_prompt": sp if isinstance(sp, dict) else None}
 
@@ -97,7 +99,7 @@ class ChatStore:
         if chat is None:
             cid = int(time.time() * 1000)
             first = next((m["content"] for m in history if m["role"] == "user"),
-                         "新对话")
+                         tr("ai.new_chat"))
             chat = {"id": cid, "title": first.replace("\n", " ")[:18],
                     "updated": 0, "pin": 0, "messages": []}
             self.add(chat)

@@ -7,7 +7,7 @@ import math
 from . import data
 from .paths import CALC_HISTORY_PATH
 
-ERROR = "错误"
+ERROR = "ERROR"  # 内部哨兵；显示层经 i18n 翻译为「错误/Error」
 HIST_MAX = 50
 
 

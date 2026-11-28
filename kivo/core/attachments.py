@@ -9,6 +9,8 @@ import re
 import zipfile
 import zlib
 
+from .i18n import tr
+
 ATTACH_INFLATE_LIMIT = 20 * 1024 * 1024
 ATTACH_TEXT_LIMIT = 4 * 1024 * 1024
 ATTACH_ENTRY_LIMIT = 2000
@@ -181,15 +183,15 @@ def extract_xlsx_text(data):
 def read_attach_text(path):
     """返回 (text, err); 不支持/超限/无文字返回人话 err。"""
     ext = os.path.splitext(path)[1].lower()
-    fail = "文件读不了 (只支持文本文件)"
+    fail = tr("att.read_fail")
     try:
         size = os.path.getsize(path)
     except OSError:
         return "", fail
     if size > RAW_SIZE_LIMIT:
-        return "", "文件超过 12MB, 请拆分后再附加"
+        return "", tr("att.too_large")
     if ext in (".doc", ".xls", ".ppt", ".rtf"):
-        return "", "暂不支持这种格式, 请转成 .docx/.xlsx/.pdf 或文本后再试"
+        return "", tr("att.unsupported")
     try:
         data = open(path, "rb").read()
     except OSError:
@@ -212,10 +214,10 @@ def read_attach_text(path):
             if text is None:
                 return "", fail
     except AttachLimit:
-        return "", "文件解压后体积远超正常范围 (疑似异常文件), 已中止解析"
+        return "", tr("att.bomb")
     except Exception:
         return "", fail
     text = (text or "").strip()
     if not text:
-        return "", "没能从文件里提取到文字 (扫描版 PDF 请截图后用图片提问)"
+        return "", tr("att.no_text")
     return text, ""

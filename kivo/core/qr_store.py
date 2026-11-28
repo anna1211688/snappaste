@@ -2,13 +2,15 @@
 """二维码生成数据层: 封装 qrcode，返回 PIL 图像。"""
 from __future__ import annotations
 
+from .i18n import tr
+
 
 def generate_qr(text):
     """生成二维码 PIL RGB 图像；缺 qrcode 库时抛 RuntimeError。"""
     try:
         import qrcode
     except ImportError:
-        raise RuntimeError("缺少 qrcode 库，请先 pip install qrcode")
+        raise RuntimeError(tr("qr.missing"))
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_M,

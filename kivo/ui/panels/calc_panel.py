@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 from ..theme import Theme, add_shadow
 from ..components import SectionHeader
 from ...core.i18n import tr
-from ...core.calc_store import CalcStore
+from ...core.calc_store import CalcStore, ERROR
 
 
 class CalcPanel(QWidget):
@@ -96,7 +96,8 @@ class CalcPanel(QWidget):
         return card
 
     def _sync(self):
-        self.disp_lab.setText(self.store.display)
+        shown = tr("common.error") if self.store.display == ERROR else self.store.display
+        self.disp_lab.setText(shown)
         self.trail_lab.setText(self.store.trail)
         self._fill_history()
 

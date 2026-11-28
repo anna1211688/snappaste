@@ -20,6 +20,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from . import network
 from .util import redact_secrets
+from .i18n import tr
 
 CACHE_MAX = 256
 BUDGET = 7.0
@@ -35,9 +36,8 @@ def has_cjk(text: str) -> bool:
 
 
 class TranslateClient:
-    def __init__(self, config, translate=None):
+    def __init__(self, config):
         self.config = config
-        self._t = translate or (lambda key, zh: zh)
         self._cache = collections.OrderedDict()
         self._lock = threading.Lock()
         self._dead = {}  # name -> (until, soft_count)
@@ -99,7 +99,9 @@ class TranslateClient:
         with network.open_url(req, timeout=12) as r:
             d = json.loads(r.read().decode("utf-8"))
         if d.get("error_code"):
-            raise RuntimeError(f"百度翻译错误 {d.get('error_code')}: {d.get('error_msg', '')}")
+            raise RuntimeError(tr("trerr.baidu",
+                                 code=d.get("error_code"),
+                                 msg=d.get("error_msg", "")))
         return "\n".join(seg.get("dst", "") for seg in d.get("trans_result") or [])
 
     def youdao_translate(self, q, target, appkey, secret, source=None):
@@ -121,7 +123,7 @@ class TranslateClient:
         with network.open_url(req, timeout=12) as r:
             d = json.loads(r.read().decode("utf-8"))
         if str(d.get("errorCode", "0")) != "0":
-            raise RuntimeError(f"有道翻译错误码 {d.get('errorCode')}")
+            raise RuntimeError(tr("trerr.youdao", code=d.get("errorCode")))
         return "\n".join(d.get("translation") or [])
 
     def google_translate(self, q, target, apikey, source=None):
@@ -141,8 +143,9 @@ class TranslateClient:
         except Exception:
             raise RuntimeError(redact_secrets("google translate request failed")) from None
         if d.get("error"):
-            raise RuntimeError(f"谷歌翻译错误 {d['error'].get('code')}: "
-                               f"{d['error'].get('message', '')}")
+            raise RuntimeError(tr("trerr.google",
+                                 code=d["error"].get("code"),
+                                 msg=d["error"].get("message", "")))
         trs = (d.get("data") or {}).get("translations") or []
         return html.unescape(trs[0].get("translatedText", "")) if trs else ""
 

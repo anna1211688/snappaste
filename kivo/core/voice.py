@@ -11,6 +11,7 @@ import uuid
 from . import network
 from .util import redact_ai_detail
 from .ai import http_base
+from .i18n import tr
 
 MAX_SIZE = 25 * 1024 * 1024
 STT_DEFAULT = "whisper-1"
@@ -77,8 +78,8 @@ class VoiceClient:
         ext = os.path.splitext(path)[1].lower()
         mime = MIME.get(ext)
         if not mime:
-            raise RuntimeError("不支持这个音频格式 (支持 %s)。"
-                               % "、".join(sorted(MIME)))
+            raise RuntimeError(tr("voice.bad_mime",
+                                  fmts="、".join(sorted(MIME))))
         return ext, mime
 
     def transcribe(self, path, cfg, language="", timeout=120):
@@ -86,11 +87,11 @@ class VoiceClient:
         try:
             size = os.path.getsize(path)
         except OSError as e:
-            raise RuntimeError("读不到这个音频文件: " + str(e))
+            raise RuntimeError(tr("voice.file_read", err=str(e)))
         if size <= 0:
-            raise RuntimeError("这个音频文件是空的 (0 字节)。")
+            raise RuntimeError(tr("voice.empty_file"))
         if size > MAX_SIZE:
-            raise RuntimeError("音频超过转写接口 25 MB 的上限, 请先裁剪或压缩。")
+            raise RuntimeError(tr("voice.too_big"))
         with open(path, "rb") as f:
             data = f.read()
         boundary = "----KIVOvoice" + uuid.uuid4().hex
@@ -113,17 +114,19 @@ class VoiceClient:
                 detail = exc.read(2048).decode("utf-8", "replace")
             except Exception:
                 pass
-            raise RuntimeError("语音转写失败 (HTTP %s): %s"
-                               % (exc.code, redact_ai_detail(detail, cfg["key"])[:300])) from exc
+            raise RuntimeError(tr("voice.http_fail",
+                                  code=exc.code,
+                                  detail=redact_ai_detail(detail, cfg["key"])[:300])) from exc
         except urllib.error.URLError as exc:
-            raise RuntimeError("连不上语音转写服务: " + str(exc.reason)) from exc
+            raise RuntimeError(tr("voice.unreachable",
+                                  reason=str(exc.reason))) from exc
         try:
             obj = json.loads(raw.decode("utf-8"))
         except Exception:
-            raise RuntimeError("转写服务返回的内容不是有效 JSON。")
+            raise RuntimeError(tr("voice.bad_json"))
         text = (obj.get("text") or "").strip() if isinstance(obj, dict) else ""
         if not text:
-            raise RuntimeError("转写结果为空: 可能没有可识别的人声, 或模型不被支持。")
+            raise RuntimeError(tr("voice.empty_result"))
         return text
 
     def translate_text(self, text, target_code, timeout=90):
