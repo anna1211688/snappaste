@@ -85,4 +85,4 @@ def test_build_mapping_roundtrip():
 def test_actions_count():
     # 27 个配置项，含全局切换
     assert len(hs.HOTKEY_ACTIONS) == 27
-    assert ("OCHotKey", "HotKey", "全局切换热键") in hs.HOTKEY_ACTIONS
+    assert ("OCHotKey", "HotKey", "hk.global_toggle") in hs.HOTKEY_ACTIONS
