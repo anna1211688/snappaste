@@ -96,6 +96,18 @@ QTextEdit#phraseEditor {{
     background: {t['stripe']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px;
     font-size: {FONT_SIZE['md']}px; padding: 8px;
 }}
+QFrame#templateCard {{
+    background: {t['stripe']}; border: 1.4px dashed {t['border_strong']};
+    border-radius: {RADIUS['lg']}px;
+}}
+QFrame#templateCard:hover {{ border: 1.4px dashed {t['accent']}; }}
+QLabel#tplTitle {{ background: transparent; font-weight: 700; font-size: {FONT_SIZE['lg']}px; }}
+QLabel#tplDesc {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['sm']}px; }}
+QLabel#tplPlus {{ background: transparent; color: {t['muted']}; font-size: 20px; }}
+QTextEdit#detailBox {{
+    background: {t['stripe']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px;
+    font-size: {FONT_SIZE['md']}px; padding: 8px;
+}}
 QLabel#swapIcon {{ background: transparent; font-size: 18px; color: {t['muted']}; padding: 0 4px; }}
 QLabel#mutedLabel {{ color: {t['text_2']}; background: transparent; }}
 QLabel#hero {{ font-size: {FONT_SIZE['hero']}px; font-weight: 700; background: transparent; }}

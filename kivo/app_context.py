@@ -9,11 +9,13 @@ from .core.translate import TranslateClient
 from .core.chat_store import ChatStore
 from .core.clip_store import ClipStore
 from .core.phrase_store import PhraseStore
+from .core.project_store import ProjectStore
 from .ui.panels.ai_panel import AIPanel
 from .ui.panels.voice_panel import VoicePanel
 from .ui.panels.trans_panel import TranslatePanel
 from .ui.panels.clip_panel import ClipPanel
 from .ui.panels.phrase_panel import PhrasePanel
+from .ui.panels.project_panel import ProjectPanel
 
 
 class Services:
@@ -25,6 +27,7 @@ class Services:
         self.chat_store = ChatStore()
         self.clip_store = ClipStore()
         self.phrase_store = PhraseStore()
+        self.project_store = ProjectStore()
 
     def pane_factory(self, key):
         if key == "ai":
@@ -37,6 +40,8 @@ class Services:
             return ClipPanel(self._theme, self.clip_store)
         if key == "phrases":
             return PhrasePanel(self._theme, self.phrase_store)
+        if key == "project":
+            return ProjectPanel(self._theme, self.project_store)
         return None
 
     def make_main_services(self, theme):
