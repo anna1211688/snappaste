@@ -13,6 +13,7 @@ from ..theme import Theme, add_shadow
 from ..components import (
     PrimaryButton, SecondaryButton, Switch,
 )
+from ...core.i18n import tr
 from ...core.voice import TRANS_TARGETS
 
 
@@ -36,7 +37,7 @@ class TranslatePanel(QWidget):
         root.setContentsMargins(20, 18, 20, 18)
         root.setSpacing(12)
 
-        title = QLabel("文本翻译")
+        title = QLabel(tr("trans.title"))
         title.setObjectName("hero")
         root.addWidget(title)
 
@@ -58,9 +59,9 @@ class TranslatePanel(QWidget):
     # ---------- 控制行 ----------
     def _control_row(self):
         row = QHBoxLayout()
-        row.addWidget(QLabel("源语言"))
+        row.addWidget(QLabel(tr("trans.source")))
         self.source_lang = QComboBox()
-        self.source_lang.addItem("自动检测", None)
+        self.source_lang.addItem(tr("trans.auto"), None)
         for name, code in TRANS_TARGETS:
             self.source_lang.addItem(name, code)
         self.source_lang.currentIndexChanged.connect(self.translate_now)
@@ -72,7 +73,7 @@ class TranslatePanel(QWidget):
         swap.mousePressEvent = lambda _e: self._swap_languages()
         row.addWidget(swap)
 
-        row.addWidget(QLabel("目标语言"))
+        row.addWidget(QLabel(tr("trans.target")))
         self.target_lang = QComboBox()
         for name, code in TRANS_TARGETS:
             self.target_lang.addItem(name, code)
@@ -81,9 +82,9 @@ class TranslatePanel(QWidget):
         row.addWidget(self.target_lang)
 
         row.addSpacing(16)
-        self.ai_switch = self._labelled_switch("启用AI翻译", "TTUseAI", True)
-        self.mini_switch = self._labelled_switch("启用迷你翻译", "MiniTrans", True)
-        self.copy_switch = self._labelled_switch("启用复制即译", "CopyTrans", True)
+        self.ai_switch = self._labelled_switch(tr("trans.use_ai"), "TTUseAI", True)
+        self.mini_switch = self._labelled_switch(tr("trans.use_mini"), "MiniTrans", True)
+        self.copy_switch = self._labelled_switch(tr("trans.use_copy"), "CopyTrans", True)
         row.addWidget(self.ai_switch)
         row.addWidget(self.mini_switch)
         row.addWidget(self.copy_switch)
@@ -115,8 +116,8 @@ class TranslatePanel(QWidget):
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(12)
 
-        self.source_box = self._edit_card("原文", readonly=False)
-        self.target_box = self._edit_card("译文", readonly=True)
+        self.source_box = self._edit_card(tr("trans.source_text"), readonly=False)
+        self.target_box = self._edit_card(tr("trans.target_text"), readonly=True)
         h.addWidget(self.source_box, 1)
         h.addWidget(self.target_box, 1)
         return wrap
@@ -144,13 +145,13 @@ class TranslatePanel(QWidget):
     # ---------- 按钮行 ----------
     def _button_row(self):
         row = QHBoxLayout()
-        paste = SecondaryButton("粘贴原文", icon_name="copy")
+        paste = SecondaryButton(tr("trans.paste"), icon_name="copy")
         paste.clicked.connect(self._paste)
-        clear = SecondaryButton("清空", icon_name="trash")
+        clear = SecondaryButton(tr("common.clear"), icon_name="trash")
         clear.clicked.connect(self._clear)
-        copy_both = SecondaryButton("复制双语", icon_name="copy")
+        copy_both = SecondaryButton(tr("trans.copy_both"), icon_name="copy")
         copy_both.clicked.connect(self._copy_both)
-        copy_t = PrimaryButton("复制译文", icon_name="copy")
+        copy_t = PrimaryButton(tr("trans.copy_target"), icon_name="copy")
         copy_t.clicked.connect(self._copy_target)
         row.addWidget(paste)
         row.addWidget(clear)
@@ -226,7 +227,7 @@ class TranslatePanel(QWidget):
                 if r:
                     signals.result.emit(r)
                 else:
-                    signals.failed.emit("没拿到译文")
+                    signals.failed.emit(tr("trans.no_result"))
             except Exception as e:
                 signals.failed.emit(str(e))
 
@@ -253,4 +254,4 @@ class TranslatePanel(QWidget):
 
     def _on_failed(self, msg):
         self.busy = False
-        self._target_edit.setPlainText("（翻译失败）" + msg)
+        self._target_edit.setPlainText(tr("trans.failed") + " " + msg)

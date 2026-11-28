@@ -224,6 +224,24 @@ _TABLE.update({
     "ai.sug4.s": ("提炼会议要点和待办", "extract key points and to-dos"),
 })
 
+# 文本翻译面板
+_TABLE.update({
+    "trans.title": ("文本翻译", "Text Translation"),
+    "trans.source": ("源语言", "Source language"),
+    "trans.auto": ("自动检测", "Auto-detect"),
+    "trans.target": ("目标语言", "Target language"),
+    "trans.use_ai": ("启用AI翻译", "Enable AI translation"),
+    "trans.use_mini": ("启用迷你翻译", "Enable mini translation"),
+    "trans.use_copy": ("启用复制即译", "Enable copy-to-translate"),
+    "trans.source_text": ("原文", "Source"),
+    "trans.target_text": ("译文", "Translation"),
+    "trans.paste": ("粘贴原文", "Paste source"),
+    "trans.copy_both": ("复制双语", "Copy both"),
+    "trans.copy_target": ("复制译文", "Copy translation"),
+    "trans.no_result": ("没拿到译文", "No translation returned"),
+    "trans.failed": ("（翻译失败）", "(Translation failed)"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
