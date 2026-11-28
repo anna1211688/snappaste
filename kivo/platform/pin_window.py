@@ -27,6 +27,7 @@ class PinWindow(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint |
                             Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self._click_through = False
 
         lay = QVBoxLayout(self)
         lay.setContentsMargins(1, 1, 1, 1)
@@ -53,6 +54,22 @@ class PinWindow(QWidget):
         from PySide6.QtGui import QTransform
         self._orig = self._orig.transformed(QTransform().rotate(-90))
         self._render()
+
+    def set_click_through(self, enabled):
+        """鼠标穿透: 开启后点击/滚轮不被该窗口拦截 (对应 WS_EX_TRANSPARENT)。"""
+        if enabled == self._click_through:
+            return
+        flags = (Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        if enabled:
+            flags |= Qt.WindowTransparentForInput
+        self.setWindowFlags(flags)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self._click_through = enabled
+        self.show()
+
+    @property
+    def click_through(self):
+        return self._click_through
 
     def copy_to_clipboard(self):
         QApplication.clipboard().setPixmap(self._orig)

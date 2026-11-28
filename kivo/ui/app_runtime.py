@@ -29,6 +29,7 @@ class AppRuntime:
         self.beeper = beeper or self._beep
         self._paste_busy = False
         self._pins = []
+        self._closed_pins = []
         self._tray = None
 
         # 单实例守卫: 已有实例时由 app.py 决定退出, 这里只暴露结果
@@ -288,7 +289,12 @@ class AppRuntime:
         if pm.isNull():
             return
         from ..platform.pin_window import PinWindow
-        pin = PinWindow(self.window.theme, pm)
+
+        def _on_close(pin):
+            if pin in self._pins:
+                self._closed_pins.append(pin)
+
+        pin = PinWindow(self.window.theme, pm, on_close=_on_close)
         self._pins.append(pin)
         pin.show()
 
@@ -364,17 +370,43 @@ class AppRuntime:
             ("OCHotKey", "HotKey"): self.toggle_hotkeys,
         }
 
-    def open_quick_panel(self):
-        raise NotImplementedError
-
     def select_ai(self):
-        raise NotImplementedError
+        """显示主窗口并切到 AI 助手面板 (对应 Tk SelectAiKey)。"""
+        self.show_main()
+        self.window.select("ai")
 
     def copy_trans(self):
-        raise NotImplementedError
+        """复制即译: 取剪贴板当前文字, 光标旁弹结果卡翻译。"""
+        if self.config.get("Translate", "CopyTrans", fallback="1") == "0":
+            return
+        text = (self._clip_get() or "").strip()
+        if not text:
+            return
+        from .dialogs.copy_trans_card import CopyTransCard
+        target = self.config.get("Snip", "TransTarget", fallback="")
+        card = CopyTransCard(
+            self.window.theme, self.services.translate_client.translate,
+            target=target)
+        pos = QApplication.primaryScreen().availableGeometry().topLeft()
+        card.show_at(text, pos.x() + 120, pos.y() + 120)
 
     def snip_delayed(self):
-        raise NotImplementedError
+        """延时截图: 按 [Snip] DelaySeconds 倒计时后再启动区域截图。"""
+        if getattr(self, "_delay_pending", False):
+            return
+        try:
+            secs = float(self.config.get("Snip", "DelaySeconds", fallback="3"))
+        except Exception:
+            secs = 3.0
+        self._delay_pending = True
+
+        from PySide6.QtCore import QTimer
+
+        def _fire():
+            self._delay_pending = False
+            self.snip_region()
+
+        QTimer.singleShot(int(secs * 1000), _fire)
 
     def close_all_pins(self):
         for pin in list(self._pins):
@@ -387,10 +419,23 @@ class AppRuntime:
             pin.setVisible(not visible)
 
     def restore_pin(self):
-        raise NotImplementedError
+        """恢复上次关闭的贴图; 没有已关闭记录时把隐藏的贴图重新显示。"""
+        if self._closed_pins:
+            pin = self._closed_pins.pop()
+            if pin in self._pins:
+                pin.show()
+            return
+        for pin in self._pins:
+            if not pin.isVisible():
+                pin.show()
 
     def toggle_clickthrough(self):
-        raise NotImplementedError
+        """贴图鼠标穿透开关: 所有贴图在可穿透/可交互之间切换。"""
+        if not self._pins:
+            return
+        enable = not any(p.click_through for p in self._pins)
+        for pin in self._pins:
+            pin.set_click_through(enable)
 
     def toggle_hotkeys(self):
         if self.hotkeys.active_count:

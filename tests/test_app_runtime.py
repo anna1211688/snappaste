@@ -131,3 +131,57 @@ def test_toggle_hotkeys(rt):
     assert r.hotkeys.active_count == 1
     r.toggle_hotkeys()
     assert r.hotkeys.active_count == 0
+
+
+def test_select_ai_shows_and_switches(rt):
+    r, services, win = rt
+    win.hide()
+    r.select_ai()
+    assert win.isVisible()
+    assert win._current == "ai"
+
+
+def test_snip_delayed_uses_config_seconds(rt, monkeypatch):
+    r, services, win = rt
+    fired = []
+    monkeypatch.setattr(r, "snip_region", lambda: fired.append(1))
+    services.config.set("Snip", "DelaySeconds", "0")
+    r.snip_delayed()
+    assert r._delay_pending is True
+    from PySide6.QtCore import QCoreApplication
+    QCoreApplication.processEvents()
+    assert fired == [1]
+    assert r._delay_pending is False
+
+
+def test_toggle_clickthrough(rt):
+    r, services, win = rt
+    from kivo.platform.pin_window import PinWindow
+    from PySide6.QtGui import QPixmap
+    p1 = PinWindow(win.theme, QPixmap(40, 40))
+    p2 = PinWindow(win.theme, QPixmap(40, 40))
+    r._pins = [p1, p2]
+    r.toggle_clickthrough()
+    assert p1.click_through and p2.click_through
+    r.toggle_clickthrough()
+    assert not p1.click_through and not p2.click_through
+
+
+def test_restore_pin_reopens_closed(rt):
+    r, services, win = rt
+    from kivo.platform.pin_window import PinWindow
+    from PySide6.QtGui import QPixmap
+    pin = PinWindow(win.theme, QPixmap(40, 40))
+    pin.on_close = lambda p: r._closed_pins.append(p)
+    r._pins = [pin]
+    pin.close_pin()
+    assert r._closed_pins == [pin]
+    r.restore_pin()
+    assert r._closed_pins == []
+    assert pin.isVisible()
+
+
+def test_copy_trans_disabled_returns(rt):
+    r, services, win = rt
+    services.config.set("Translate", "CopyTrans", "0")
+    r.copy_trans()  # 开关关闭时直接返回, 不弹卡
