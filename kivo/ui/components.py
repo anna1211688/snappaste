@@ -2,17 +2,17 @@
 """KIVO 通用组件库。所有组件用 objectName 挂应用级 QSS, 不内联样式。"""
 from __future__ import annotations
 
-from typing import Callable, Optional
+from typing import Optional
 
 from PySide6.QtCore import Qt, Signal, QSize
-from PySide6.QtGui import QIcon, QPainter, QColor, QPixmap
+from PySide6.QtGui import QPainter, QColor, QPixmap
 from PySide6.QtWidgets import (
-    QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QSizePolicy,
-    QLineEdit, QCheckBox, QGraphicsOpacityEffect,
+    QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
+    QLineEdit, QCheckBox,
 )
 
 from . import icons as iconlib
-from .theme import add_shadow, RADIUS, SPACING, Theme
+from .theme import add_shadow, RADIUS
 
 
 # ---------- 容器 ----------
@@ -221,11 +221,14 @@ class ListRow(QFrame):
 
 # ---------- 导航项 ----------
 class NavItem(QPushButton):
-    """侧边导航项 (图标 + 文字, 选中态)。"""
+    """侧边导航项 (图标 + 文字, 选中态图标切换强调色)。"""
 
-    def __init__(self, key: str, icon_name: str, label: str, parent: Optional[QWidget] = None):
+    def __init__(self, key: str, icon_name: str, label: str,
+                 parent: Optional[QWidget] = None, active_color: str = "#007AFF"):
         super().__init__(parent)
         self.key = key
+        self._icon_name = icon_name
+        self._active_color = active_color
         self.setObjectName("navItem")
         self.setCheckable(True)
         self.setCursor(Qt.PointingHandCursor)
@@ -233,6 +236,13 @@ class NavItem(QPushButton):
         self.setIconSize(QSize(20, 20))
         self.setText(label)
         self.setMinimumHeight(40)
+        self.toggled.connect(self._on_toggle)
+
+    def _on_toggle(self, checked: bool):
+        if checked:
+            self.setIcon(iconlib.tinted_icon(self._icon_name, self._active_color))
+        else:
+            self.setIcon(iconlib.icon(self._icon_name))
 
 
 # ---------- 聊天气泡 ----------

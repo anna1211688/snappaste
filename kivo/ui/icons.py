@@ -1,41 +1,107 @@
 # -*- coding: utf-8 -*-
-"""KIVO 图标模块。base64 图标从 Tkinter 版本平移, 提供 QIcon 与着色能力。"""
+"""KIVO 图标模块: 统一线性符号图标, 经 QSvgRenderer 矢量渲染, 支持任意尺寸与着色。"""
 from __future__ import annotations
 
-import base64
 from functools import lru_cache
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter
+from PySide6.QtCore import Qt, QByteArray, QRect, QPoint
+from PySide6.QtGui import QIcon, QIconEngine, QPixmap, QPainter
+from PySide6.QtSvg import QSvgRenderer
 
-_ICONS_B64 = {'copy': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAADaUlEQVR4nLWUz29UVRTHv+fcO29+lZaCqIQYF02KCUmlBhLFRKMFpVgLCyehEJUfbeI/YIyrx6xcGePOmBA10Q3PhT+iAVwgNm21hQZbnLQgJVZiCrWTDtC+N2/evcdFf8yUTsc00bM7yfd87rnnF/A/Gf2rwnX5+R/BtSQXL2YNAPlvH153oOsyslnb0vZ6s46nuyITxUBCBEBEBETCxCDifMzePz149ou7izypDl4ACgBpae9uZuJ+AjYbYwyRMARCrBgARCy0k0BUKg5IFOwb2dPkL8U+CCYA4rquc6f4SPrSb7++C9ZvpxzdujFdN2NMRKpOi/O3vj0+eyMWhfUUjwcvq9SGL4t+4bnRc5/2ZjIZ5Xme0Q9+fVdHz+4zvZOn54PxbYAkARFrcY4AEkBYMdLJ5C/1jVuO/ex9kH+y/eQUm8gyRFVmqJczPXVK3gQSAz/d/Hz3zh3Nzz71BKLIgAkA88PAQvVEBN9euPTq5K3JDwG8YUUSIGIilmpggEg2ue+n/CB49MVnWuyJzP6l0iw3ZNFM7sYkjf1+vQmAsIWtNgK60gmKoVgrERPx0MiYfPNDP9XXpWHFEhEQBCV0H36FlNIKFuFq3BpgABCx5MQ0pmdm0Tc0is2bGmCMBTMwN1fEkUN7oZWC2FWNrw3WWqFwbw5HDrbhwAtPVw2a832wrrmMq8HGWKSSCQxfvYavzvehYUMa1loQEYIgRE9XBxJxB2Ls+sAigphWmJrOo3dwBA81NsBYA60V5v0iug62QTHDAgTXZQz8CUCEmNaYinWUYj4oQiuOkM1a2Xu8RKTIiF3BqlIKkWQijqGRMXx9vg8b69PwgxBHD+3DY1u3gJnZRiUopXa1HugeBOhxEwbTEUkOAHmeZwGsPIdh0SGxlupSSfGDEFfHb+LaxC3krv8BJkIspqEUQ2slYoWIGCC+HAXh/tz3n03BdZdnvjJjEj1VSibjtn84R8deeyl6750eJhCIgHzhLu7MzAKE6Hb+vqMUXxj+7uPOynhks7bsLNnirWhtP3k8jOSjyFhHpNwPYloUE7Tiv5wYdTalClcmJhr5csdWUwldCS77sqfzre2iEtuMmRcIlzVEouJx8u8VRq+c/WQaq9e9hrlu7ckvC2vqqq+l63Iml1tzZT3vjF24omvbP8gCh/3cHzhKAAAAAElFTkSuQmCC', 'phrases': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAACVElEQVR4nNWVy2tTQRTGvzMz9zZpEhvbTasxFHdRg4gbN5KColC7FaFCwYUWBFeuXIXudKMbd/oPSPAB6kZQyMqF+KJaSkUoUtMqFJI2r5t7Z46LPKxlEhNceeDC5Tx+fMycOYfQ3cjuZoB3ZhDb8waCWiybFf0CCAAzM81cvREvF2p8KDVOJQAjABaRxmLtMCMsqOQl67hDtX7ABDCOn50f9zh4YAwfITBvV6oEEhBBBdXkNGrJMwCYw7VCaf/K7YvvXz55jWxWYGHBtEFqJzWTycp8noKKP3clkUicHIu52CyWcW06g8AADny82JjAs28GIVfCkTTKMnITQGa3YrXbAQAVz6N4dNgcTU3qzyuran52phOrvirh4fIqoqERzYEvAAQ2hhUsAGg2ot5omEBrCrSGHxg4SqDeaACGUPcNDRELsP2irTcKNA9fEIGIoKSElBJKSvzY0rhwIo67sxMoegJK2BvIqtiqoFV/OhXBscQo9u118fhpCZ++6H8FN8nn0rGO7wB/xQdj7Pn9gttmGNC6+dh8Vl0BA4MFAS3xIHR/zQOD+xbw34F7doXh5hkaY2AMoz1ajGEIIcE9BqYVzAxDROw6CkKI1vc73v5XUjAzW/vNCnZcGa57Pq3/3NTb5Yp483EZzAxqtQMzQylHF7fK0nFU9K/gqSmYfB4UC0UerX1fv7xW2BgDgLnrt2y17pDrIhoevmcLdh306VOXDob3RCY9r8pD0v0zj4illOQ16qV3z++/tYG7mH3d2FP7X02dgvNLSz13Xw4AcjnrFPoFQgXei5uvcGsAAAAASUVORK5CYII=', 'translate': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAACp0lEQVR4nO1TPUyTURQ9931fK5TQ1gENLJoYo3xBiiGulERi60weBBfBJl2QHxMHf/PZaKKDiT+w+BOMDsS0iwOTDqQLIQiKAq0sLkZRQIUiQvq17zqUYhsUYiBh8UzvnZt37rk/D/iPDWGaAqYpttvGGlD24PV6daAWM7tiomTaUF8LPhzRSUu5lspeZzkAiEZDqU1lrPS1XK70nzq7KceGlHZ9wXmOiIqZeZkABxg1AKdANADQIgiFYCwVzs1fHxyMLK285b8JZ4YzATAQZ7BOzM0Av1ICt5SgLhY8CqhWgMFQsakdjhUxBpgJOe1cFx5fIHrQFyzN3qvqmvdX+gMD/9qK1XUypGkHQMx4akfqcZZXmnhECg8AkCGlPeOQCUG27bzBLgSHbQCv79o0TQGYwuMPvKw6Hjjh8bcEPf5A9HcMgMkCAFztE73ui98Szo5YTy6/xjHAFInFdCCkFrF8VDE/BIvQm5nROgDo65vSIMMaQqRcHfG9EFq9+jmriERjYWu8DCFSuR8qR5g4Fokkq+ukq4iKrhJoGIRPVburr+3xniwYGblvIdKQBgAGN4GEjS2riTSbQ7dBZjRqV/UyUzVN8gx+LBe6Jpm5HkwD2jSfTpdYbghbDwj7iNGbptSzA46F+PPSK5MMzBfarJrllH2IoVTiTsUhMBOIeFVYSikmF4qfaEK30lbq5tsXPeO5/fL4ArXQ9DPC+vHlffmle9DtQ1BJAWYLJGwgPSXSycPf7xrjMFkgROqPQ5RSajnV5A3F1RELu89/Zlf7WL2zLXbM2fmuwX1hlp3tE5lNMvv1rOM8wYhhMEKh/IxSahJAxDDYNdfYyWmVTHRXdGfDxW1jnaTp6cTt8i5s8CM3hgxrkJzZlC2B2a9ny83jwrxFCbYLvwCbmBAvHVNkVwAAAABJRU5ErkJggg==', 'ai': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAACi0lEQVR4nM2UzW9MURjGf+89906/tdpQQXw0moigi7ESYSFCIhbEtZEQIpWmSUX8AdO7kGCnXZEgse1GrEQidqWRSIQ2aYqS1Fdxqc6t6cy957UwKMZoQ8Rvec77PufJc95zYFaozK7uf2Hp8f6qufY4ZXf1cwSTOr+zrnOo6e8JiygHRyvVxvuNam3xtFnlXUZYHYCm2lyjmIq1eCwHwP+NmSJuaU0VunHhpk0m4rRTu9hN3j9bR0b7CUcMqhYRnYOwCogWm/IA9tiDTcZ44LCMQGIgpve7eoCfDimZV13nUJN6usbBrAc54biVK2wheiI456AwkNiKwWxv6xv4tWv5chn1HfcbpKJ2s1LYC7pdqhoXSKoazY6j+QhJ1SB1iyAfYafCEOQ2puoCcfbuxNnVT4tyOkO4SEYdwhGvRnINXirVrFQtpBClFY46qZqVdjo7irgXxKQGHc09kqlcWF3dFI5F4zHnN8Sl4ihLfdfgqfndUzqv68GZufSVmAoVMgjhiEdjayLh0C2SAog7SkZdQgyNFKAbgsC27TywJGfcD8NXL07OVCkxk6IEYultLRBInAhD+jFEkniYQGJeEhOIrhoIPTIZR2K3o2LabvR936TT7V4Zx9+sA1R7hee5fPTYajwGQB8W0IfXeqe5BnbHkT0oY319fQmQfLVXNihVQUTruwZ7YpKTUc/6V2QyTvr2i2Z12WWt7kNkK2rHgesO7qVKL3+n/+rF7O//CsCY/Ono3tu3AASBGokiiwzgyDm1SVZVb4Bejt14dDxfk2euE1KKtu2Hb7RtO7T7x/VyGc+g+NRnkE63ey0t7+zwJFcwvMb3jQ8Us/5zlm85WOn7vvkrYv+KkpP1CY5pESEj7mvpAAAAAElFTkSuQmCC', 'browser': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAD5klEQVR4nL1VTWhcVRT+zn13ZvIzrWna4O8iUlGYIZ2pESmxZkaUJNXQrF4XVSgmMQHpoisXrTC+RVBwraCYjKVF0FeKojVpE6wPoVWa2nZSR7AqplTQiWkbk8zfe+8cF52ESWpSEfSs7s93v/vdc797LvAfBd0ZImSae1QuF6lgv4STTDIsi//1pqZpGmvOplIKqZRac/E64wIArd0DWwDs9Dx+lMggRfjJE/9MZvS9H5Y3+Bv1txNXgI+07d5Qe9fdQ0R4kYxAmD0XAoGhg2DfAwQnyvn8gaxz9EfTNA3btv31iAmAxBI9DRS+Z4KIWtlzvxVISEGeKhdqC7q2+I4i1QpQEyld47n59qlTh8+vVq5WkKZSFEm8HFb1955UyohKsfgwRE6T4NOLY+mZrPP2giY1LMwzf9y4+YCAvw8E60/HOvujsF6TVFXOlxumaSpYFhuh4pARDDxeLsw/eXHi/StC9IwQPgKEkEqp2bx7BkQNG7dsauLyYkKEF4T4Q4BgValcIibbtv1IR1+jofVgubDwweWJI5OxzsFmIgmHatyrprlHmdmsnk42l0VkTrteIjN+NM9u6VCwJhyNd73UDsviJSepZbUANCFpBEIh6NDrAMDkbgVj5tzHR2Zt2/Zt2y7DshhCk4BEAcilU+m0W8oXWPh5AFjyu67ugLCdvZKQ78fjnf1bRbADxI3xzv4eIV+JKFIgn0UeAkjFO/t7RDER8LtAWgDASYLhVIiX8yJERIog3n4mIRI0AHQ/Ex+EEAECJhEiNEOImfggmFhp1QjhX6u5VhAD8gspA6xl79SJ9M/xrr5nGXIoMzbyRDWqpbPvTSIOZMbSBwBgW1fvrAj9BgBmNkr2EnEyabHjAGTIuDCDPOoF8KoITYOkKdazr+FSMD8fAYxsJOLRN9figDqeSCT0jboH24Oh+sZycfHYrbR+R8uXZ1lgmKZx4fORac8tjSodeKVl595N7sa5KwT4uhTaDNv2zUjEAwAibGaSc47jeIoCQ26pMHf95vwnAMhxLH+Fj1ORiCCVUqJlvyK1qBs2fJG14QvUWQ/+bgBkAYifvdoCBi6PjkzGdg28FQjV7RD2eq99bRcq7pJbPqiOyrNs6djXqoN1XzH702Dvggjdlzk5nASAbbv63iCgTYT+DNWFnyvl5/ozY+nh1fXitiK0BIh2vBAL6rrDSgdjIgyvXMwAVFZKPaaDNfDc0nXfdQenxtPH/kkRWqEcALZ3DzwtLN3M0kYEUqSyzP6E1sbx85+9m4dpGlhFun6sU8SrT7fW3J2+JjJNU+VyEXKSYAAws1nK5XLkOI6PykX9r/EXjXHkc2I+9bMAAAAASUVORK5CYII=', 'fx': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAACsklEQVR4nO2UT2hcVRTGf+e+15lJxjKxVUoJiNkmdppquhIRlDK6axdvI2Ibg11InWjjpgq+voWuQlHc6UosCBP3Bl3EblXQFjNWUKnuRDB/MIOZue9+LmYmickEhXbXfrt77rnf+b7zznlwt8FI5e4cmWQg24okjagb27d66kjTbQXb54GPjsx9Vx6p36wOJtuvSBfac5N+XzjcOlJ0G7+rM2SHg7cbkt6Nh45eWVn5pcUHUx0Al/YUVmszl06eeXXpWO3cbI9Q1dp0fepMfWmyNnOpb72yZm/mUb7ejlmXd7cMHYzKD74ltVYrw6Unuq1RFDebTQOQ2VLIO+9EcfHx40+98OnfLpaLDswrDwcMvQGmrhNdk/K3kQWZhl1cmlPrjy+Iy18pL/wKwHjPaZIkEcCxU9OvTZ2e9dXazNVq7cWPp07P+kdOnbu4M+dfkKxS/2F6YC/TNHVZdlnV2szzUaH4DOI5Bd+9dDGgT/LcL974bPRqmkLGZYDuB24iFizv9l4xGXnPWS8BE6LlxM++055XCEEhBN9pzzvsJ4kWZAGAzAKZeTLzjCMSRYCRme+TArh+jzEblWnSGY/2psLMeCwQTqAwutN+l0xGZgEWIGm4rdiOsTJAE0+/dLIwFD3k2+1DzngfIIhX4kLhz7bPf1te/PDrfm7/ceXi8om1KxPfDuzx7sDxJ8+OWLm4AqCNzfuvX/totSfVwFSZuzlGXB5Ta/2COSbM2XkFMysUpbZdX3tvbBVk8RZjkkQJsLxBKc7zzwF8mVKSJNECwDhGhjfvX3YjR18PAm3+BaVDX5oCVjhI8LeeBRZJcPvu9170FuTCjw9TGp4kbM7Lt83JpuX2Kh7MsfufMQD3nf/mgZF68+z/F/afwmU0tL0siSKSRrR7Km6vQNLYu433sBv/AMIpLUgyP/7PAAAAAElFTkSuQmCC', 'clock': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAD00lEQVR4nL1VTWhcVRT+zn33zUySTtIGhFSElhIqviRN0glqg3bGYic/4N/iumjFkDQds1CpLlwUyssorl24sFaGoeJCGVuEBptmFDpFYSgMJim+LkztRohOKDGNZub93esiL9MkNakIenb33nO+e+53zvku8B8ZPdhFkRAvs3LZCHyvopBISKTT8l9fKoTQtjw1TQbTZFsGb7OvAMBInmgOcf60lF4PIw5FuMU877sfpjJztQv+Jvv7gQPHR3ufj0Z2trzHoMY0PRL2PAdQgMY5lJSQ0rvkeJW3ranP5oQQWi6X87cDJgCqM/7CTmpoyWu63uNVVz4FKDt9JXNNA2RbcijGiD9HnL9DgPTcavzG1PnS5sxpA6hpknF1oT4cld+CqF3azjMzU5nrABB9a24YAJY/aM0CQFf/8ENMC10Gaft91zk0c+UTyzTHKR2A18gXQjCk01ILV9/XNP1xz145PDOVub4nbkYghMakc5pJ5zRMk+2Jm5HpyezC3YU/jkjlLyuSXwCE9FZFNJInmrsGU9WOvpHzABBLpXSYigFA0ymr2HTqZhFQBFOxWCylA0B7cuh4z4tvqq7+k/EgQa2WsRCCAQAnJLgeDnPgLGCyfYuLNc4UGCA9AkgZ1jgv7XtWAop2NDVf9OyKI5V/DADW+p2vX0DJmOtUFKrRm0Ba5nKKoIDYfEqv3M7uIGk/vLsvtdvKpefXOqiIRrujuGQR6CAAFBKQKKzjOCBEAxSpEHfvMUTQFxd5qPKrX8/cXRGmfu4eTL174OhIu2FZHOm0ZCCbgA3DxDYu2BzXIyC2tBcAmaZJIKCYy1WkqjvqSi8plfyccf0MMbrgLLdQLJXSATymoG4BgLDaqAacSKy2CGkqr6SEhC8AqImJeQ3BBM7mz5anL32cn53MDEuvsldp8tW5yQ9t53b1kB6pbwThwiqtP26ajaCaB/pGvu4efM3ueOrYLgAIqk+rYiS0eDzO14d1Dox+3zkw+vsjT4q6GnfrqTANQ8E0meLqdWJsRW+K5lv7jzeWSudcAArmOOUMQxUKBW8tpmvw5EehSEOvkt7IL8VcJegutVadexaMZUdyKMb1+muAvOP59pmQF/qq9M25JQBo7X8j3CD/7CVdH9f1yGG7end0djKb2awX94nQmkNb8pXOkF6f1Xi427VXpFJqlgAfRPv1cF3Uc507vuuO3chnv/wnIrQhcwA4ODB2RJJ8Sfr+E8QIIPYTpH+Z898uliYmViCEhk2g29s2Ir7+dVudPehrIiEEK5cNKiQgAUBYFpXLZSoUCj6CQv2v9hc4mq5HjqAsawAAAABJRU5ErkJggg==', 'calc': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAADBUlEQVR4nKWVTWxUVRTHf/e+j7kz05kWNRoXJgZDxGqjBKIxRmtcGBcG8WMWLhQkajDGhdGdDdNRVwZWJkZJZUFYmI6CCxSqJpIotpuK0UAaEUKLBVpFqXS+3rx7j4uWWsN7I8jZvOT+z/93T847OVeRHqq/v+zNz59RaQnjj95oqVRcB8ZVReLFSYcKkLWlF7ubc+65RhR1u9ghSpZylVKSDUIbhHr4x/1DP1/0dAaXy7of9B+jU5/1rLj24WvyGk+rZakL/rm647dzf84E6DXjIzvO/ksE/EuqrVTc9a+We6bqjfueKd0bc9P9Mnu+pkLfW3CKQ+mA27Kn3fZ337/Bau924EypVPKq1apNAwMQNI0opCnKz38w1pYTk/NKZzxEABEIDO886LlQI7XYxUmMRPBiaBFhhREKeTAZFsELLg9BQCGS+PM6gRHgr5Zwoe5oOvVPxb4jdinj0Anc3Q3WCgWj2f3sdczVCpjQx7qFkdXapzHbZFfkMEF4+eCL1foa7r7ZAOYS/ZhXJLKOXDbZr9PAToQwCJieOccnB74hii2ffnGIyelZzv5+no/2HcRkQmxsE/2pYHGCyYQcP/kru/eMYOOYXR8f4PjkNCdPnWZ439eEQUAcJw5Feis8TzN3ocbT6x/igXvuBGDPjreW9Op7gzy+ZZBiPrkXqRVb58jnDD9NnGBg24dE7TZbt+/k8JFjTPwyxcC2nWSNoRW3rgx8tZHeCq2p1Zv0rV5J3+qVALz52uYl/e3XN//PVlgrxa4cB8d+4LHn36DWaLLhhQG++nac78aP8NRLZbryOWm1IknyJ4KjTKiU1r4Tsev6brUvb9xg81ljX9n0hF17xyp7V+8tduOTj9goauNrP7i8VoioeNNgvZjPzVT3H1o1dngCYzLsHRml0JVj75ejgNBuO0/Ega9OAfT29v73PqZScevWb1kzX29tbTTqRRtb5fsecWzR2kMpxPN821PIDn3/+dAwlDVc4RPVadF0Skn3lcu6dPSoqqbIpcXv8uW+PP4GWqxDTDPRNaAAAAAASUVORK5CYII=', 'download': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAACFElEQVR4nMVUz2sTQRh93zeT3TbY2FAtPRUpHiQigkgvetCL6MHjehIkiJdA9Q8QHBf0DyiSSyl66K3Bm4ce/QMUEW0QxB83sRA1CSnJ7s58HmJSS350Syu+48w3b9+892aB1BCCCKWf/0dIreB46f2RKDeVqfufmwgvJ3vN856MRhgAOprXiLOf8j/mFgEAgaiDEe/gKFjnBZJJM5yamEgS2FjAIodKDCECUepM9mPFvvCfiLvJaxjRQt1qimMFIxpzH/W4o2M3USELwAIA3a1GIAbY/kRICYCxXR4RhhDMSzX9a7YkmeyMxC1LwrfIyy4g3n4G5q8CpV0ULzfLhRogBNCutgy3IgAjvGQdpMOT+QfsT4dQekGiFqAnipSbD+HiE81j3+tdu2iggqPrE4hChWxu6d19nsw/knYjApwif0pJ1NqoLxeuQXrODxKPDq9CFkZ048mZx67TeE4TOY+Uxy7pfHEJbsIYHkU6nhgA8NDBCFOU3JGo9QGsiGw7aJYLNVRPD/j6N4ZZQTBmZ/3bdYWV83G+9OqiIz5VL59bLQTrXrWwubsVYejGizwk9JUFwbqqVG7Ys1duF7XvF+O4bQno/xoFzACI4Gx/TcipjGaXxG/ebjy9B2O4p7z/QLa2NrtRMM0DcoG6D6C/TxhyU5I/H6d4pOIeTl5d8me9lldLeeUZAB2n7esXK9spjxwMvwEghsO9GKLCEwAAAABJRU5ErkJggg==', 'gear': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAD5klEQVR4nLWUT4jVVRTHv+fce3/vvRnGHExpoj+LIOGBM8ErsSJ+o0VjOeXqB4ENisZr0yaGVlnDMIhItiiIYFCzhbaYwcVo5bgoZxGE+iCHHF1WJkOaZaH2fr977zkt5k9jTY4EneXhns+559+XcGdGaTpgAGBiYjDcYcz/Y7SYM8syM1KtanoSPDExGNZu3LIs59ZXEeLPZ0/s/wgApWlquru7ZWpqikZGRuIdgRfa6he3t5UKOp6UWp5QACG/+d7Dbb/3Lwa7HZgAoKtn+5vWlTfkzZt7nePL7Cqnfd5sMrMTifnk+P1tXRsvbWbrXhOff3l2/MCu2XidA/HC8gFoZ8+Ona7SOqSQ9TZJPpVIa3zR/I6ZS8RsQDjf+eyl5421Rwi6wVVahzp7duwEoLOMW8Ej1epcthckhBiKIocKQPohVFepikoIEUAXsYzF4DX4IpfgBUS9f2Ms+PHUFCHLDBHtBtSQ4ZKKKJhLRNTCbJitMwSyABEAEJFTVYLqHgCUnvyL94/hrVuXVW4ua0nZJKOq2gIVZZdw9MV5IrrGbB4XEUA1srVGYtF37Q8Z/X7i4+YiwxtgDACdX1/aayxvkxi+VaXHiJAY4zhqeMv+xHsajWHf+dwrvUw0qiIJQFDIaSZ+CKAzxlx/uXHsk6sAwGmaWmBQuk79uDUpl18XkXY2yVNEKDMbDuKnzn62b1ejMexrtbqb/HzfMRE9bGxCqiLGuLWqWGGTck/wlb0AFGlq+Pr11TP9EtwDACqSqwSoqhAzoPgNgNbqdedcq51ZKr1MRABBRSJUJVeJUOJ7F7aCAMWaTVuWm9hy1LjkSV/kV0DaTiBmNhQlbp48vv8oANR66w+EqGcIuFtVAOAXY90KEZkWCZsmjx/4ZgADRAsSaK1Wd9KBR6MPXcT8LlTLABEReVE5zMAVJdpGRCslSjTWmhh8vzP2qxvxxg8Xxg9Nz7Hm1kPTdMA2GsM+FvEuY5P3oagAIFUVVUmsS7axK71BmIESgSUGMdbt9iG2Xxg/NF2r1d3c9c3v3UQ3BAARY4gIRlUKADDWGYAQfB6CbwZVUWOtmU3qicgRYwhQavR2zOvHrQcCqCrG2Do2LimxsSTR9ynklDHOErFVxdUYfD8Rw7pSia0jVYwBpLOMRQ9kXoTYldZHX3wwOb7/SOfGHb8yuE00BuOSkhb5I0p0n3Xl/uCbXywmQkvK5oPp1vLyij3qyi3PSIyIobgSYqidO3Hw4u3i7GLOLMtMtVrVkzNC31z1dN9LnvkdEK9UlbfPnTh4sVaru0ZvR8z+Rej/qy1Z6ZIP5t5lWcbArDQODspSAX8Cm0TtanseiCAAAAAASUVORK5CYII=', 'star': 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAACeUlEQVR4nNWUQUhUURSG/3PfffNmTGdMxRQ3ErhoxsVkkW0EayEEtRxo0SIiWhRCRfvnrFyVqNUqaNUiWhpEKyMS2pQtzAgXtQkRLH0zOE/fu++cFk8Tx4EZI5DO6t7Lf7/733PPucDhhxBE6LBdNBKxy/Zr71ra7nztiZfqO1d1uYVYY5pbb5jIuACAMVj1ttXPmSsKANJrXz6CcDylg+6V+/mN+CYkjYPdWQ0Mx+NfSxbafkTp1a48OfZ7UtoiU7m4lll5je+9Gr29Jha+AYrnzMEcA2i9/fkp7OarEAaHlZelydylenu2wfG1Wm4ttquEvgMQi9kypEgBcCB0F4oSAEE48okwCWBLWJi0owFRHJiJ8qPszx3WrmNXFJY/WOlU6rrSqceUzEDCDYA0ZNMDsJ1OIpCTAcSA7COQTQ9s/Jsl33+C7lMRisQ1UhGflhn9dBKJ9CsCjklYCUHK3ivjkOwmW4AVBKUL3nR+vvoxq8qNBK5obzo/z+H6kEg0RzqpIcK7UGHSSS0SzXG4PuRN5+fhiq6ukP11XCSDwkKiPDWwpAJ/HNohEARABEgEQKAdUoE/Xp4aWEJhIYEimWpM7QbJ5hiuq1jrkdiJGLJTFjlpKz6AhLUegesqZHNcC1EbPIYIizkCR2chTJQ86nDgv5Wt8jNymhMgIjAPYjFHGEPUIFgUiKSjp7+T7KYzwpHHQWW0tHzivDeZvcJRcFnM5jLs1GBHT38niASQfZz94EJcKYHwsJCaEd44XZroe4gXYBTEKj3oex76qwMQmglku0ULjTUaAKDp3reuPxN3Vtca79EcLIR2PqG9y0I73+nfQf+J5n+J39QzDLg7vrq5AAAAAElFTkSuQmCC', 'project': 'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAg0lEQVR4nO3YQQ6AIAwF0Wq8/5X1AkZaCIwk89ZV+gFJMEKSJHGOZN096b3DzkRNtfneZ7q0Aow0siTEVaidtd2GtJpa2syL5qRlZpUOEfHRZ+Yj/rXKFlp2NFbG334FDEAzAM0ANAPQDEAzAM0ANAPQtg/gpZ5WuagTK0H8SJAkaZ0HxmsMM1Zne3AAAAAASUVORK5CYII=', 'voice': 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAfElEQVR4nO2WwQrAIAxDrez/f9lddhgjnctapWLfqWBoQ4NoKUlioF1YelTLcFRPM+DFJwPsqhl91wC7ala/RgTTDHhcqzdQ/3o/RLXncFTHiiANpIG9DYiIoNoLrf+hiUaA+seJQIONhtb3BBrP9+JvfPEjCM3o/0OyBydhRVv+p1U1MAAAAABJRU5ErkJggg=='}
+from .icon_paths import ICON_PATHS
 
-_TOOL_TINTS = {'copy': ('#1D7FE0', '#DCEEFF'), 'phrases': ('#DE8A00', '#FDEEC9'), 'translate': ('#1F9D66', '#D8F3E3'), 'ai': ('#7C5CFC', '#E7E1FF'), 'fx': ('#0CA6A0', '#D2F1EF'), 'clock': ('#5B6EE1', '#E0E4FC'), 'calc': ('#EE5B7F', '#FDE0E8'), 'download': ('#F06423', '#FEE3D3'), 'gear': ('#5B7A99', '#E2EBF3'), 'star': ('#E8A13A', '#FCEFD2')}
+# 未选中/默认态使用中性冷灰, 久看不刺眼
+DEFAULT_COLOR = "#5B6B7E"
+_STROKE_WIDTH = 2
+_RAW_SIZE = 32
+
+_SVG_TEMPLATE = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
+    'viewBox="0 0 24 24" fill="none" stroke="{color}" '
+    'stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round">'
+    '{body}</svg>'
+)
+
+# 工具 (主色, 浅底) 配色, 用于 IconBadge 等彩色图标底
+_TOOL_TINTS = {
+    "copy": ("#1D7FE0", "#DCEEFF"),
+    "phrases": ("#DE8A00", "#FDEEC9"),
+    "translate": ("#1F9D66", "#D8F3E3"),
+    "ai": ("#7C5CFC", "#E7E1FF"),
+    "fx": ("#0CA6A0", "#D2F1EF"),
+    "clock": ("#5B6EE1", "#E0E4FC"),
+    "calc": ("#EE5B7F", "#FDE0E8"),
+    "download": ("#F06423", "#FEE3D3"),
+    "gear": ("#5B7A99", "#E2EBF3"),
+    "star": ("#E8A13A", "#FCEFD2"),
+    "voice": ("#D9446E", "#FCE0E8"),
+    "browser": ("#7A6CF0", "#E8E5FF"),
+    "project": ("#3E86D8", "#DFECFB"),
+}
 
 
-def _raw_pixmap(name: str) -> QPixmap:
-    pm = QPixmap()
-    pm.loadFromData(base64.b64decode(_ICONS_B64[name]))
+def has_icon(name: str) -> bool:
+    return name in ICON_PATHS
+
+
+def _svg_bytes(name: str, color: str) -> QByteArray:
+    body = ICON_PATHS[name]
+    svg = _SVG_TEMPLATE.format(color=color, width=_STROKE_WIDTH, body=body)
+    return QByteArray(svg.encode("utf-8"))
+
+
+class _SvgIconEngine(QIconEngine):
+    """按需以矢量方式渲染 SVG 图标, 任意尺寸/设备像素比都清晰。"""
+
+    def __init__(self, name: str, color: str):
+        super().__init__()
+        self._name = name
+        self._color = color
+        self._renderer = QSvgRenderer(_svg_bytes(name, color))
+
+    def paint(self, painter, rect, mode, state):
+        painter.save()
+        if mode == QIcon.Disabled:
+            painter.setOpacity(0.4)
+        self._renderer.render(painter, rect)
+        painter.restore()
+
+    def clone(self):
+        return _SvgIconEngine(self._name, self._color)
+
+    def pixmap(self, size, mode, state):
+        pm = QPixmap(size)
+        pm.fill(Qt.transparent)
+        p = QPainter(pm)
+        self.paint(p, QRect(QPoint(0, 0), size), mode, state)
+        p.end()
+        return pm
+
+
+def _raw_pixmap(name: str, color: str = DEFAULT_COLOR,
+                size: int = _RAW_SIZE) -> QPixmap:
+    renderer = QSvgRenderer(_svg_bytes(name, color))
+    pm = QPixmap(size, size)
+    pm.fill(Qt.transparent)
+    p = QPainter(pm)
+    renderer.render(p, QRect(0, 0, size, size))
+    p.end()
     return pm
 
 
 @lru_cache(maxsize=None)
 def icon(name: str) -> QIcon:
-    return QIcon(_raw_pixmap(name))
+    if not has_icon(name):
+        raise KeyError(f"未知图标: {name}")
+    return QIcon(_SvgIconEngine(name, DEFAULT_COLOR))
 
 
 @lru_cache(maxsize=None)
 def tinted_icon(name: str, color: str) -> QIcon:
-    """把单色线条图标着成指定颜色 (用于深色背景/选中态)。"""
-    src = _raw_pixmap(name)
-    out = QPixmap(src.size())
-    out.fill(Qt.transparent)
-    p = QPainter(out)
-    p.drawPixmap(0, 0, src)
-    p.setCompositionMode(QPainter.CompositionMode_SourceIn)
-    p.fillRect(out.rect(), QColor(color))
-    p.end()
-    return QIcon(out)
+    """返回指定颜色的图标 (用于选中态/深色背景)。"""
+    if not has_icon(name):
+        raise KeyError(f"未知图标: {name}")
+    return QIcon(_SvgIconEngine(name, color))
 
 
 def tool_colors(name: str):
