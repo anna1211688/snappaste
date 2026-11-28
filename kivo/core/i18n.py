@@ -736,6 +736,80 @@ _TABLE.update({
     "anno.text_prompt": ("输入文字:", "Enter text:"),
 })
 
+# AI 服务商显示名
+_TABLE.update({
+    "prov.zhipu": ("智谱 GLM-4V-Flash (免费)", "Zhipu GLM-4V-Flash (Free)"),
+    "prov.bailian": ("阿里云百炼 Qwen-VL", "Alibaba Cloud Bailian Qwen-VL"),
+    "prov.siliconflow": ("硅基流动 Qwen2.5-VL", "SiliconFlow Qwen2.5-VL"),
+    "prov.openai": ("OpenAI GPT-4o", "OpenAI GPT-4o"),
+    "prov.gemini": ("Google Gemini", "Google Gemini"),
+    "prov.claude": ("Anthropic Claude", "Anthropic Claude"),
+    "prov.deepseek": ("DeepSeek (深度求索)", "DeepSeek"),
+    "prov.moonshot": ("Kimi (Moonshot)", "Kimi (Moonshot)"),
+    "prov.volcengine": ("火山方舟 豆包", "Volcano Ark Doubao"),
+    "prov.hunyuan": ("腾讯混元", "Tencent Hunyuan"),
+    "prov.qianfan": ("百度千帆 文心", "Baidu Qianfan ERNIE"),
+    "prov.xai": ("xAI Grok", "xAI Grok"),
+    "prov.dots": ("Dots 点点 (免费体验)", "Dots (free trial)"),
+    "prov.ollama": ("Ollama 本地/自建", "Ollama Local/Self-hosted"),
+    "prov.custom": ("自定义 (OpenAI 兼容接口)", "Custom (OpenAI-compatible)"),
+})
+
+# 任务路由名
+_TABLE.update({
+    "route.chat": ("AI 聊天", "AI Chat"),
+    "route.vision": ("看图翻译", "Image Translation"),
+    "route.annotate": ("标注栏 AI", "Annotation AI"),
+    "route.reply": ("智能回复", "Smart Reply"),
+    "route.text": ("文本翻译", "Text Translation"),
+})
+
+# AI 模型中心弹窗
+_TABLE.update({
+    "ais.title": ("AI 模型中心", "AI Model Center"),
+    "ais.save_all": ("保存全部设置", "Save All Settings"),
+    "ais.provider": ("服务商", "Provider"),
+    "ais.base": ("接口地址", "Base URL"),
+    "ais.model": ("模型", "Model"),
+    "ais.fetch": ("获取模型", "Fetch Models"),
+    "ais.add": ("添加到模型列表", "Add to Model List"),
+    "ais.available": ("可用模型", "Available Models"),
+    "ais.use": ("选用", "Use"),
+    "ais.provider_hint": ("每家服务商独立保存；OpenAI 兼容接口可自动获取模型，其他可手动填写。",
+                          "Settings are saved separately per provider. OpenAI-compatible endpoints can fetch models automatically; others can be filled in manually."),
+    "ais.provider_tab": ("服务商配置", "Provider"),
+    "ais.fetch_fail": ("获取失败：", "Fetch failed: "),
+    "ais.fetched_count": ("获取到 {n} 个模型", "Fetched {n} models"),
+    "ais.need_id": ("请先填写模型 ID", "Enter a model ID first"),
+    "ais.added": ("已添加：", "Added: "),
+    "ais.model_exists": ("模型已存在", "Model already exists"),
+    "ais.set_default": ("设为默认", "Set as Default"),
+    "ais.toggle": ("启用/停用", "Enable/Disable"),
+    "ais.delete_model": ("删除模型", "Delete Model"),
+    "ais.models_tab": ("模型列表", "Model List"),
+    "ais.enabled": ("启用", "Enabled"),
+    "ais.disabled": ("停用", "Disabled"),
+    "ais.default_set": ("已设为该服务商默认模型",
+                        "Set as the default model for this provider"),
+    "ais.routes_hint": ("为不同任务指定服务商；选「跟随当前服务」则用默认服务商。",
+                       "Assign a provider to each task. “Follow current service” uses the default provider."),
+    "ais.follow": ("跟随当前服务", "Follow current service"),
+    "ais.routes_tab": ("任务分配", "Task Routing"),
+    "ais.fallback": ("当前模型失败时自动尝试同服务商其他已启用模型",
+                     "Automatically try other enabled models of the same provider when the current model fails"),
+    "ais.test_hint": ("选择服务商并填写 Key、模型后，可在此测试连接。",
+                      "Select a provider and fill in its key and model, then test the connection here."),
+    "ais.test_provider": ("测试当前服务商", "Test Current Provider"),
+    "ais.test_tab": ("连接测试", "Connection Test"),
+    "ais.testing": ("测试中…", "Testing…"),
+    "ais.conn_ok": ("连接正常 · {sec} 秒 · 返回：{r}",
+                    "Connection OK · {sec} s · Reply: {r}"),
+    "ais.conn_fail": ("连接失败 · {sec} 秒 · {e}",
+                     "Connection failed · {sec} s · {e}"),
+    "ais.empty_reply": ("空", "Empty"),
+    "ais.saved": ("AI 模型中心已保存", "AI model center saved"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

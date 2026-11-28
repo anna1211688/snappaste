@@ -11,11 +11,11 @@ MODEL_ID_MAX = 200
 
 # 可在任务分配里指定的路由（与 Tk 任务分配一致，不含 voice）
 ROUTE_DEFS = [
-    ("RouteChat", "AI 聊天"),
-    ("RouteVision", "看图翻译"),
-    ("RouteAnnotate", "标注栏 AI"),
-    ("RouteReply", "智能回复"),
-    ("RouteText", "文本翻译"),
+    ("RouteChat", "route.chat"),
+    ("RouteVision", "route.vision"),
+    ("RouteAnnotate", "route.annotate"),
+    ("RouteReply", "route.reply"),
+    ("RouteText", "route.text"),
 ]
 
 

@@ -16,6 +16,12 @@ import ipaddress
 
 from .util import redact_ai_detail, redact_secrets
 from . import network
+from .i18n import tr
+
+
+def provider_label(svc_key):
+    """服务商显示名按当前语言返回；未注册的回退为 key。"""
+    return tr(f"prov.{svc_key}")
 
 # 服务 -> (显示名, 接口地址, 默认模型)
 AI_PRESETS = {

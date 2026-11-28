@@ -15,8 +15,9 @@ from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, MutedLabel
 from ..icons import icon
 from .base import show_toast
-from ...core.ai import AIClient, AI_PRESETS
+from ...core.ai import AIClient, AI_PRESETS, provider_label
 from ...core import ai_settings_store as astore
+from ...core.i18n import tr
 
 
 class _Signals(QObject):
@@ -49,7 +50,7 @@ class AiSettingsDialog(QDialog):
         cl.setSpacing(10)
 
         head = QHBoxLayout()
-        title = QLabel("AI 模型中心")
+        title = QLabel(tr("ais.title"))
         title.setObjectName("title")
         head.addWidget(title); head.addStretch()
         close = QPushButton()
@@ -70,7 +71,7 @@ class AiSettingsDialog(QDialog):
 
         footer = QHBoxLayout()
         footer.addStretch()
-        save = PrimaryButton("保存全部设置", icon_name="save")
+        save = PrimaryButton(tr("ais.save_all"), icon_name="save")
         save.clicked.connect(self._save_all)
         footer.addWidget(save)
         cl.addLayout(footer)
@@ -89,10 +90,10 @@ class AiSettingsDialog(QDialog):
         self.svc_store = {k: self._read_svc(k) for k in AI_PRESETS}
 
         row = QHBoxLayout()
-        row.addWidget(QLabel("服务商"))
+        row.addWidget(QLabel(tr("ais.provider")))
         self.svc = QComboBox()
         for k in AI_PRESETS:
-            self.svc.addItem(AI_PRESETS[k][0], k)
+            self.svc.addItem(provider_label(k), k)
         self.svc.setCurrentIndex(list(AI_PRESETS).index(self._svc_key))
         self.svc.currentIndexChanged.connect(self._on_svc_changed)
         row.addWidget(self.svc, 1)
@@ -104,15 +105,15 @@ class AiSettingsDialog(QDialog):
         grid = QGridLayout()
         grid.addWidget(QLabel("API Key"), 0, 0)
         grid.addWidget(self.key_edit, 0, 1)
-        grid.addWidget(QLabel("接口地址"), 1, 0)
+        grid.addWidget(QLabel(tr("ais.base")), 1, 0)
         grid.addWidget(self.base_edit, 1, 1)
-        grid.addWidget(QLabel("模型"), 2, 0)
+        grid.addWidget(QLabel(tr("ais.model")), 2, 0)
         grid.addWidget(self.model_edit, 2, 1)
-        fetch = QPushButton("获取模型")
+        fetch = QPushButton(tr("ais.fetch"))
         fetch.setIcon(icon("refresh"))
         fetch.clicked.connect(self._fetch_models)
         grid.addWidget(fetch, 2, 2)
-        add = QPushButton("添加到模型列表")
+        add = QPushButton(tr("ais.add"))
         add.setIcon(icon("plus"))
         add.clicked.connect(self._add_current_model)
         grid.addWidget(add, 2, 3)
@@ -121,17 +122,17 @@ class AiSettingsDialog(QDialog):
         self.model_combo = QComboBox()
         self.model_combo.setEditable(False)
         fetched_row = QHBoxLayout()
-        fetched_row.addWidget(QLabel("可用模型"))
+        fetched_row.addWidget(QLabel(tr("ais.available")))
         fetched_row.addWidget(self.model_combo, 1)
-        use = QPushButton("选用")
+        use = QPushButton(tr("ais.use"))
         use.setIcon(icon("check"))
         use.clicked.connect(self._use_fetched_model)
         fetched_row.addWidget(use)
         lay.addLayout(fetched_row)
 
-        lay.addWidget(MutedLabel("每家服务商独立保存；OpenAI 兼容接口可自动获取模型，其他可手动填写。"))
+        lay.addWidget(MutedLabel(tr("ais.provider_hint")))
         lay.addStretch()
-        self.tabs.addTab(tab, "服务商配置")
+        self.tabs.addTab(tab, tr("ais.provider_tab"))
         self._load_svc_fields()
 
     def _read_svc(self, k):
@@ -171,7 +172,7 @@ class AiSettingsDialog(QDialog):
                 ids = client.fetch_models(cfg)
                 signals.models.emit(list(ids or []))
             except Exception as e:
-                signals.message.emit(f"获取失败：{e}")
+                signals.message.emit(tr("ais.fetch_fail") + str(e))
             finally:
                 signals.finished.emit()
 
@@ -181,7 +182,7 @@ class AiSettingsDialog(QDialog):
         self.model_combo.clear()
         self.model_combo.addItems(ids)
         if ids:
-            show_toast(self, f"获取到 {len(ids)} 个模型")
+            show_toast(self, tr("ais.fetched_count", n=len(ids)))
 
     def _use_fetched_model(self):
         if self.model_combo.count():
@@ -190,13 +191,13 @@ class AiSettingsDialog(QDialog):
     def _add_current_model(self):
         model = self.model_edit.text().strip()
         if not model:
-            show_toast(self, "请先填写模型 ID")
+            show_toast(self, tr("ais.need_id"))
             return
         if astore.add_model(self.profiles, self._svc_key, model):
             self._refresh_model_list()
-            show_toast(self, f"已添加：{model}")
+            show_toast(self, tr("ais.added") + model)
         else:
-            show_toast(self, "模型已存在")
+            show_toast(self, tr("ais.model_exists"))
 
     # ---------- 模型列表 ----------
     def _build_models_tab(self):
@@ -205,27 +206,28 @@ class AiSettingsDialog(QDialog):
         self.model_list = QListWidget()
         lay.addWidget(self.model_list)
         btns = QHBoxLayout()
-        default = QPushButton("设为默认")
+        default = QPushButton(tr("ais.set_default"))
         default.setIcon(icon("star"))
         default.clicked.connect(self._set_selected_default)
-        toggle = QPushButton("启用/停用")
+        toggle = QPushButton(tr("ais.toggle"))
         toggle.clicked.connect(self._toggle_selected)
-        delete = QPushButton("删除模型")
+        delete = QPushButton(tr("ais.delete_model"))
         delete.setIcon(icon("trash"))
         delete.clicked.connect(self._delete_selected)
         for b in (default, toggle, delete):
             btns.addWidget(b)
         btns.addStretch()
         lay.addLayout(btns)
-        self.tabs.addTab(tab, "模型列表")
+        self.tabs.addTab(tab, tr("ais.models_tab"))
         self._refresh_model_list()
 
     def _refresh_model_list(self):
         self.model_list.clear()
         for svc in AI_PRESETS:
             for p in self.profiles[svc]:
-                state = "启用" if p["enabled"] else "停用"
-                item = QListWidgetItem(f"{AI_PRESETS[svc][0]} · {p['model']}（{state}）")
+                state = tr("ais.enabled") if p["enabled"] else tr("ais.disabled")
+                item = QListWidgetItem(
+                    f"{provider_label(svc)} · {p['model']}（{state}）")
                 item.setData(Qt.UserRole, (svc, p["model"]))
                 self.model_list.addItem(item)
 
@@ -243,7 +245,7 @@ class AiSettingsDialog(QDialog):
         self.svc_store[svc][1] = model
         if svc == self._svc_key:
             self.model_edit.setText(model)
-        show_toast(self, "已设为该服务商默认模型")
+        show_toast(self, tr("ais.default_set"))
 
     def _toggle_selected(self):
         sel = self._selected_profile()
@@ -259,18 +261,18 @@ class AiSettingsDialog(QDialog):
     def _build_routes_tab(self):
         tab = QWidget()
         lay = QVBoxLayout(tab)
-        lay.addWidget(MutedLabel("为不同任务指定服务商；选「跟随当前服务」则用默认服务商。"))
+        lay.addWidget(MutedLabel(tr("ais.routes_hint")))
         self.route_combos = {}
         saved = astore.load_routes(self.config)
         names = [k for k in AI_PRESETS]
-        for rk, label in astore.ROUTE_DEFS:
+        for rk, label_key in astore.ROUTE_DEFS:
             row = QHBoxLayout()
-            lab = QLabel(label); lab.setFixedWidth(90)
+            lab = QLabel(tr(label_key)); lab.setFixedWidth(90)
             row.addWidget(lab)
             combo = QComboBox()
-            combo.addItem("跟随当前服务", ("", ""))
+            combo.addItem(tr("ais.follow"), ("", ""))
             for k in names:
-                combo.addItem(AI_PRESETS[k][0], (k, ""))
+                combo.addItem(provider_label(k), (k, ""))
             svc, model = saved[rk]
             if svc:
                 idx = names.index(svc) + 1
@@ -279,32 +281,32 @@ class AiSettingsDialog(QDialog):
             self.route_combos[rk] = combo
             lay.addLayout(row)
         lay.addStretch()
-        self.tabs.addTab(tab, "任务分配")
+        self.tabs.addTab(tab, tr("ais.routes_tab"))
 
     # ---------- 连接测试 ----------
     def _build_test_tab(self):
         tab = QWidget()
         lay = QVBoxLayout(tab)
-        self.fallback = QCheckBox("当前模型失败时自动尝试同服务商其他已启用模型")
+        self.fallback = QCheckBox(tr("ais.fallback"))
         self.fallback.setChecked(
             (self.config.get("AI", "AutoFallback", fallback="0") or "0").strip() == "1")
         lay.addWidget(self.fallback)
-        self.test_result = QLabel("选择服务商并填写 Key、模型后，可在此测试连接。")
+        self.test_result = QLabel(tr("ais.test_hint"))
         self.test_result.setWordWrap(True)
         self.test_result.setObjectName("aiTestResult")
         lay.addWidget(self.test_result)
-        btn = QPushButton("测试当前服务商")
+        btn = QPushButton(tr("ais.test_provider"))
         btn.setIcon(icon("zap"))
         btn.clicked.connect(self._run_connection_test)
         lay.addWidget(btn)
         lay.addStretch()
-        self.tabs.addTab(tab, "连接测试")
+        self.tabs.addTab(tab, tr("ais.test_tab"))
 
     def _run_connection_test(self):
         if self._busy:
             return
         self._busy = True
-        self.test_result.setText("测试中…")
+        self.test_result.setText(tr("ais.testing"))
         cfg = self._current_svc_cfg()
         client = self.client
         signals = self.signals
@@ -317,10 +319,13 @@ class AiSettingsDialog(QDialog):
                     [{"role": "user", "content": "只回复两个字：正常"}],
                     cfg=cfg, max_tokens=16, timeout=30)
                 elapsed = time.monotonic() - started
-                signals.message.emit(f"连接正常 · {elapsed:.2f} 秒 · 返回：{r or '空'}")
+                reply = r if r else tr("ais.empty_reply")
+                signals.message.emit(tr(
+                    "ais.conn_ok", sec=f"{elapsed:.2f}", r=reply))
             except Exception as e:
                 elapsed = time.monotonic() - started
-                signals.message.emit(f"连接失败 · {elapsed:.2f} 秒 · {e}")
+                signals.message.emit(tr(
+                    "ais.conn_fail", sec=f"{elapsed:.2f}", e=str(e)))
             finally:
                 signals.finished.emit()
 
@@ -341,5 +346,5 @@ class AiSettingsDialog(QDialog):
         astore.save_routes(self.config, routes)
         self.config.set("AI", "AutoFallback", "1" if self.fallback.isChecked() else "0")
         self.config.save()
-        show_toast(self, "AI 模型中心已保存")
+        show_toast(self, tr("ais.saved"))
         self.accept()
