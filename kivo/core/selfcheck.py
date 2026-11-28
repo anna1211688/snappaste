@@ -6,14 +6,16 @@ import json
 import os
 import tempfile
 
-# (key, 中文标签)
+from .i18n import tr
+
+# (key, 标签 i18n key)
 CHK_ITEMS = [
-    ("data", "数据目录可写"),
-    ("config", "配置文件完好"),
-    ("records", "记录数据完好"),
-    ("ocr", "OCR 识别引擎"),
-    ("translate", "翻译通道"),
-    ("hotkey", "全局热键"),
+    ("data", "chk.data"),
+    ("config", "chk.config"),
+    ("records", "chk.records"),
+    ("ocr", "chk.ocr"),
+    ("translate", "chk.translate"),
+    ("hotkey", "chk.hotkey"),
 ]
 
 
@@ -85,11 +87,11 @@ class SelfCheckRunner:
 
     def _hotkey(self):
         if self.hotkey_provider is None:
-            return False, "全局热键未注册"
+            return False, tr("chk.hotkey_missing")
         try:
             n = self.hotkey_provider()
             if n:
-                return True, f"{n} 个已注册"
-            return False, "全局热键未注册"
+                return True, tr("chk.hotkey_count", n=n)
+            return False, tr("chk.hotkey_missing")
         except OSError as e:
             return False, str(e)[:50]

@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 from ..theme import Theme, add_shadow
 from ..components import SearchInput
 from ...core import quick_store
+from ...core.i18n import tr
 
 
 class QuickPanel(QDialog):
@@ -36,7 +37,7 @@ class QuickPanel(QDialog):
         cl.setContentsMargins(16, 14, 16, 14)
         cl.setSpacing(10)
 
-        self.entry = SearchInput("搜索剪贴板、常用语，或直接算算术…")
+        self.entry = SearchInput(tr("quick.search_ph"))
         self.entry.textChanged.connect(self.refresh)
         self.entry.returnPressed.connect(self.pick)
         cl.addWidget(self.entry)

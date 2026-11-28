@@ -268,6 +268,32 @@ _TABLE.update({
     "voice.failed": ("失败：", "Failed: "),
 })
 
+# 计算器 / 快捷面板
+_TABLE.update({
+    "calc.history": ("计算历史", "History"),
+    "calc.empty": ("暂无计算历史", "No calculation history"),
+    "quick.search_ph": ("搜索剪贴板、常用语，或直接算算术…",
+                        "Search clips and phrases, or do a quick calculation…"),
+})
+
+# 软件自检
+_TABLE.update({
+    "chk.title": ("软件自检", "Self-check"),
+    "chk.wait": ("待检测", "Waiting"),
+    "chk.running": ("检测中…", "Checking…"),
+    "chk.start": ("开始自检", "Run self-check"),
+    "chk.ok": ("正常", "Normal"),
+    "chk.bad": ("异常", "Abnormal"),
+    "chk.data": ("数据目录可写", "Data directory writable"),
+    "chk.config": ("配置文件完好", "Config file intact"),
+    "chk.records": ("记录数据完好", "Records intact"),
+    "chk.ocr": ("OCR 识别引擎", "OCR engine"),
+    "chk.translate": ("翻译通道", "Translation channel"),
+    "chk.hotkey": ("全局热键", "Global hotkeys"),
+    "chk.hotkey_missing": ("全局热键未注册", "Global hotkeys not registered"),
+    "chk.hotkey_count": ("{n} 个已注册", "{n} registered"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

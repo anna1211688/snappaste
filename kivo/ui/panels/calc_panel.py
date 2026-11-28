@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import SectionHeader
+from ...core.i18n import tr
 from ...core.calc_store import CalcStore
 
 
@@ -78,9 +79,9 @@ class CalcPanel(QWidget):
         # 历史
         lay.addSpacing(8)
         hrow = QHBoxLayout()
-        hrow.addWidget(SectionHeader("计算历史"))
+        hrow.addWidget(SectionHeader(tr("calc.history")))
         hrow.addStretch()
-        clear = QPushButton("清空")
+        clear = QPushButton(tr("common.clear"))
         clear.setObjectName("calcClearHist")
         clear.clicked.connect(self._clear_history)
         hrow.addWidget(clear)
@@ -102,7 +103,7 @@ class CalcPanel(QWidget):
     def _fill_history(self):
         self.hist_list.clear()
         if not self.store.history:
-            it = QListWidgetItem("暂无计算历史")
+            it = QListWidgetItem(tr("calc.empty"))
             it.setFlags(Qt.NoItemFlags)
             self.hist_list.addItem(it)
             return

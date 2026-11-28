@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import PrimaryButton
+from ...core.i18n import tr
 from ...core.selfcheck import CHK_ITEMS
 
 
@@ -36,7 +37,7 @@ class SelfCheckPanel(QWidget):
         outer.setContentsMargins(20, 18, 20, 18)
         outer.setSpacing(12)
 
-        title = QLabel("软件自检")
+        title = QLabel(tr("chk.title"))
         title.setObjectName("hero")
         outer.addWidget(title)
 
@@ -49,9 +50,9 @@ class SelfCheckPanel(QWidget):
 
         for key, label in CHK_ITEMS:
             row = QHBoxLayout()
-            name = QLabel(label)
+            name = QLabel(tr(label))
             name.setFixedWidth(140)
-            result = QLabel("待检测")
+            result = QLabel(tr("chk.wait"))
             result.setObjectName("chkWait")
             row.addWidget(name)
             row.addWidget(result)
@@ -59,7 +60,7 @@ class SelfCheckPanel(QWidget):
             lay.addLayout(row)
             self._rows[key] = result
 
-        run_btn = PrimaryButton("开始自检", icon_name="zap")
+        run_btn = PrimaryButton(tr("chk.start"), icon_name="zap")
         run_btn.clicked.connect(self.run_check)
         btn_row = QHBoxLayout()
         btn_row.addStretch(); btn_row.addWidget(run_btn)
@@ -71,7 +72,7 @@ class SelfCheckPanel(QWidget):
         if self._thread is not None:
             return
         for lab in self._rows.values():
-            lab.setText("检测中…")
+            lab.setText(tr("chk.running"))
             lab.setObjectName("chkWait")
             lab.style().unpolish(lab); lab.style().polish(lab)
 
@@ -85,7 +86,7 @@ class SelfCheckPanel(QWidget):
     def _on_finished(self, results):
         for key, (ok, extra) in results.items():
             lab = self._rows[key]
-            text = ("正常" if ok else "异常") + (f" — {extra}" if extra else "")
+            text = (tr("chk.ok") if ok else tr("chk.bad")) + (f" — {extra}" if extra else "")
             lab.setText(text)
             lab.setObjectName("chkOk" if ok else "chkBad")
             lab.style().unpolish(lab); lab.style().polish(lab)
