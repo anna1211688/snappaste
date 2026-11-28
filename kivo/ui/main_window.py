@@ -6,7 +6,6 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QWidget, QFrame, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel,
 )
-
 from .theme import Theme, add_shadow
 from .components import NavItem, SectionHeader
 from ..core.paths import VERSION
@@ -174,3 +173,11 @@ class MainWindow(QWidget):
         self._settings_win.show()
         self._settings_win.raise_()
         self._settings_win.activateWindow()
+
+    def closeEvent(self, event):
+        # AppRuntime 可挂 close_requested 实现"隐藏到托盘"; 未挂则默认接受关闭
+        hook = getattr(self, "close_requested", None)
+        if hook is not None:
+            hook(event)
+        else:
+            super().closeEvent(event)

@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QApplication
 
 from kivo.ui.theme import Theme
 from kivo.ui.main_window import MainWindow
+from kivo.ui.app_runtime import AppRuntime
 from kivo.ui.splash import create_splash, set_message
 from kivo.app_context import Services
 from kivo.core import i18n, data
@@ -50,6 +51,14 @@ def main() -> int:
         i = sys.argv.index("--pane")
         win.select(sys.argv[i + 1])
     win.show()
+
+    # 运行时: 单实例/托盘/全局热键/编辑动作/窗口关闭行为
+    runtime = AppRuntime(services, win)
+    if not runtime.single_instance_ok:
+        # 已有实例在跑: 本实例退出 (单实例守卫已放行异常, 这里正常处理)
+        return 0
+    runtime.start()
+    app.aboutToQuit.connect(runtime.stop)
 
     if splash is not None:
         splash.finish(win)

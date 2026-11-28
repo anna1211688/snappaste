@@ -107,3 +107,15 @@ def tinted_icon(name: str, color: str) -> QIcon:
 def tool_colors(name: str):
     """返回 (主色, 浅底) 工具配色。"""
     return _TOOL_TINTS.get(name, ("#007AFF", "#E9F2FF"))
+
+
+def load_tray_icon():
+    """托盘图标 (PIL 图, pystray 需要): 从 KIVO.ico 取 64px; 失败返回 None。"""
+    import os
+    ico = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__)))), "KIVO.ico")
+    try:
+        from PIL import Image
+        return Image.open(ico).convert("RGBA").resize((64, 64))
+    except Exception:
+        return None
