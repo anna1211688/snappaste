@@ -186,7 +186,7 @@ class DownloadPanel(QWidget):
         self.bar.setValue(0)
         self.status.setText(tr("dl.downloading"))
 
-        self._thread = QThread(self)
+        self._thread = QThread()
         self._worker = _Worker(self.store, url, download, outdir,
                                self.cookie_switch.isChecked())
         self._worker.moveToThread(self._thread)

@@ -25,6 +25,29 @@ def test_config_check(tmp_path):
     assert ok
 
 
+def test_config_check_gbk(tmp_path):
+    # GBK 编码的老配置在 utf-8-sig 下解码失败: 自检项应报告失败而非抛异常
+    cfg = tmp_path / "Config.ini"
+    cfg.write_bytes("[Config]\n名字=值\n".encode("gbk"))
+    ok, _ = selfcheck.check_config(str(cfg))
+    assert not ok
+
+
+def test_worker_run_fallback(qapp):
+    from kivo.ui.panels.selfcheck_panel import _Worker
+
+    class Boom:
+        def run(self):
+            raise RuntimeError("boom")
+
+    got = []
+    w = _Worker(Boom())
+    w.finished.connect(lambda d: got.append(d))
+    w.run()  # 直接调用, 验证异常兜底后仍发出 finished
+    assert len(got) == 1
+    assert all(not ok for ok, _ in got[0].values())
+
+
 def test_records_good(tmp_path):
     rec = tmp_path / "records.json"
     rec.write_text(json.dumps(["a", "b"]), encoding="utf-8")

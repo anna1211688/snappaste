@@ -206,7 +206,10 @@ class AIClient:
                 open_timeout = min(timeout, 45) if stream_callback is not None else timeout
                 with network.open_url(req, timeout=open_timeout) as r:
                     if stream_callback is None:
-                        return json.loads(r.read().decode("utf-8"))
+                        raw = r.read(2 * 1024 * 1024 + 1)
+                        if len(raw) > 2 * 1024 * 1024:
+                            raise RuntimeError(tr("aierr.response_too_large"))
+                        return json.loads(raw.decode("utf-8"))
                     chunks, raw_lines, saw_sse = [], [], False
                     while not (cancel_event is not None and cancel_event.is_set()):
                         line = r.readline(1024 * 1024 + 1)

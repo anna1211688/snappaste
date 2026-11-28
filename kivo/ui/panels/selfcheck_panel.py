@@ -21,7 +21,12 @@ class _Worker(QObject):
         self.runner = runner
 
     def run(self):
-        self.finished.emit(self.runner.run())
+        # 兜底: 任何检查项抛异常都归为失败, 确保 finished 一定发出, 线程能正常退出
+        try:
+            results = self.runner.run()
+        except Exception as e:
+            results = {key: (False, str(e)[:80]) for key, _ in CHK_ITEMS}
+        self.finished.emit(results)
 
 
 class SelfCheckPanel(QWidget):
@@ -76,7 +81,8 @@ class SelfCheckPanel(QWidget):
             lab.setObjectName("chkWait")
             lab.style().unpolish(lab); lab.style().polish(lab)
 
-        self._thread = QThread(self)
+        # 线程不挂 parent: 避免面板销毁时强删仍在运行的线程
+        self._thread = QThread()
         self._worker = _Worker(self.runner)
         self._worker.moveToThread(self._thread)
         self._thread.started.connect(self._worker.run)

@@ -38,7 +38,7 @@ def check_config(config_path):
         cp = configparser.ConfigParser(strict=False, interpolation=None)
         cp.read(config_path, encoding="utf-8-sig")
         return len(cp.sections()) > 0, ""
-    except OSError as e:
+    except Exception as e:  # 含 UnicodeDecodeError(GBK 老配置)等: 自检项只应报告失败, 不应崩溃
         return False, str(e)[:50]
 
 

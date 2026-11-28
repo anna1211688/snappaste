@@ -29,9 +29,13 @@ class _Worker(QObject):
         self.out_dir = out_dir
 
     def run(self):
-        ok, errors = self.store.run_all(
-            self.files, self.opts, self.out_dir,
-            lambda i, t: self.progress.emit(i, t))
+        # 兜底: run_all 异常 (如输出目录创建失败) 时仍发出 finished, 线程能正常退出
+        try:
+            ok, errors = self.store.run_all(
+                self.files, self.opts, self.out_dir,
+                lambda i, t: self.progress.emit(i, t))
+        except Exception as e:
+            ok, errors = 0, [str(e)[:120]]
         self.finished.emit(ok, errors)
 
 
@@ -183,7 +187,7 @@ class BatchPanel(QWidget):
                 "format": rb.property("fmt"),
                 "watermark": self.watermark.text().strip()}
 
-        self._thread = QThread(self)
+        self._thread = QThread()
         self._worker = _Worker(self.store, list(self.files), opts, out_dir)
         self._worker.moveToThread(self._thread)
         self._thread.started.connect(self._worker.run)

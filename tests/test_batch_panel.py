@@ -107,3 +107,17 @@ def test_remove_files(bp):
     bp.file_list.setCurrentRow(0)
     bp._remove_sel()
     assert bp.files == ["/tmp/b.png"]
+
+
+def test_worker_run_fallback(qapp):
+    from kivo.ui.panels.batch_panel import _Worker
+
+    class BoomStore:
+        def run_all(self, *a, **k):
+            raise RuntimeError("boom")
+
+    got = []
+    w = _Worker(BoomStore(), ["a.png"], {}, "/out")
+    w.finished.connect(lambda ok, errs: got.append((ok, errs)))
+    w.run()  # 直接调用, 验证 run_all 异常兜底后仍发出 finished
+    assert got == [(0, ["boom"])]
