@@ -483,6 +483,29 @@ _TABLE.update({
     "dl.failed": ("失败：", "Failed: "),
 })
 
+# 图片批量处理面板
+_TABLE.update({
+    "batch.title": ("图片批量处理", "Batch Image Processing"),
+    "batch.add_images": ("添加图片", "Add images"),
+    "batch.remove_sel": ("移除选中", "Remove selected"),
+    "batch.percent": ("缩放百分比", "Scale percentage"),
+    "batch.max_side": ("最长边(0=不限)", "Longest edge (0 = no limit)"),
+    "batch.output_fmt": ("输出格式", "Output format"),
+    "batch.keep_fmt": ("保持原格式", "Keep original"),
+    "batch.quality": ("JPG/WEBP 质量", "JPG/WEBP quality"),
+    "batch.watermark": ("文字水印(留空不加)", "Text watermark (blank = none)"),
+    "batch.out_folder": ("输出文件夹", "Output folder"),
+    "batch.choose": ("选择", "Choose"),
+    "batch.start": ("开始批量处理", "Start batch processing"),
+    "batch.choose_images": ("选择图片", "Choose images"),
+    "batch.choose_out": ("选择输出文件夹", "Choose output folder"),
+    "batch.need_images": ("请先添加图片", "Add images first"),
+    "batch.bad_params": ("缩放或质量参数有误", "Invalid scale or quality parameters"),
+    "batch.processing": ("处理中 {i}/{total}", "Processing {i}/{total}"),
+    "batch.done": ("批量处理完成：成功 {ok} 张", "Batch finished: {ok} succeeded"),
+    "batch.failed_count": ("，失败 {n} 张", ", {n} failed"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
