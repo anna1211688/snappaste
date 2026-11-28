@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, SecondaryButton
+from ..icons import icon
 from ...core.voice import TRANS_TARGETS
 
 
@@ -66,13 +67,14 @@ class MiniTranslateWindow(QDialog):
         bar.setObjectName("miniTitleBar")
         lay = QHBoxLayout(bar)
         lay.setContentsMargins(14, 8, 10, 8)
-        title = QLabel("🌐 迷你翻译")
+        title = QLabel("迷你翻译")
         title.setObjectName("miniTitle")
         lay.addWidget(title)
         lay.addStretch()
-        close = QLabel("✕")
+        close = QLabel()
         close.setObjectName("miniClose")
         close.setCursor(Qt.PointingHandCursor)
+        close.setPixmap(icon("close").pixmap(14, 14))
         close.mousePressEvent = lambda _e: self.hide()
         lay.addWidget(close)
         # 拖动支持

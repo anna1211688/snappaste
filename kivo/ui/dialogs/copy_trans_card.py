@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, SecondaryButton
+from ..icons import icon
 
 AUTO_CLOSE_MS = 20_000
 
@@ -75,9 +76,10 @@ class CopyTransCard(QDialog):
         title.setObjectName("ctTitle")
         lay.addWidget(title)
         lay.addStretch()
-        close = QLabel("✕")
+        close = QLabel()
         close.setObjectName("ctClose")
         close.setCursor(Qt.PointingHandCursor)
+        close.setPixmap(icon("close").pixmap(14, 14))
         close.mousePressEvent = lambda _e: self.close_card()
         lay.addWidget(close)
         return bar
