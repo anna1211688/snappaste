@@ -119,6 +119,9 @@ class SettingsPanel(QWidget):
 
         entry_row = QHBoxLayout()
         entry_row.addStretch()
+        ai_btn = SecondaryButton("AI 模型中心")
+        ai_btn.clicked.connect(self._open_ai_settings)
+        entry_row.addWidget(ai_btn)
         tr_btn = SecondaryButton("翻译服务")
         tr_btn.clicked.connect(self._open_translate_service)
         entry_row.addWidget(tr_btn)
@@ -126,6 +129,12 @@ class SettingsPanel(QWidget):
         hk_btn.clicked.connect(self._open_hotkey)
         entry_row.addWidget(hk_btn)
         lay.addLayout(entry_row)
+
+    def _open_ai_settings(self):
+        from ..dialogs.ai_settings_dialog import AiSettingsDialog
+        dlg = AiSettingsDialog(self, self.theme, self.config)
+        dlg.exec()
+        dlg.deleteLater()
 
     def _open_hotkey(self):
         from ..dialogs.hotkey_dialog import HotkeyDialog

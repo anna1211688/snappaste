@@ -146,6 +146,12 @@ QLabel#ctClose {{ background: transparent; color: {t['muted']}; font-size: {FONT
 QLabel#ctOrig {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['sm']}px; padding: 2px 14px; }}
 QLabel#ctTrans {{ background: transparent; color: {t['text']}; font-size: {FONT_SIZE['md']}px; padding: 2px 14px; }}
 QLabel#ctFail {{ background: transparent; color: {t['danger']}; font-size: {FONT_SIZE['sm']}px; padding: 2px 14px; }}
+QFrame#aiSetCard {{ background: {t['surface']}; border: 1px solid {t['border']}; border-radius: {RADIUS['xl']}px; }}
+QLabel#aiTestResult {{ background: transparent; color: {t['accent']}; font-size: {FONT_SIZE['sm']}px; }}
+QTabWidget#aiTabs::pane {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['md']}px; top: -1px; }}
+QTabBar::tab {{ background: transparent; color: {t['muted']}; padding: 7px 16px; font-size: {FONT_SIZE['sm']}px; border-top-left-radius: {RADIUS['sm']}px; border-top-right-radius: {RADIUS['sm']}px; margin-right: 4px; }}
+QTabBar::tab:selected {{ background: {t['soft']}; color: {t['accent']}; font-weight: 600; }}
+QTabBar::tab:hover:!selected {{ color: {t['text']}; }}
 QTextEdit#qrInput {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; padding: 8px; font-size: {FONT_SIZE['md']}px; color: {t['text']}; }}
 QListWidget#promptList {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; outline: none; font-size: {FONT_SIZE['md']}px; }}
 QListWidget#promptList::item {{ padding: 8px 10px; border-radius: {RADIUS['sm']}px; color: {t['text']}; }}
