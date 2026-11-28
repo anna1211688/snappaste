@@ -58,7 +58,7 @@ def test_menu_spec():
     c, _ = _controller(FakePystray())
     spec = c.menu_spec()
     assert len(spec) == len(TRAY_MENU)
-    assert spec[0] == ("显示主窗口", "show", True)
+    assert spec[0] == ("tray.show", "show", True)
 
 
 def test_build_menu_items():
@@ -98,7 +98,6 @@ def test_stop_icon():
 
 
 def test_missing_pystray_degrades():
-    invoked = []
     c = TrayController({}, Image.new("RGB", (16, 16)),
                        invoke=lambda fn: fn(), factory=None)
     assert c.available is False
