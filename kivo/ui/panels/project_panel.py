@@ -10,8 +10,9 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import (
-    PrimaryButton, SecondaryButton, SectionHeader, MutedLabel,
+    PrimaryButton, SecondaryButton, SectionHeader,
 )
+from ..icons import icon
 from ...core.project_store import PROJECT_TEMPLATES
 
 
@@ -39,7 +40,7 @@ class ProjectPanel(QWidget):
         lay.setContentsMargins(14, 16, 14, 16)
         lay.setSpacing(8)
 
-        new = PrimaryButton("＋ 新建项目")
+        new = PrimaryButton("新建项目", icon_name="plus")
         new.clicked.connect(lambda: self.open(self.store.create()))
         lay.addWidget(new)
 
@@ -72,9 +73,11 @@ class ProjectPanel(QWidget):
         for p in self.store.projects:
             if q and q not in p["title"].lower():
                 continue
-            row = QPushButton(("📌 " if p["pin"] else "  ") + p["title"])
+            row = QPushButton(p["title"])
             row.setObjectName("chatRow")
             row.setCursor(Qt.PointingHandCursor)
+            if p["pin"]:
+                row.setIcon(icon("pin"))
             row.setProperty("selected", "true" if self.current and p["id"] == self.current["id"] else "false")
             row.clicked.connect(lambda _=False, pid=p["id"]: self.open(self.store.get(pid)))
             self.list_lay.insertWidget(self.list_lay.count() - 1, row)
@@ -95,7 +98,7 @@ class ProjectPanel(QWidget):
         self.head_title.setObjectName("title")
         tl.addWidget(self.head_title)
         tl.addStretch()
-        del_btn = SecondaryButton("删除项目")
+        del_btn = SecondaryButton("删除项目", icon_name="trash")
         del_btn.clicked.connect(self.delete_current)
         tl.addWidget(del_btn)
         outer.addWidget(top)
@@ -201,7 +204,7 @@ class ProjectPanel(QWidget):
         notes.setFixedHeight(140)
         self.content_lay.insertWidget(i[0], notes)
         i[0] += 1
-        save_note = SecondaryButton("保存笔记")
+        save_note = SecondaryButton("保存笔记", icon_name="save")
         save_note.clicked.connect(lambda: self.store.set_notes(p["id"], notes.toPlainText()))
         self.content_lay.insertWidget(i[0], save_note)
         i[0] += 1
@@ -235,7 +238,7 @@ class ProjectPanel(QWidget):
         link_name.setPlaceholderText("名称")
         link_path = QLineEdit()
         link_path.setPlaceholderText("URL 或路径")
-        add_link = SecondaryButton("添加")
+        add_link = SecondaryButton("添加", icon_name="plus")
         add_link.clicked.connect(lambda: self._add_link(p, link_name, link_path))
         link_row.addWidget(link_name)
         link_row.addWidget(link_path, 1)
@@ -270,9 +273,10 @@ class ProjectPanel(QWidget):
             cb.setChecked(td["done"])
             cb.toggled.connect(lambda _on, i=idx: (self.store.toggle_todo(p["id"], i),
                                                     self._update_progress(p)))
-            x = QPushButton("✕")
+            x = QPushButton()
             x.setObjectName("iconBtn")
             x.setFixedWidth(28)
+            x.setIcon(icon("close"))
             x.clicked.connect(lambda _=False, i=idx: (self.store.remove_todo(p["id"], i),
                                                        self._render_todos(self.store.get(p["id"]))))
             row.addWidget(cb)
@@ -301,10 +305,11 @@ class ProjectPanel(QWidget):
                 w.deleteLater()
         for idx, lk in enumerate(p["links"]):
             row = QHBoxLayout()
-            name = QLabel(("🔗 " if lk["kind"] == "url" else "📄 ") + lk["name"])
-            x = QPushButton("✕")
+            name = QLabel(lk["name"])
+            x = QPushButton()
             x.setObjectName("iconBtn")
             x.setFixedWidth(28)
+            x.setIcon(icon("close"))
             x.clicked.connect(lambda _=False, i=idx: (self.store.remove_link(p["id"], i),
                                                        self._render_links(self.store.get(p["id"]))))
             row.addWidget(name)

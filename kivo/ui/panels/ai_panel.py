@@ -16,6 +16,7 @@ from .. import icons as iconlib
 from ..theme import Theme, add_shadow
 from ..components import (
     PrimaryButton, GhostButton, SectionHeader, MutedLabel, MessageActionBar,
+    EmptyState,
 )
 
 # 侧边功能入口 (动作键, 图标, 文案), 行为由组装层经 side_actions 注入
@@ -92,7 +93,7 @@ class AIPanel(QWidget):
         lay.setContentsMargins(14, 16, 14, 16)
         lay.setSpacing(10)
 
-        new = PrimaryButton("＋ 新对话")
+        new = PrimaryButton("新对话", icon_name="plus")
         new.clicked.connect(self.new_chat)
         lay.addWidget(new)
 
@@ -139,9 +140,11 @@ class AIPanel(QWidget):
         for c in self.store.chats:
             if q and q not in c["title"].lower():
                 continue
-            row = QPushButton(("📌 " if c.get("pin") else "  ") + c["title"])
+            row = QPushButton(c["title"])
             row.setObjectName("chatRow")
             row.setCursor(Qt.PointingHandCursor)
+            if c.get("pin"):
+                row.setIcon(iconlib.icon("pin"))
             row.setProperty("selected", "true" if c["id"] == self.cid else "false")
             row.clicked.connect(lambda _=False, cid=c["id"]: self.load_chat(cid))
             self.recent_lay.insertWidget(self.recent_lay.count() - 1, row)
@@ -168,7 +171,7 @@ class AIPanel(QWidget):
         title.setObjectName("title")
         tl.addWidget(title)
         tl.addStretch()
-        clear = GhostButton("清空对话")
+        clear = GhostButton("清空对话", icon_name="trash")
         clear.clicked.connect(self.new_chat)
         tl.addWidget(clear)
         outer.addWidget(top)
@@ -195,18 +198,8 @@ class AIPanel(QWidget):
         return wrap
 
     def _build_empty_state(self):
-        box = QWidget()
-        v = QVBoxLayout(box)
-        v.setAlignment(Qt.AlignCenter)
-        v.setSpacing(8)
-        big = QLabel("开始一段新对话")
-        big.setObjectName("emptyTitle")
-        big.setAlignment(Qt.AlignCenter)
-        sub = MutedLabel("在下方输入问题，或点击右侧建议快速开始")
-        sub.setAlignment(Qt.AlignCenter)
-        v.addWidget(big)
-        v.addWidget(sub)
-        return box
+        return EmptyState(
+            "ai", "开始一段新对话", "在下方输入问题，或点击右侧建议快速开始")
 
     def _update_empty(self):
         self.empty_state.setVisible(not self.history)
@@ -279,6 +272,7 @@ class AIPanel(QWidget):
         self.send_btn.setObjectName("send")
         self.send_btn.setFixedSize(72, 36)
         self.send_btn.setCursor(Qt.PointingHandCursor)
+        self.send_btn.setIcon(iconlib.icon("send"))
         self.send_btn.clicked.connect(self._on_send_clicked)
         bottom.addStretch()
         bottom.addWidget(self.send_btn)
@@ -358,6 +352,7 @@ class AIPanel(QWidget):
     def request_reply(self):
         self.busy = True
         self.send_btn.setText("停止")
+        self.send_btn.setIcon(iconlib.icon("stop"))
         self._cancel = threading.Event()
         self._stream_text = ""
         self._stream_bubble = self._add_bubble("bot", "")
@@ -391,6 +386,7 @@ class AIPanel(QWidget):
     def _on_finished(self, text):
         self.busy = False
         self.send_btn.setText("发送")
+        self.send_btn.setIcon(iconlib.icon("send"))
         if self._stream_bubble is not None:
             self._stream_bubble.setText(text)
         if text:
@@ -402,6 +398,7 @@ class AIPanel(QWidget):
     def _on_failed(self, msg):
         self.busy = False
         self.send_btn.setText("发送")
+        self.send_btn.setIcon(iconlib.icon("send"))
         partial = self._stream_text.strip()
         if partial:
             partial += "\n（生成中断）"
