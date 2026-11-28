@@ -98,8 +98,6 @@ def apply_mapping(config, mapping):
         for action_key in keys[:-1]:
             normalized = [(ak, None if ak == action_key else hk) for ak, hk in normalized]
     for (section, key), hk in normalized:
-        if not config.has_section(section):
-            config.add_section(section)
         config.set(section, key, hk.upper() if hk else NONE)
     return normalized, conflicts
 

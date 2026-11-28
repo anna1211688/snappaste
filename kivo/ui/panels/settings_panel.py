@@ -117,16 +117,25 @@ class SettingsPanel(QWidget):
         self.wave.toggled.connect(self._on_wave)
         lay.addLayout(self._switch_row(self.wave, "提示音（复制/粘贴成功时响一声）"))
 
-        hk_row = QHBoxLayout()
-        hk_row.addStretch()
+        entry_row = QHBoxLayout()
+        entry_row.addStretch()
+        tr_btn = SecondaryButton("翻译服务")
+        tr_btn.clicked.connect(self._open_translate_service)
+        entry_row.addWidget(tr_btn)
         hk_btn = SecondaryButton("热键设置")
         hk_btn.clicked.connect(self._open_hotkey)
-        hk_row.addWidget(hk_btn)
-        lay.addLayout(hk_row)
+        entry_row.addWidget(hk_btn)
+        lay.addLayout(entry_row)
 
     def _open_hotkey(self):
         from ..dialogs.hotkey_dialog import HotkeyDialog
         dlg = HotkeyDialog(self, self.theme, self.config)
+        dlg.exec()
+        dlg.deleteLater()
+
+    def _open_translate_service(self):
+        from ..dialogs.translate_service_dialog import TranslateServiceDialog
+        dlg = TranslateServiceDialog(self, self.theme, self.config)
         dlg.exec()
         dlg.deleteLater()
 
