@@ -89,6 +89,17 @@ def set_proxy_config(mode, manual=""):
     _PROXY_CFG["manual"] = (manual or "").strip()
 
 
+def apply_config_proxy(config):
+    """从 ConfigManager 读 [Network] 代理设置并同步到网络层 (启动时调用)。
+
+    与 Tkinter 版行为一致: 代理档位与手动地址保存在 Config.ini,
+    启动时必须注入网络层, 否则手动代理/直连设置不生效。
+    """
+    mode = (config.get("Network", "ProxyMode", fallback="system") or "system").strip()
+    manual = (config.get("Network", "ProxyServer", fallback="") or "").strip()
+    set_proxy_config(mode, manual)
+
+
 def active_proxy_url():
     """供 yt-dlp proxy 参数; 无代理返回 None。"""
     px = _resolve_proxies()

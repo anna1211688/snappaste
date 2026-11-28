@@ -70,6 +70,44 @@ class TestNetwork:
         from kivo.core import network as net
         assert net._PROXY_CFG["mode"] == "system"
 
+    def test_apply_config_proxy_manual(self):
+        class _FakeCfg:
+            def get(self, section, key, fallback=None):
+                return {("Network", "ProxyMode"): "manual",
+                        ("Network", "ProxyServer"): "127.0.0.1:7890"}.get(
+                            (section, key), fallback)
+        network.apply_config_proxy(_FakeCfg())
+        assert network.active_proxy_url() == "http://127.0.0.1:7890"
+        network.set_proxy_config("system", "")
+
+    def test_apply_config_proxy_off(self):
+        class _FakeCfg:
+            def get(self, section, key, fallback=None):
+                return "off" if (section, key) == ("Network", "ProxyMode") else fallback
+        network.apply_config_proxy(_FakeCfg())
+        assert network.active_proxy_url() is None
+        network.set_proxy_config("system", "")
+
+    def test_apply_config_proxy_defaults_system(self):
+        class _FakeCfg:
+            def get(self, section, key, fallback=None):
+                return fallback
+        network.apply_config_proxy(_FakeCfg())
+        assert network._PROXY_CFG["mode"] == "system"
+        assert network._PROXY_CFG["manual"] == ""
+
+    def test_services_loads_proxy_at_startup(self, tmp_path, monkeypatch):
+        from kivo.core import paths
+        from kivo.app_context import Services
+        for name in ("CONFIG_PATH", "RECORDS_PATH", "PHRASES_PATH", "AI_CHATS_PATH",
+                     "PROJECTS_PATH", "CALC_HISTORY_PATH", "CRASH_LOG_PATH"):
+            monkeypatch.setattr(paths, name, str(tmp_path / f"{name}.dat"))
+        with open(paths.CONFIG_PATH, "w", encoding="utf-8") as f:
+            f.write("[Network]\nProxyMode=manual\nProxyServer=127.0.0.1:7890\n")
+        Services()
+        assert network.active_proxy_url() == "http://127.0.0.1:7890"
+        network.set_proxy_config("system", "")
+
 
 # ---------- data ----------
 class TestData:

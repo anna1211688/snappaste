@@ -70,6 +70,28 @@ def test_proxy_save(sp):
     assert sp.config.get("Network", "ProxyServer") == "127.0.0.1:1080"
 
 
+def test_proxy_save_applies_to_network_layer(sp):
+    from kivo.core import network
+    manual = [b for b in sp.proxy_group.buttons() if b.property("val") == "manual"][0]
+    manual.setChecked(True)
+    sp.proxy_server.setText("127.0.0.1:1080")
+    sp._save_proxy()
+    assert network.active_proxy_url() == "http://127.0.0.1:1080"
+    network.set_proxy_config("system", "")
+
+
+def test_proxy_invalid_manual_rejected(sp):
+    from kivo.core import network
+    manual = [b for b in sp.proxy_group.buttons() if b.property("val") == "manual"][0]
+    manual.setChecked(True)
+    sp.proxy_server.setText("not-a-proxy")
+    sp._save_proxy()
+    # 非法地址不落盘、不注入网络层
+    assert sp.config.get("Network", "ProxyMode", "") != "manual"
+    assert sp.config.get("Network", "ProxyServer", "") == ""
+    assert network._PROXY_CFG["mode"] != "manual"
+
+
 def test_mirror_bad_address(sp):
     sp.mirror.setText("not-a-url")
     sp._save_mirror()

@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 from .core.config import ConfigManager
+from .core import network
 from .core.ai import AIClient
 from .core.voice import VoiceClient
 from .core.translate import TranslateClient
@@ -26,6 +27,8 @@ from .core.batch_store import BatchStore
 class Services:
     def __init__(self):
         self.config = ConfigManager()
+        # 代理配置必须先于任何网络请求注入 (AI/翻译/更新/下载共用 network 层)
+        network.apply_config_proxy(self.config)
         self.ai_client = AIClient(self.config)
         self.voice_client = VoiceClient(self.config, self.ai_client)
         self.translate_client = TranslateClient(self.config)

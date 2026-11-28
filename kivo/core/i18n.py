@@ -904,6 +904,9 @@ _TABLE.update({
 _TABLE.update({
     "net.redirect": ("接口要求跳转到其他地址，为保护密钥已中止",
                     "The API requested a redirect to another address; aborted to protect the key"),
+    "net.bad_proxy": ("代理地址格式不对，示例：127.0.0.1:7890",
+                      "Invalid proxy address, e.g. 127.0.0.1:7890"),
+    "net.proxy_saved": ("网络代理设置已保存", "Network proxy settings saved"),
 })
 
 # 翻译引擎错误码

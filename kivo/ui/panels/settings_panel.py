@@ -15,6 +15,7 @@ from ..components import (
 from ..dialogs.base import show_toast
 from ...core.update import UpdateClient, is_newer
 from ...core.paths import VERSION
+from ...core import network
 from ...core.i18n import tr
 
 
@@ -228,10 +229,17 @@ class SettingsPanel(QWidget):
 
     def _save_proxy(self):
         btn = self.proxy_group.checkedButton()
-        self.config.set("Network", "ProxyMode",
-                        btn.property("val") if btn else "system")
-        self.config.set("Network", "ProxyServer", self.proxy_server.text().strip())
+        mode = btn.property("val") if btn else "system"
+        manual = self.proxy_server.text().strip()
+        if mode == "manual" and manual and not network.normalize_manual_proxy(manual):
+            show_toast(self, tr("net.bad_proxy"))
+            return
+        self.config.set("Network", "ProxyMode", mode)
+        self.config.set("Network", "ProxyServer", manual)
         self._save()
+        # 立即注入网络层, 无需重启生效 (与 Tkinter 版行为一致)
+        network.set_proxy_config(mode, manual)
+        show_toast(self, tr("net.proxy_saved"))
 
     # ---------- 更新镜像 ----------
     def _build_mirror(self):
