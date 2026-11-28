@@ -16,6 +16,7 @@ from .core.calc_store import CalcStore
 from .core.download_store import DownloadStore
 from .core.pomo_store import PomoStore
 from .core.winman import WindowManager
+from .core.batch_store import BatchStore
 from .ui.panels.ai_panel import AIPanel
 from .ui.panels.voice_panel import VoicePanel
 from .ui.panels.trans_panel import TranslatePanel
@@ -28,6 +29,7 @@ from .ui.panels.calc_panel import CalcPanel
 from .ui.panels.download_panel import DownloadPanel
 from .ui.panels.pomo_panel import PomoPanel
 from .ui.panels.winman_panel import WinmanPanel
+from .ui.panels.batch_panel import BatchPanel
 
 
 class Services:
@@ -46,6 +48,7 @@ class Services:
         self.download_store = DownloadStore(self.config)
         self.pomo_store = PomoStore()
         self.window_manager = WindowManager()
+        self.batch_store = BatchStore()
 
     def pane_factory(self, key):
         if key == "ai":
@@ -72,6 +75,8 @@ class Services:
             return PomoPanel(self._theme, self.pomo_store)
         if key == "winman":
             return WinmanPanel(self._theme, self.window_manager)
+        if key == "batch":
+            return BatchPanel(self._theme, self.batch_store)
         return None
 
     def make_main_services(self, theme):
