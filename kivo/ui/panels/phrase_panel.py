@@ -2,7 +2,6 @@
 """常用语面板: 列表+编辑区、新增/保存/删除/排序、复制与直接粘贴。"""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QFrame, QLabel, QListWidget, QListWidgetItem, QVBoxLayout,
     QHBoxLayout, QTextEdit,
@@ -10,7 +9,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import (
-    PrimaryButton, SecondaryButton, SectionHeader, MutedLabel,
+    PrimaryButton, SecondaryButton, MutedLabel, EmptyState,
 )
 
 
@@ -44,7 +43,8 @@ class PhrasePanel(QWidget):
         self.listw.itemActivated.connect(lambda _it: self.paste_selected())
         lay.addWidget(self.listw, 1)
 
-        self.empty = self._empty_widget()
+        self.empty = EmptyState(
+            "phrases", "还没有常用语", "把常回的话存成一条，之后双击就能直接粘贴")
         lay.addWidget(self.empty)
 
         hint = MutedLabel("选中一条，内容会填进编辑区；改完点「保存修改」。双击列表可直接粘贴。")
@@ -59,22 +59,6 @@ class PhrasePanel(QWidget):
         lay.addLayout(self._button_row())
         self.refresh()
         return card
-
-    def _empty_widget(self):
-        box = QWidget()
-        v = QVBoxLayout(box)
-        v.setAlignment(Qt.AlignCenter)
-        icon = QLabel("💬")
-        icon.setAlignment(Qt.AlignCenter)
-        t1 = QLabel("还没有常用语")
-        t1.setAlignment(Qt.AlignCenter)
-        t1.setObjectName("blockHead")
-        t2 = MutedLabel("把常回的话存成一条，之后双击就能直接粘贴")
-        t2.setAlignment(Qt.AlignCenter)
-        v.addWidget(icon)
-        v.addWidget(t1)
-        v.addWidget(t2)
-        return box
 
     def refresh(self):
         self.listw.clear()
@@ -93,17 +77,17 @@ class PhrasePanel(QWidget):
 
     def _button_row(self):
         row = QHBoxLayout()
-        paste = PrimaryButton("粘贴选中")
+        paste = PrimaryButton("粘贴选中", icon_name="check")
         paste.clicked.connect(self.paste_selected)
-        copy = SecondaryButton("复制选中")
+        copy = SecondaryButton("复制选中", icon_name="copy")
         copy.clicked.connect(self.copy_selected)
-        add = SecondaryButton("新增")
+        add = SecondaryButton("新增", icon_name="plus")
         add.clicked.connect(self.add)
-        from_clip = SecondaryButton("从剪贴板添加")
+        from_clip = SecondaryButton("从剪贴板添加", icon_name="copy")
         from_clip.clicked.connect(self.add_from_clipboard)
-        save = SecondaryButton("保存修改")
+        save = SecondaryButton("保存修改", icon_name="save")
         save.clicked.connect(self.save_edit)
-        delete = SecondaryButton("删除")
+        delete = SecondaryButton("删除", icon_name="trash")
         delete.clicked.connect(self.delete)
         up = SecondaryButton("上移")
         up.clicked.connect(lambda: self.move(-1))

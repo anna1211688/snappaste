@@ -67,8 +67,9 @@ def test_panel_empty(qapp, tmp_path):
     p = GalleryPanel(Theme(False), d)
     p.show()
     qapp.processEvents()
-    # 空态盒存在
-    boxes = [w for w in p.container.findChildren(QFrame) if w.objectName() == "emptyBox"]
+    # 空态组件存在
+    from kivo.ui.components import EmptyState
+    boxes = p.container.findChildren(EmptyState)
     assert len(boxes) == 1
 
 

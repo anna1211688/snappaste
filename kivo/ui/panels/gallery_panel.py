@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..theme import Theme
-from ..components import SecondaryButton, DangerButton
+from ..components import DangerButton, EmptyState
 from ...core import gallery_store
 
 THUMB_W, THUMB_H = 160, 110
@@ -41,7 +41,7 @@ class GalleryPanel(QWidget):
         self.count_label.setObjectName("muted")
         head.addWidget(self.count_label)
         head.addStretch()
-        del_all = DangerButton("删除全部")
+        del_all = DangerButton("删除全部", icon_name="trash")
         del_all.clicked.connect(self._delete_all)
         head.addWidget(del_all)
         outer.addLayout(head)
@@ -83,25 +83,10 @@ class GalleryPanel(QWidget):
                 w.deleteLater()
 
     def _build_empty(self):
-        box = QFrame()
-        box.setObjectName("emptyBox")
-        lay = QVBoxLayout(box)
-        lay.setContentsMargins(20, 40, 20, 40)
-        icon = QLabel("🖼")
-        icon.setAlignment(Qt.AlignCenter)
-        icon.setObjectName("emptyIcon")
-        t1 = QLabel("还没有截图")
-        t1.setAlignment(Qt.AlignCenter)
-        t1.setObjectName("emptyTitle")
-        t2 = QLabel("按 F1 截一张，截完会自动存在这里")
-        t2.setAlignment(Qt.AlignCenter)
-        t2.setObjectName("muted")
-        lay.addWidget(icon); lay.addWidget(t1); lay.addWidget(t2)
-        if self.screenshot_callback:
-            btn = SecondaryButton("截一张图")
-            btn.clicked.connect(self.screenshot_callback)
-            row = QHBoxLayout(); row.addStretch(); row.addWidget(btn); row.addStretch()
-            lay.addLayout(row)
+        box = EmptyState(
+            "browser", "还没有截图", "按 F1 截一张，截完会自动存在这里",
+            action_text="截一张图" if self.screenshot_callback else "",
+            on_action=self.screenshot_callback)
         self.grid.addWidget(box, 0, 0, 1, COLUMNS)
 
     def _make_cell(self, name):

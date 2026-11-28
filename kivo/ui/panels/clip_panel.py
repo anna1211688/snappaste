@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import (
-    PrimaryButton, SecondaryButton, DangerButton, SectionHeader, MutedLabel,
+    PrimaryButton, SecondaryButton, DangerButton, SectionHeader, EmptyState,
 )
 
 
@@ -54,13 +54,13 @@ class ClipPanel(QWidget):
         lay.setSpacing(8)
 
         top = QHBoxLayout()
-        lock = SecondaryButton("锁定/解锁")
+        lock = SecondaryButton("锁定/解锁", icon_name="lock")
         lock.clicked.connect(self.toggle_lock)
-        dedupe = SecondaryButton("去重")
+        dedupe = SecondaryButton("去重", icon_name="filter")
         dedupe.clicked.connect(self.dedupe)
-        del_sel = DangerButton("删除选定")
+        del_sel = DangerButton("删除选定", icon_name="trash")
         del_sel.clicked.connect(self.delete_selected)
-        del_all = DangerButton("删除全部")
+        del_all = DangerButton("删除全部", icon_name="trash")
         del_all.clicked.connect(self.delete_all)
         for b in (lock, dedupe):
             top.addWidget(b)
@@ -74,25 +74,10 @@ class ClipPanel(QWidget):
         self.listw.setSelectionMode(QListWidget.SingleSelection)
         lay.addWidget(self.listw)
 
-        self.empty = self._empty_widget()
+        self.empty = EmptyState(
+            "copy", "还没有记录", "直接复制一段文字，或按 F1 截一张图即可开始")
         lay.addWidget(self.empty)
         return card
-
-    def _empty_widget(self):
-        box = QWidget()
-        v = QVBoxLayout(box)
-        v.setAlignment(Qt.AlignCenter)
-        icon = QLabel("🗂")
-        icon.setAlignment(Qt.AlignCenter)
-        t1 = QLabel("还没有记录")
-        t1.setAlignment(Qt.AlignCenter)
-        t1.setObjectName("blockHead")
-        t2 = MutedLabel("直接复制一段文字，或按 F1 截一张图即可开始")
-        t2.setAlignment(Qt.AlignCenter)
-        v.addWidget(icon)
-        v.addWidget(t1)
-        v.addWidget(t2)
-        return box
 
     def refresh(self):
         q = self.search.text().strip().lower()
@@ -145,11 +130,11 @@ class ClipPanel(QWidget):
     # ---------- 主操作行 ----------
     def _action_row(self):
         row = QHBoxLayout()
-        multi = PrimaryButton("多次复制 (加入队列)")
+        multi = PrimaryButton("多次复制 (加入队列)", icon_name="copy")
         multi.clicked.connect(self.multi_copy)
-        paste_one = SecondaryButton("顺序粘贴下一条")
+        paste_one = SecondaryButton("顺序粘贴下一条", icon_name="chevron-right")
         paste_one.clicked.connect(self.paste_next)
-        paste_all = SecondaryButton("全部粘贴")
+        paste_all = SecondaryButton("全部粘贴", icon_name="check")
         paste_all.clicked.connect(self.paste_all)
         row.addWidget(multi)
         row.addWidget(paste_one)
