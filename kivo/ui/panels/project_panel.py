@@ -214,7 +214,7 @@ class ProjectPanel(QWidget):
         todo_input = QLineEdit()
         todo_input.setPlaceholderText("添加一条待办，回车确认")
         todo_input.returnPressed.connect(
-            lambda: self._add_todo(p["id"], todo_input, todo_holder))
+            lambda: self._add_todo(p["id"], todo_input, self.todo_holder))
         todo_input_row.addWidget(todo_input)
         self.content_lay.insertLayout(i[0], todo_input_row)
         i[0] += 1

@@ -276,6 +276,15 @@ QLabel#sugSub {{ background: transparent; color: {t['muted']}; font-size: {FONT_
 QFrame#modal {{ background: {t['surface']}; border-radius: {RADIUS['xl']}px; }}
 QFrame#toast {{ background: {t['text']}; border-radius: {RADIUS['pill']}px; }}
 QLabel#toastText {{ color: {t['surface']}; background: transparent; font-size: {FONT_SIZE['md']}px; }}
+
+/* ---------- 标注编辑器 ---------- */
+QFrame#annoBar {{ background: {t['surface']}; border: 1px solid {t['border']}; border-radius: {RADIUS['md']}px; }}
+QPushButton#annoTool {{ background: transparent; color: {t['text_2']}; border: 1px solid transparent; border-radius: {RADIUS['sm']}px; padding: 5px 10px; font-size: {FONT_SIZE['sm']}px; }}
+QPushButton#annoTool:hover {{ background: {t['soft']}; }}
+QPushButton#annoTool:checked {{ background: {t['accent']}; color: #FFFFFF; border-color: {t['accent']}; }}
+QPushButton#annoSwatch {{ border: 1px solid {t['border_strong']}; border-radius: {RADIUS['sm']}px; }}
+QPushButton#annoSwatch:checked {{ border: 2px solid {t['accent']}; }}
+QLabel#annoCanvas {{ background: #FFFFFF; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; }}
 """
 
 
