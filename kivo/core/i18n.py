@@ -82,6 +82,8 @@ _TABLE.update({
     "nav.pomo": ("番茄钟", "Pomodoro"),
     "nav.winman": ("窗口管理", "Window Manager"),
     "nav.batch": ("图片批量处理", "Batch Image"),
+    "nav.gallery": ("截图画廊", "Screenshot Gallery"),
+    "nav.selfcheck": ("软件自检", "Self Check"),
     "main.placeholder_hint": ("该面板将在迁移中接入完整功能",
                               "Full features will be added to this panel"),
     "group.tools": ("工具", "Tools"),

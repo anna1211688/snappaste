@@ -15,6 +15,7 @@ from ..platform import input_sim
 from ..platform.tray import TrayController
 from ..platform.hotkey_listener import HotkeyListener
 from ..platform.single_instance import SingleInstanceGuard
+from ..core.i18n import tr
 from .runtime_bridge import UiBridge
 
 
@@ -246,12 +247,35 @@ class AppRuntime:
         self.services.clip_store.delete_all()
         self.services.clip_store.save()
 
-    # ---------- 截图/贴图/快捷/迷你 (后续批次实现) ----------
+    # ---------- 截图/贴图/快捷/迷你 ----------
+    def _snip_controller(self):
+        from ..platform.snip_controller import SnipController
+        return SnipController(self.window.theme)
+
     def snip_region(self):
-        raise NotImplementedError
+        def handle(result):
+            from ..platform.snip_controller import save_shot
+            save_shot(result["image"])
+            self.bridge.post(lambda img=result["image"]: self._open_annotation(img))
+        self._snip_controller().begin("region", handle)
+
+    def _open_annotation(self, pil_image):
+        from .dialogs.annotation_editor import AnnotationEditor
+        AnnotationEditor(pil_image, self.window.theme).exec()
 
     def snip_copy(self):
-        raise NotImplementedError
+        def handle(result):
+            self.bridge.post(lambda img=result["image"]: self._image_to_clipboard(img))
+        self._snip_controller().begin("copy", handle)
+
+    def _image_to_clipboard(self, pil_image):
+        import io
+        from PySide6.QtGui import QPixmap
+        buf = io.BytesIO()
+        pil_image.save(buf, "PNG")
+        pm = QPixmap()
+        pm.loadFromData(buf.getvalue(), "PNG")
+        QApplication.clipboard().setPixmap(pm)
 
     def snip_translate(self):
         raise NotImplementedError
@@ -260,10 +284,53 @@ class AppRuntime:
         raise NotImplementedError
 
     def pin_clipboard(self):
-        raise NotImplementedError
+        pm = QApplication.clipboard().pixmap()
+        if pm.isNull():
+            return
+        from ..platform.pin_window import PinWindow
+        pin = PinWindow(self.window.theme, pm)
+        self._pins.append(pin)
+        pin.show()
 
     def show_mini_translate(self):
-        raise NotImplementedError
+        from .panels.mini_trans_panel import MiniTranslateWindow
+        dlg = MiniTranslateWindow(
+            self.window.theme, self.services.translate_client,
+            self.services.ai_client)
+        dlg.show_with()
+
+    def open_quick_panel(self):
+        from .panels.quick_panel import QuickPanel
+        dlg = QuickPanel(
+            self.window.theme, self.services.clip_store.records,
+            self.services.phrase_store.phrases)
+        dlg.exec()
+
+    def open_gallery(self):
+        from ..platform.snip_controller import shots_dir
+        from .panels.gallery_panel import GalleryPanel
+        self._show_as_window(
+            GalleryPanel(self.window.theme, shots_dir()), tr("nav.gallery"))
+
+    def open_selfcheck(self):
+        from ..core import paths
+        from ..core.selfcheck import SelfCheckRunner
+        from .panels.selfcheck_panel import SelfCheckPanel
+        runner = SelfCheckRunner(
+            paths.BASE, paths.CONFIG_PATH, paths.RECORDS_PATH,
+            hotkey_provider=lambda: self.hotkeys.active_count > 0)
+        self._show_as_window(
+            SelfCheckPanel(self.window.theme, runner), tr("nav.selfcheck"))
+
+    def _show_as_window(self, panel, title):
+        from PySide6.QtWidgets import QDialog, QVBoxLayout
+        dlg = QDialog(self.window)
+        dlg.setWindowTitle(title)
+        dlg.resize(900, 700)
+        lay = QVBoxLayout(dlg)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.addWidget(panel)
+        dlg.show()
 
     # ---------- 基础设施 ----------
     def _build_action_map(self):
