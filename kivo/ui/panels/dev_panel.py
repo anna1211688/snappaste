@@ -13,6 +13,7 @@ from ..theme import Theme
 from ..components import SecondaryButton
 from ..dialogs.base import show_toast
 from ...core import devtools
+from ...core.i18n import tr
 
 
 class DevPanel(QWidget):
@@ -25,16 +26,16 @@ class DevPanel(QWidget):
         outer.setContentsMargins(20, 18, 20, 18)
         outer.setSpacing(10)
 
-        title = QLabel("开发者工具箱")
+        title = QLabel(tr("dev.title"))
         title.setObjectName("hero")
         outer.addWidget(title)
 
         tabs = QTabWidget()
-        tabs.addTab(self._timestamp_tab(), "时间戳")
+        tabs.addTab(self._timestamp_tab(), tr("dev.tab_ts"))
         tabs.addTab(self._json_tab(), "JSON")
-        tabs.addTab(self._regex_tab(), "正则测试")
+        tabs.addTab(self._regex_tab(), tr("dev.tab_regex"))
         tabs.addTab(self._b64_tab(), "Base64")
-        tabs.addTab(self._unit_tab(), "单位换算")
+        tabs.addTab(self._unit_tab(), tr("dev.tab_unit"))
         outer.addWidget(tabs, 1)
 
     # ---------- 时间戳 ----------
@@ -44,21 +45,21 @@ class DevPanel(QWidget):
         now = QLineEdit(str(int(time.time())))
         r1 = QHBoxLayout()
         r1.addWidget(now, 1)
-        refresh = SecondaryButton("刷新", icon_name="refresh")
+        refresh = SecondaryButton(tr("common.refresh"), icon_name="refresh")
         refresh.clicked.connect(lambda: now.setText(str(int(time.time()))))
-        copy = SecondaryButton("复制", icon_name="copy")
+        copy = SecondaryButton(tr("common.copy"), icon_name="copy")
         copy.clicked.connect(lambda: self._copy(now.text()))
         r1.addWidget(refresh); r1.addWidget(copy)
         lay.addLayout(r1)
 
-        ts_in = QLineEdit(); ts_in.setPlaceholderText("输入时间戳")
+        ts_in = QLineEdit(); ts_in.setPlaceholderText(tr("dev.ts_in"))
         ts_out = QLabel("")
         r2 = QHBoxLayout()
         r2.addWidget(ts_in, 1)
-        b2 = SecondaryButton("时间戳→日期")
+        b2 = SecondaryButton(tr("dev.ts_to_date"))
         b2.clicked.connect(lambda: self._safe(
             lambda: ts_out.setText(devtools.ts_to_date(ts_in.text())),
-            lambda: ts_out.setText("输入有误")))
+            lambda: ts_out.setText(tr("dev.bad_input"))))
         r2.addWidget(b2)
         lay.addLayout(r2)
         lay.addWidget(ts_out)
@@ -67,10 +68,10 @@ class DevPanel(QWidget):
         d_out = QLabel("")
         r3 = QHBoxLayout()
         r3.addWidget(d_in, 1)
-        b3 = SecondaryButton("日期→时间戳")
+        b3 = SecondaryButton(tr("dev.date_to_ts"))
         b3.clicked.connect(lambda: self._safe(
             lambda: d_out.setText(str(devtools.date_to_ts(d_in.text()))),
-            lambda: d_out.setText("输入有误")))
+            lambda: d_out.setText(tr("dev.bad_input"))))
         r3.addWidget(b3)
         lay.addLayout(r3)
         lay.addWidget(d_out)
@@ -84,14 +85,14 @@ class DevPanel(QWidget):
         j_in = QPlainTextEdit(); j_in.setFixedHeight(120)
         j_out = QPlainTextEdit()
         row = QHBoxLayout()
-        pretty = SecondaryButton("格式化")
+        pretty = SecondaryButton(tr("dev.pretty"))
         pretty.clicked.connect(lambda: self._safe(
             lambda: j_out.setPlainText(devtools.json_pretty(j_in.toPlainText())),
-            lambda: j_out.setPlainText("JSON 解析失败")))
-        minify = SecondaryButton("压缩")
+            lambda: j_out.setPlainText(tr("dev.json_fail"))))
+        minify = SecondaryButton(tr("dev.minify"))
         minify.clicked.connect(lambda: self._safe(
             lambda: j_out.setPlainText(devtools.json_minify(j_in.toPlainText())),
-            lambda: j_out.setPlainText("JSON 解析失败")))
+            lambda: j_out.setPlainText(tr("dev.json_fail"))))
         row.addWidget(pretty); row.addWidget(minify); row.addStretch()
         lay.addWidget(j_in); lay.addLayout(row); lay.addWidget(j_out, 1)
         return w
@@ -101,7 +102,7 @@ class DevPanel(QWidget):
         w = QWidget()
         lay = QVBoxLayout(w)
         r1 = QHBoxLayout()
-        pat = QLineEdit(); pat.setPlaceholderText("正则表达式")
+        pat = QLineEdit(); pat.setPlaceholderText(tr("dev.regex_ph"))
         ic = QCheckBox("ignore case")
         r1.addWidget(pat, 1); r1.addWidget(ic)
         lay.addLayout(r1)
@@ -109,12 +110,12 @@ class DevPanel(QWidget):
         lay.addWidget(x_in)
         out = QLabel("")
         out.setWordWrap(True)
-        go = SecondaryButton("测试匹配", icon_name="search")
+        go = SecondaryButton(tr("dev.regex_go"), icon_name="search")
         go.clicked.connect(lambda: self._safe(
             lambda: (lambda hits: out.setText(
-                f"{len(hits)} 处匹配: " + " | ".join(hits[:20])))(
+                tr("dev.regex_hits", n=len(hits)) + " | ".join(hits[:20])))(
                 devtools.regex_find(pat.text(), x_in.toPlainText(), ic.isChecked())),
-            lambda: out.setText("正则表达式有误")))
+            lambda: out.setText(tr("dev.regex_fail"))))
         lay.addWidget(go); lay.addWidget(out); lay.addStretch()
         return w
 
@@ -125,14 +126,14 @@ class DevPanel(QWidget):
         b_in = QPlainTextEdit(); b_in.setFixedHeight(100)
         b_out = QPlainTextEdit(); b_out.setFixedHeight(100)
         row = QHBoxLayout()
-        enc = SecondaryButton("编码")
+        enc = SecondaryButton(tr("dev.encode"))
         enc.clicked.connect(lambda: self._safe(
             lambda: b_out.setPlainText(devtools.b64_encode(b_in.toPlainText().strip())),
-            lambda: b_out.setPlainText("编码失败")))
-        dec = SecondaryButton("解码")
+            lambda: b_out.setPlainText(tr("dev.enc_fail"))))
+        dec = SecondaryButton(tr("dev.decode"))
         dec.clicked.connect(lambda: self._safe(
             lambda: b_out.setPlainText(devtools.b64_decode(b_in.toPlainText().strip())),
-            lambda: b_out.setPlainText("解码失败")))
+            lambda: b_out.setPlainText(tr("dev.dec_fail"))))
         row.addWidget(enc); row.addWidget(dec); row.addStretch()
         lay.addWidget(b_in); lay.addLayout(row); lay.addWidget(b_out); lay.addStretch()
         return w
@@ -157,11 +158,11 @@ class DevPanel(QWidget):
 
         cat.currentTextChanged.connect(sync_units)
         sync_units()
-        go = SecondaryButton("换算", icon_name="check")
+        go = SecondaryButton(tr("dev.convert"), icon_name="check")
         go.clicked.connect(lambda: self._safe(
             lambda: out.setText(
                 f"{devtools.unit_convert(val.text(), cat.currentText(), frm.currentText(), to.currentText()):g} {to.currentText()}"),
-            lambda: out.setText("输入有误")))
+            lambda: out.setText(tr("dev.bad_input"))))
         r1.addWidget(cat); r1.addWidget(val); r1.addWidget(frm)
         r1.addWidget(QLabel("→")); r1.addWidget(to); r1.addWidget(go)
         lay.addLayout(r1); lay.addWidget(out); lay.addStretch()
@@ -177,4 +178,4 @@ class DevPanel(QWidget):
     def _copy(self, text):
         from PySide6.QtWidgets import QApplication
         QApplication.clipboard().setText(text)
-        show_toast(self, "已复制")
+        show_toast(self, tr("dev.copied"))

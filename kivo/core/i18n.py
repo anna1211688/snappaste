@@ -506,6 +506,30 @@ _TABLE.update({
     "batch.failed_count": ("，失败 {n} 张", ", {n} failed"),
 })
 
+# 开发者工具箱
+_TABLE.update({
+    "dev.title": ("开发者工具箱", "Developer Tools"),
+    "dev.tab_ts": ("时间戳", "Timestamp"),
+    "dev.tab_regex": ("正则测试", "Regex"),
+    "dev.tab_unit": ("单位换算", "Unit Conversion"),
+    "dev.ts_in": ("输入时间戳", "Enter timestamp"),
+    "dev.ts_to_date": ("时间戳→日期", "Timestamp → Date"),
+    "dev.date_to_ts": ("日期→时间戳", "Date → Timestamp"),
+    "dev.bad_input": ("输入有误", "Invalid input"),
+    "dev.pretty": ("格式化", "Format"),
+    "dev.minify": ("压缩", "Minify"),
+    "dev.json_fail": ("JSON 解析失败", "Invalid JSON"),
+    "dev.regex_ph": ("正则表达式", "Regex pattern"),
+    "dev.regex_go": ("测试匹配", "Test match"),
+    "dev.regex_hits": ("{n} 处匹配: ", "{n} matches: "),
+    "dev.regex_fail": ("正则表达式有误", "Invalid regex"),
+    "dev.encode": ("编码", "Encode"),
+    "dev.decode": ("解码", "Decode"),
+    "dev.enc_fail": ("编码失败", "Encoding failed"),
+    "dev.dec_fail": ("解码失败", "Decoding failed"),
+    "dev.copied": ("已复制", "Copied"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
