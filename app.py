@@ -13,6 +13,7 @@ from PySide6.QtWidgets import QApplication
 from kivo.ui.theme import Theme
 from kivo.ui.main_window import MainWindow
 from kivo.app_context import Services
+from kivo.core import i18n
 
 
 def main() -> int:
@@ -21,6 +22,7 @@ def main() -> int:
     app.setStyleSheet(theme.base_qss())
 
     services = Services()
+    i18n.configure(services.config)
     win = MainWindow(theme, services.make_main_services(theme))
     if "--pane" in sys.argv:
         i = sys.argv.index("--pane")

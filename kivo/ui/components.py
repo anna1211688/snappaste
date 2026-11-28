@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 
 from . import icons as iconlib
 from .theme import add_shadow, RADIUS
+from ..core.i18n import tr
 
 
 # ---------- 容器 ----------
@@ -213,10 +214,11 @@ class Chip(QFrame):
 
 # ---------- 搜索框 ----------
 class SearchInput(QLineEdit):
-    def __init__(self, placeholder: str = "搜索", parent: Optional[QWidget] = None):
+    def __init__(self, placeholder: Optional[str] = None,
+                 parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setObjectName("search")
-        self.setPlaceholderText(placeholder)
+        self.setPlaceholderText(placeholder or tr("common.search"))
         self.setClearButtonEnabled(True)
 
 

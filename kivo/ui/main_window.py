@@ -9,29 +9,30 @@ from PySide6.QtWidgets import (
 from .theme import Theme, add_shadow
 from .components import NavItem, SectionHeader
 from ..core.paths import VERSION
+from ..core.i18n import tr
 
-# (key, 图标, 文案, 分组标题或 None)
+# (key, 图标, 文案 i18n key, 分组标题 key 或 None)
 NAV_DEF = [
-    ("ai", "ai", "AI 助手", None),
-    ("voice", "voice", "语音翻译", None),
-    ("trans", "translate", "翻译中心", None),
-    ("clip", "copy", "剪贴板", None),
-    ("phrases", "phrases", "常用语", None),
-    ("fx", "fx", "汇率换算", "工具"),
-    ("clock", "clock", "世界时钟", "工具"),
-    ("calc", "calc", "计算器", "工具"),
-    ("dl", "download", "无水印下载", "工具"),
-    ("dev", "star", "开发者工具箱", "工具"),
-    ("pomo", "clock", "番茄钟", "工具"),
-    ("winman", "gear", "窗口管理", "工具"),
-    ("batch", "browser", "图片批量处理", "工具"),
+    ("ai", "ai", "nav.ai", None),
+    ("voice", "voice", "nav.voice", None),
+    ("trans", "translate", "nav.trans", None),
+    ("clip", "copy", "nav.clip", None),
+    ("phrases", "phrases", "nav.phrases", None),
+    ("fx", "fx", "nav.fx", "group.tools"),
+    ("clock", "clock", "nav.clock", "group.tools"),
+    ("calc", "calc", "nav.calc", "group.tools"),
+    ("dl", "download", "nav.dl", "group.tools"),
+    ("dev", "star", "nav.dev", "group.tools"),
+    ("pomo", "clock", "nav.pomo", "group.tools"),
+    ("winman", "gear", "nav.winman", "group.tools"),
+    ("batch", "browser", "nav.batch", "group.tools"),
 ]
 
 
 class PlaceholderPane(QWidget):
     """面板占位: 显示名称, 后续逐个替换为真实面板。"""
 
-    def __init__(self, label: str, theme: Theme):
+    def __init__(self, label_key: str, theme: Theme):
         super().__init__()
         outer = QVBoxLayout(self)
         outer.setContentsMargins(20, 20, 20, 20)
@@ -40,9 +41,9 @@ class PlaceholderPane(QWidget):
         add_shadow(card)
         cl = QVBoxLayout(card)
         cl.setContentsMargins(28, 26, 28, 26)
-        title = QLabel(label)
+        title = QLabel(tr(label_key))
         title.setObjectName("title")
-        hint = QLabel("该面板将在迁移中接入完整功能")
+        hint = QLabel(tr("main.placeholder_hint"))
         hint.setObjectName("mutedLabel")
         cl.addWidget(title)
         cl.addWidget(hint)
@@ -56,7 +57,7 @@ class MainWindow(QWidget):
         self.theme = theme
         self.services = services or {}
         self.setObjectName("root")
-        self.setWindowTitle("KIVO 启沃")
+        self.setWindowTitle(tr("app.title"))
         self.resize(1200, 800)
         self._nav_items = {}
 
@@ -89,9 +90,9 @@ class MainWindow(QWidget):
             if group:
                 prev = NAV_DEF[NAV_DEF.index((key, icon, label, group)) - 1]
                 if prev[3] != group:
-                    head = SectionHeader(group)
+                    head = SectionHeader(tr(group))
                     sl.addWidget(head)
-            item = NavItem(key, icon, label)
+            item = NavItem(key, icon, tr(label))
             item.clicked.connect(lambda _=False, k=key: self.select(k))
             self._nav_items[key] = item
             sl.addWidget(item)
@@ -104,7 +105,7 @@ class MainWindow(QWidget):
         line.setFixedHeight(1)
         sl.addWidget(line)
 
-        settings_item = NavItem("settings", "gear", "设置")
+        settings_item = NavItem("settings", "gear", tr("common.settings"))
         settings_item.clicked.connect(lambda: self.open_settings())
         self._nav_items["settings"] = settings_item
         sl.addWidget(settings_item)
@@ -139,7 +140,7 @@ class MainWindow(QWidget):
             return
         if getattr(self, "_settings_win", None) is None:
             win = factory()
-            win.setWindowTitle("设置")
+            win.setWindowTitle(tr("common.settings"))
             win.resize(720, 780)
             self._settings_win = win
         self._settings_win.show()
