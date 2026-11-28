@@ -15,6 +15,7 @@ from ..components import (
     PrimaryButton, SecondaryButton, Switch, MutedLabel,
 )
 from ...core.download_store import DownloadStore, clean_url, default_dir
+from ...core.i18n import tr
 
 
 class _Worker(QObject):
@@ -59,7 +60,7 @@ class DownloadPanel(QWidget):
         outer.setContentsMargins(20, 18, 20, 18)
         outer.setSpacing(12)
 
-        title = QLabel("无水印下载")
+        title = QLabel(tr("dl.title"))
         title.setObjectName("hero")
         outer.addWidget(title)
 
@@ -70,46 +71,42 @@ class DownloadPanel(QWidget):
         lay.setContentsMargins(16, 14, 16, 14)
         lay.setSpacing(10)
 
-        lay.addWidget(MutedLabel(
-            "支持 Instagram / Facebook / 小红书 / 抖音 / TikTok / B站 / 微博 / 快手 / YouTube / X 等，"
-            "保存平台原文件（不带水印）。"))
+        lay.addWidget(MutedLabel(tr("dl.support")))
 
         url_row = QHBoxLayout()
         self.url_edit = QLineEdit()
-        self.url_edit.setPlaceholderText("粘贴分享链接或整段分享文案")
+        self.url_edit.setPlaceholderText(tr("dl.url_ph"))
         url_row.addWidget(self.url_edit, 1)
-        paste = SecondaryButton("粘贴链接", icon_name="link")
+        paste = SecondaryButton(tr("dl.paste"), icon_name="link")
         paste.clicked.connect(self._paste)
         url_row.addWidget(paste)
         lay.addLayout(url_row)
 
         dir_row = QHBoxLayout()
-        dir_row.addWidget(QLabel("保存到"))
+        dir_row.addWidget(QLabel(tr("dl.save_to")))
         self.dir_edit = QLineEdit(default_dir(self.store.config))
         dir_row.addWidget(self.dir_edit, 1)
-        pick = SecondaryButton("选择文件夹", icon_name="folder-open")
+        pick = SecondaryButton(tr("dl.pick_folder"), icon_name="folder-open")
         pick.clicked.connect(self._pick_dir)
         dir_row.addWidget(pick)
         lay.addLayout(dir_row)
 
         self.cookie_switch = Switch()
         self.cookie_switch._on_color = theme.tokens["accent"]
-        lay.addLayout(self._switch_row(self.cookie_switch,
-                                       "使用 Chrome 登录状态（IG/FB 受限内容，需先关 Chrome）"))
+        lay.addLayout(self._switch_row(self.cookie_switch, tr("dl.cookie")))
 
         self.ask_switch = Switch(
             (self.store.config.get("Config", "DownloadAsk", fallback="1") or "1") != "0")
         self.ask_switch._on_color = theme.tokens["accent"]
         self.ask_switch.toggled.connect(self._save_ask)
-        lay.addLayout(self._switch_row(self.ask_switch,
-                                       "每次下载前选择保存位置；不勾选则一直保存到上面文件夹"))
+        lay.addLayout(self._switch_row(self.ask_switch, tr("dl.ask")))
 
         btn_row = QHBoxLayout()
-        parse_btn = SecondaryButton("解析", icon_name="search")
+        parse_btn = SecondaryButton(tr("dl.parse"), icon_name="search")
         parse_btn.clicked.connect(lambda: self._start(False))
-        self.dl_btn = PrimaryButton("开始下载", icon_name="download")
+        self.dl_btn = PrimaryButton(tr("dl.start"), icon_name="download")
         self.dl_btn.clicked.connect(lambda: self._start(True))
-        open_btn = SecondaryButton("打开文件夹", icon_name="folder-open")
+        open_btn = SecondaryButton(tr("dl.open_folder"), icon_name="folder-open")
         open_btn.clicked.connect(self._open_dir)
         btn_row.addWidget(parse_btn)
         btn_row.addWidget(self.dl_btn)
@@ -122,18 +119,18 @@ class DownloadPanel(QWidget):
         self.bar.setValue(0)
         lay.addWidget(self.bar)
 
-        self.status = MutedLabel("把分享链接粘贴进来，点「开始下载」。")
+        self.status = MutedLabel(tr("dl.initial"))
         self.status.setWordWrap(True)
         lay.addWidget(self.status)
 
         self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(("标题", "平台", "文件"))
+        self.table.setHorizontalHeaderLabels(
+            (tr("dl.col_title"), tr("dl.col_site"), tr("dl.col_file")))
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.table.setFixedHeight(170)
         lay.addWidget(self.table)
 
-        lay.addWidget(MutedLabel(
-            "请只下载自己有权使用的内容；未经授权搬运他人作品可能涉及版权与平台规则。"))
+        lay.addWidget(MutedLabel(tr("dl.copyright")))
         outer.addWidget(card)
         outer.addStretch()
 
@@ -153,7 +150,7 @@ class DownloadPanel(QWidget):
             self.url_edit.setText(t)
 
     def _pick_dir(self):
-        d = QFileDialog.getExistingDirectory(self, "选择保存位置", self.dir_edit.text())
+        d = QFileDialog.getExistingDirectory(self, tr("dl.pick_location"), self.dir_edit.text())
         if d:
             self.dir_edit.setText(d)
             self.store.config.set("Config", "DownloadDir", d)
@@ -176,18 +173,18 @@ class DownloadPanel(QWidget):
             return
         url = clean_url(self.url_edit.text())
         if not url.startswith("http"):
-            self.status.setText("先粘贴一条链接再开始")
+            self.status.setText(tr("dl.need_url"))
             return
         self.url_edit.setText(url)
         outdir = self.dir_edit.text() or default_dir(self.store.config)
         if download and self.ask_switch.isChecked():
-            picked = QFileDialog.getExistingDirectory(self, "选择保存位置", outdir)
+            picked = QFileDialog.getExistingDirectory(self, tr("dl.pick_location"), outdir)
             if picked:
                 outdir = picked
 
         self._set_busy(True)
         self.bar.setValue(0)
-        self.status.setText("下载中…")
+        self.status.setText(tr("dl.downloading"))
 
         self._thread = QThread(self)
         self._worker = _Worker(self.store, url, download, outdir,
@@ -201,10 +198,10 @@ class DownloadPanel(QWidget):
 
     def _on_progress(self, pct):
         self.bar.setValue(int(pct))
-        self.status.setText(f"下载中 {pct:.0f}%")
+        self.status.setText(tr("dl.download_pct", pct=round(pct)))
 
     def _on_finished(self, info):
-        title = info.get("title") or "(无标题)"
+        title = info.get("title") or tr("dl.untitled")
         site = info.get("extractor_key") or info.get("extractor") or ""
         fname = os.path.basename(info.get("filename") or info.get("_filename") or "")
         self.table.insertRow(0)
@@ -212,12 +209,12 @@ class DownloadPanel(QWidget):
         self.table.setItem(0, 1, QTableWidgetItem(site))
         self.table.setItem(0, 2, QTableWidgetItem(fname))
         self.bar.setValue(100)
-        self.status.setText(f"已保存：{title[:50]}")
+        self.status.setText(tr("dl.saved") + title[:50])
         self._cleanup()
 
     def _on_failed(self, msg):
         hint = self.store.friendly_error(msg)
-        self.status.setText(f"失败：{msg} {hint}")
+        self.status.setText(tr("dl.failed") + f"{msg} {hint}")
         self._cleanup()
 
     def _cleanup(self):

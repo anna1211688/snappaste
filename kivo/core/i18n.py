@@ -451,6 +451,38 @@ _TABLE.update({
     "mini.both_copied": ("双语已复制", "Both copied"),
 })
 
+# 无水印下载面板
+_TABLE.update({
+    "dl.title": ("无水印下载", "Watermark-free Download"),
+    "dl.support": ("支持 Instagram / Facebook / 小红书 / 抖音 / TikTok / B站 / 微博 / 快手 / YouTube / X 等，保存平台原文件（不带水印）。",
+                   "Supports Instagram, Facebook, Xiaohongshu, Douyin, TikTok, Bilibili, Weibo, Kuaishou, YouTube and X; saves original files without watermarks."),
+    "dl.url_ph": ("粘贴分享链接或整段分享文案", "Paste a share link or the whole share text"),
+    "dl.paste": ("粘贴链接", "Paste link"),
+    "dl.save_to": ("保存到", "Save to"),
+    "dl.pick_folder": ("选择文件夹", "Choose folder"),
+    "dl.cookie": ("使用 Chrome 登录状态（IG/FB 受限内容，需先关 Chrome）",
+                  "Use Chrome login state (restricted IG/FB content; close Chrome first)"),
+    "dl.ask": ("每次下载前选择保存位置；不勾选则一直保存到上面文件夹",
+               "Choose a location each time; otherwise always save to the folder above"),
+    "dl.parse": ("解析", "Parse"),
+    "dl.start": ("开始下载", "Start download"),
+    "dl.open_folder": ("打开文件夹", "Open folder"),
+    "dl.initial": ("把分享链接粘贴进来，点「开始下载」。",
+                   "Paste a share link, then click Start download."),
+    "dl.col_title": ("标题", "Title"),
+    "dl.col_site": ("平台", "Platform"),
+    "dl.col_file": ("文件", "File"),
+    "dl.copyright": ("请只下载自己有权使用的内容；未经授权搬运他人作品可能涉及版权与平台规则。",
+                     "Only download content you have rights to; unauthorized use may violate copyright and platform rules."),
+    "dl.pick_location": ("选择保存位置", "Choose save location"),
+    "dl.need_url": ("先粘贴一条链接再开始", "Paste a link first"),
+    "dl.downloading": ("下载中…", "Downloading…"),
+    "dl.download_pct": ("下载中 {pct}%", "Downloading {pct}%"),
+    "dl.untitled": ("(无标题)", "(Untitled)"),
+    "dl.saved": ("已保存：", "Saved: "),
+    "dl.failed": ("失败：", "Failed: "),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
