@@ -51,7 +51,8 @@ def http_base(u):
     u = (u or "").strip()
     p = urllib.parse.urlparse(u)
     if p.scheme not in ("http", "https") or not p.netloc or any(c in u for c in " \t\r\n"):
-        raise RuntimeError("AI 接口地址不对 (只支持 http/https 地址): " + (u[:60] or "(空)"))
+        shown = u[:60] or tr("aierr.empty_value")
+        raise RuntimeError(tr("aierr.bad_base", u=shown))
     if p.scheme == "http":
         host = (p.hostname or "").lower()
         local = host in ("localhost",) or host.endswith(".local")
@@ -62,7 +63,8 @@ def http_base(u):
             except ValueError:
                 local = False
         if not local:
-            raise RuntimeError("公网地址只支持 https (http 会明文发送 API Key): " + (u[:60] or "(空)"))
+            shown = u[:60] or tr("aierr.empty_value")
+            raise RuntimeError(tr("aierr.public_http", u=shown))
     return u.rstrip("/")
 
 
@@ -83,10 +85,9 @@ def parse_retry_after(value):
 
 
 class AIClient:
-    def __init__(self, config, translate=None):
-        """config: ConfigManager; translate: 可选 callable(key, zh)->str, 默认返回中文原文。"""
+    def __init__(self, config):
+        """config: ConfigManager。用户可见错误文案经 core.i18n 按当前语言返回。"""
         self.config = config
-        self._t = translate or (lambda key, zh: zh)
 
     # ---------- 配置解析 ----------
     def _g(self, key, d=""):
@@ -137,14 +138,14 @@ class AIClient:
     def fetch_models(self, cfg, timeout=15):
         base = http_base(cfg.get("base", ""))
         if not base:
-            raise RuntimeError("请先填写接口地址")
+            raise RuntimeError(tr("aierr.need_base"))
         headers = {"Authorization": "Bearer " + (cfg.get("key") or ""), "User-Agent": "KIVO"}
         req = urllib.request.Request(base + "/models", headers=headers, method="GET")
         try:
             with network.open_url(req, timeout=max(3, min(int(timeout), 30))) as resp:
                 raw = resp.read(2 * 1024 * 1024 + 1)
             if len(raw) > 2 * 1024 * 1024:
-                raise RuntimeError("模型列表响应过大")
+                raise RuntimeError(tr("aierr.models_too_large"))
             data = json.loads(raw.decode("utf-8"))
         except urllib.error.HTTPError as exc:
             detail = ""
@@ -153,9 +154,11 @@ class AIClient:
             except Exception:
                 pass
             detail = redact_ai_detail(detail, cfg.get("key") or "")
-            raise RuntimeError("获取模型列表失败 (HTTP %s): %s" % (exc.code, detail[:300])) from exc
+            raise RuntimeError(tr("aierr.fetch_models_fail",
+                                 code=exc.code, detail=detail[:300])) from exc
         except urllib.error.URLError as exc:
-            raise RuntimeError("无法连接模型服务: " + str(exc.reason)) from exc
+            raise RuntimeError(tr("aierr.cannot_connect_models",
+                                 reason=str(exc.reason))) from exc
         items = data.get("data", []) if isinstance(data, dict) else []
         models = []
         for item in items[:500]:
@@ -173,9 +176,9 @@ class AIClient:
                       route=None, stream_callback=None, cancel_event=None):
         cfg = cfg or (self.cfg_for(route) if route else self.cfg())
         if not cfg["key"]:
-            raise RuntimeError("还没填 AI 接口的 API Key: 「系统设置」的「AI 设置」里选服务、填 key 即可。")
+            raise RuntimeError(tr("aierr.need_key"))
         if not cfg["base"] or not cfg["model"]:
-            raise RuntimeError("AI 设置里的接口地址/模型名没填完整, 先到「系统设置」补上。")
+            raise RuntimeError(tr("aierr.incomplete"))
         if cfg.get("service") == "zhipu":
             max_tokens = max(1, min(int(max_tokens), 1024))
         payload = {"model": cfg["model"], "max_tokens": max_tokens,
@@ -210,7 +213,7 @@ class AIClient:
                         if not line:
                             break
                         if len(line) > 1024 * 1024:
-                            raise RuntimeError("AI 流式响应单行超过 1 MiB，已中止")
+                            raise RuntimeError(tr("aierr.stream_line_too_large"))
                         line = line.decode("utf-8", "replace").strip()
                         if not line:
                             continue
@@ -245,7 +248,7 @@ class AIClient:
                         return {"choices": [{"message": {"content": ""}}]}
                     raw = ("\n".join(raw_lines)).encode("utf-8") + r.read(2 * 1024 * 1024 + 1)
                     if len(raw) > 2 * 1024 * 1024:
-                        raise RuntimeError("AI 响应超过 2 MiB，已中止")
+                        raise RuntimeError(tr("aierr.response_too_large"))
                     return json.loads(raw.decode("utf-8"))
             except urllib.error.HTTPError as e:
                 if e.code == 429 and not rate_retried:
@@ -264,21 +267,20 @@ class AIClient:
                     detail = ""
                 detail = redact_ai_detail(detail, cfg.get("key") or "")
                 detail = re.sub(r"[\r\n\t]+", " ", detail).strip()[:160]
-                err = RuntimeError(self._t("ai_err_http",
-                                           f"AI 接口返回 {e.code} 错误。{detail}"))
+                err = RuntimeError(tr("aierr.http", code=e.code, detail=detail))
                 err._kivo_status = e.code
                 raise err
             except Exception as e:
                 if isinstance(e, RuntimeError):
                     raise
-                raise RuntimeError(self._t("ai_err_conn",
-                                           f"AI 接口连不上 ({redact_secrets(str(e))}), 检查网络后重试。"))
+                raise RuntimeError(tr("aierr.conn",
+                                     detail=redact_secrets(str(e))))
 
         def _extract(d):
             try:
                 msg = d["choices"][0]["message"]
             except Exception:
-                raise RuntimeError("AI 接口返回的格式看不懂, 换个模型或检查接口地址。")
+                raise RuntimeError(tr("aierr.bad_format"))
             c = msg.get("content")
             if isinstance(c, list):
                 c = "".join(str(p.get("text", "")) for p in c if isinstance(p, dict))

@@ -831,6 +831,35 @@ _TABLE.update({
     "tray.quit": ("退出 KIVO", "Quit KIVO"),
 })
 
+# AI 客户端错误消息
+_TABLE.update({
+    "aierr.bad_base": ("AI 接口地址不对 (只支持 http/https 地址): {u}",
+                       "Invalid AI base URL (only http/https supported): {u}"),
+    "aierr.empty_value": ("(空)", "(empty)"),
+    "aierr.public_http": ("公网地址只支持 https (http 会明文发送 API Key): {u}",
+                          "Public URLs must use https (http sends the API key in plaintext): {u}"),
+    "aierr.need_base": ("请先填写接口地址", "Enter the base URL first"),
+    "aierr.models_too_large": ("模型列表响应过大", "Model list response too large"),
+    "aierr.fetch_models_fail": ("获取模型列表失败 (HTTP {code}): {detail}",
+                               "Failed to fetch model list (HTTP {code}): {detail}"),
+    "aierr.cannot_connect_models": ("无法连接模型服务: {reason}",
+                                    "Cannot connect to model service: {reason}"),
+    "aierr.need_key": ("还没填 AI 接口的 API Key：到「设置」的「AI 模型中心」选服务、填 key 即可。",
+                      "No API key set: open Settings → AI Model Center, choose a provider and enter its key."),
+    "aierr.incomplete": ("AI 设置里的接口地址/模型名没填完整，先到「设置」补上。",
+                        "Base URL or model name is incomplete. Fill it in under Settings."),
+    "aierr.stream_line_too_large": ("AI 流式响应单行超过 1 MiB，已中止",
+                                   "A single streaming line exceeded 1 MiB; aborted"),
+    "aierr.response_too_large": ("AI 响应超过 2 MiB，已中止",
+                                 "AI response exceeded 2 MiB; aborted"),
+    "aierr.http": ("AI 接口返回 {code} 错误。{detail}",
+                   "AI API returned error {code}. {detail}"),
+    "aierr.conn": ("AI 接口连不上 ({detail})，检查网络后重试。",
+                   "Cannot connect to the AI API ({detail}); check your network and retry."),
+    "aierr.bad_format": ("AI 接口返回的格式看不懂，换个模型或检查接口地址。",
+                        "Unrecognized AI response format; try another model or check the base URL."),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
