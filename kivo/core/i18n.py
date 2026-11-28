@@ -577,6 +577,24 @@ _TABLE.update({
     "set.zhang": ("张", "items"),
 })
 
+# 取色器
+_TABLE.update({
+    "color.title": ("取色器", "Color Picker"),
+    "color.pick": ("屏幕取色", "Pick from Screen"),
+    "color.empty": ("还没有历史颜色，点「屏幕取色」开始",
+                    "No history yet. Click “Pick from Screen” to start."),
+})
+
+# 二维码弹窗
+_TABLE.update({
+    "qr.title": ("二维码生成", "QR Code Generator"),
+    "qr.ph": ("输入文本或链接…", "Enter text or a link…"),
+    "qr.gen": ("生成二维码", "Generate QR Code"),
+    "qr.copy_img": ("复制图片", "Copy Image"),
+    "qr.save_img": ("保存图片", "Save Image"),
+    "qr.save_title": ("保存二维码", "Save QR Code"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

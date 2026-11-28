@@ -11,15 +11,16 @@ from PySide6.QtWidgets import (
 from .base import Dialog
 from ..components import PrimaryButton, SecondaryButton
 from ...core import color_store
+from ...core.i18n import tr
 
 
 class ColorPickerDialog(Dialog):
     def __init__(self, parent, config, pick_screen_callback=None):
-        super().__init__(parent, "取色器", width=460)
+        super().__init__(parent, tr("color.title"), width=460)
         self.config = config
         self.pick_screen_callback = pick_screen_callback
 
-        pick = PrimaryButton("屏幕取色", icon_name="droplet")
+        pick = PrimaryButton(tr("color.pick"), icon_name="droplet")
         pick.clicked.connect(self._pick_screen)
         self.body.addWidget(pick)
 
@@ -47,7 +48,7 @@ class ColorPickerDialog(Dialog):
             if w:
                 w.setParent(None); w.deleteLater()
         if not self.history:
-            empty = QLabel("还没有历史颜色，点「屏幕取色」开始")
+            empty = QLabel(tr("color.empty"))
             empty.setObjectName("muted")
             self.grid.addWidget(empty, 0, 0)
             return
@@ -77,7 +78,7 @@ class ColorPickerDialog(Dialog):
         for key in ("hex", "rgb", "hsl"):
             r = QHBoxLayout()
             lab = QLabel(fmts[key])
-            cp = SecondaryButton("复制", icon_name="copy")
+            cp = SecondaryButton(tr("common.copy"), icon_name="copy")
             cp.clicked.connect(lambda checked, v=fmts[key]: self._copy(v))
             r.addWidget(lab); r.addWidget(cp); r.addStretch()
             col.addLayout(r)

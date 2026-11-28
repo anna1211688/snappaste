@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QTextEdit, QLabel, QFileDialog
 from .base import Dialog
 from ..components import PrimaryButton, SecondaryButton
 from ...core import qr_store
+from ...core.i18n import tr
 
 
 def pil_to_pixmap(img):
@@ -21,13 +22,13 @@ def pil_to_pixmap(img):
 
 class QrDialog(Dialog):
     def __init__(self, parent):
-        super().__init__(parent, "二维码生成", width=420)
+        super().__init__(parent, tr("qr.title"), width=420)
         self._pil = None
 
         self.input = QTextEdit()
         self.input.setObjectName("qrInput")
         self.input.setFixedHeight(90)
-        self.input.setPlaceholderText("输入文本或链接…")
+        self.input.setPlaceholderText(tr("qr.ph"))
         self.body.addWidget(self.input)
 
         self.preview = QLabel()
@@ -35,11 +36,11 @@ class QrDialog(Dialog):
         self.preview.setFixedHeight(240)
         self.body.addWidget(self.preview)
 
-        gen = PrimaryButton("生成二维码", icon_name="qr")
+        gen = PrimaryButton(tr("qr.gen"), icon_name="qr")
         gen.clicked.connect(self._make)
-        copy = SecondaryButton("复制图片", icon_name="copy")
+        copy = SecondaryButton(tr("qr.copy_img"), icon_name="copy")
         copy.clicked.connect(self._copy)
-        save = SecondaryButton("保存图片", icon_name="save")
+        save = SecondaryButton(tr("qr.save_img"), icon_name="save")
         save.clicked.connect(self._save)
         self.add_button(save); self.add_button(copy); self.add_button(gen)
 
@@ -64,6 +65,6 @@ class QrDialog(Dialog):
         if self._pil is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "保存二维码", "qrcode.png", "PNG (*.png)")
+            self, tr("qr.save_title"), "qrcode.png", "PNG (*.png)")
         if path:
             self._pil.save(path)
