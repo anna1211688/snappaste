@@ -2,15 +2,17 @@
 """系统托盘: pystray 图标与菜单，回调 marshal 回主线程，缺库安全降级。"""
 from __future__ import annotations
 
-# (显示名, 动作键, 是否默认项)
+from ..core.i18n import tr
+
+# (i18n key, 动作键, 是否默认项)
 TRAY_MENU = [
-    ("显示主窗口", "show", True),
-    ("区域截图", "snip", False),
-    ("截图并复制", "snip_copy", False),
-    ("截图翻译", "snip_trans", False),
-    ("智能回复", "snip_reply", False),
-    ("迷你翻译", "mini", False),
-    ("贴剪贴板内容", "pin", False),
+    ("tray.show", "show", True),
+    ("tray.snip", "snip", False),
+    ("tray.snip_copy", "snip_copy", False),
+    ("tray.snip_trans", "snip_trans", False),
+    ("tray.snip_reply", "snip_reply", False),
+    ("tray.mini", "mini", False),
+    ("tray.pin", "pin", False),
 ]
 
 
@@ -23,13 +25,13 @@ def _default_factory():
 
 
 class TrayController:
-    def __init__(self, actions, icon_image, invoke, factory=None, tooltip="KIVO 智能工作台"):
+    def __init__(self, actions, icon_image, invoke, factory=None, tooltip=None):
         # actions: {key: callable}; invoke: callable(fn) marshal 到主线程
         self.actions = actions
         self.icon_image = icon_image
         self.invoke = invoke
         self._pystray = factory if factory is not None else _default_factory()
-        self.tooltip = tooltip
+        self.tooltip = tooltip or tr("tray.tooltip")
         self._icon = None
 
     def menu_spec(self):
@@ -38,16 +40,16 @@ class TrayController:
     def build_menu(self):
         p = self._pystray
         items = []
-        for label, key, is_default in TRAY_MENU:
+        for label_key, key, is_default in TRAY_MENU:
             def make(act_key):
                 def handler(_icon=None, _item=None):
                     fn = self.actions.get(act_key)
                     if fn:
                         self.invoke(fn)
                 return handler
-            items.append(p.MenuItem(label, make(key), default=is_default))
+            items.append(p.MenuItem(tr(label_key), make(key), default=is_default))
         items.append(p.Menu.SEPARATOR)
-        items.append(p.MenuItem("退出 KIVO",
+        items.append(p.MenuItem(tr("tray.quit"),
                                 lambda _i=None, _it=None: self.invoke(self.actions["quit"])))
         return p.Menu(*items)
 

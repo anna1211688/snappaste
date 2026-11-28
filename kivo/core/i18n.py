@@ -810,6 +810,27 @@ _TABLE.update({
     "ais.saved": ("AI 模型中心已保存", "AI model center saved"),
 })
 
+# 贴图右键菜单
+_TABLE.update({
+    "pin.rotate": ("旋转 90°", "Rotate 90°"),
+    "pin.opacity": ("透明度", "Opacity"),
+    "pin.copy_img": ("复制图片", "Copy Image"),
+    "pin.close": ("关闭贴图", "Close Pin"),
+})
+
+# 系统托盘
+_TABLE.update({
+    "tray.show": ("显示主窗口", "Show Main Window"),
+    "tray.snip": ("区域截图", "Region Screenshot"),
+    "tray.snip_copy": ("截图并复制", "Screenshot & Copy"),
+    "tray.snip_trans": ("截图翻译", "Screenshot Translate"),
+    "tray.snip_reply": ("智能回复", "Smart Reply"),
+    "tray.mini": ("迷你翻译", "Mini Translate"),
+    "tray.pin": ("贴剪贴板内容", "Pin Clipboard Content"),
+    "tray.tooltip": ("KIVO 智能工作台", "KIVO Smart Workbench"),
+    "tray.quit": ("退出 KIVO", "Quit KIVO"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

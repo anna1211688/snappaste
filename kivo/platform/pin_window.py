@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..ui.theme import Theme
+from ..core.i18n import tr
 
 MIN_SCALE = 0.1
 MAX_SCALE = 4.0
@@ -77,13 +78,13 @@ class PinWindow(QWidget):
 
     def contextMenuEvent(self, e):
         menu = QMenu(self)
-        menu.addAction("旋转 90°", self.rotate)
-        alpha = menu.addMenu("透明度")
+        menu.addAction(tr("pin.rotate"), self.rotate)
+        alpha = menu.addMenu(tr("pin.opacity"))
         for pct in (100, 80, 60, 40):
             alpha.addAction(f"{pct}%", lambda p=pct / 100: self.set_opacity(p))
-        menu.addAction("复制图片", self.copy_to_clipboard)
+        menu.addAction(tr("pin.copy_img"), self.copy_to_clipboard)
         menu.addSeparator()
-        menu.addAction("关闭贴图", self.close_pin)
+        menu.addAction(tr("pin.close"), self.close_pin)
         menu.exec(e.globalPos())
 
     def keyPressEvent(self, e):
