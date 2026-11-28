@@ -116,6 +116,14 @@ QLabel#dayDot {{ background: transparent; font-size: {FONT_SIZE['sm']}px; }}
 QLabel#chkWait {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['sm']}px; }}
 QLabel#chkOk {{ background: transparent; color: #28A745; font-size: {FONT_SIZE['sm']}px; font-weight: 600; }}
 QLabel#chkBad {{ background: transparent; color: {t['danger']}; font-size: {FONT_SIZE['sm']}px; font-weight: 600; }}
+QFrame#galCell {{ background: {t['surface']}; border: 1px solid {t['border']}; border-radius: {RADIUS['md']}px; }}
+QLabel#thumb {{ background: {t['soft']}; border-radius: {RADIUS['sm']}px; }}
+QLabel#galName {{ background: transparent; color: {t['text_2']}; font-size: {FONT_SIZE['xs']}px; }}
+QPushButton#miniBtn {{ background: {t['soft']}; color: {t['text']}; border: none; border-radius: {RADIUS['sm']}px; padding: 4px 10px; font-size: {FONT_SIZE['xs']}px; }}
+QPushButton#miniBtn:hover {{ background: {t['border']}; }}
+QFrame#emptyBox {{ background: transparent; border: 1px dashed {t['border_strong']}; border-radius: {RADIUS['md']}px; }}
+QLabel#emptyIcon {{ background: transparent; font-size: 30px; }}
+QLabel#emptyTitle {{ background: transparent; color: {t['text']}; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
 QLabel#calcTrail {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['md']}px; }}
 QLabel#calcDisplay {{ background: transparent; color: {t['text']}; font-size: 40px; font-weight: 700; }}
 QPushButton#calcDigit {{ background: {t['stripe']}; color: {t['text']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
