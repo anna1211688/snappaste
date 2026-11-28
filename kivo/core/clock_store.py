@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone, timedelta
 
+from .i18n import MESSAGES, tr
+
 CLOCK_CATALOG = [
     ("北京", "Asia/Shanghai", 8), ("香港", "Asia/Hong_Kong", 8),
     ("台北", "Asia/Taipei", 8), ("新加坡", "Asia/Singapore", 8),
@@ -31,6 +33,23 @@ WEEKDAYS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日"
 
 MAX_CITIES = 15
 SEARCH_LIMIT = 100
+
+
+def city_key(tzname: str) -> str:
+    """时区路径 -> 城市 i18n 键。"""
+    return "city." + tzname.lower().replace("/", ".")
+
+
+def city_label(tzname: str, fallback: str) -> str:
+    """城市名当前语言译文; 目录外的时区回退到其英文名。"""
+    key = city_key(tzname)
+    if key in MESSAGES["zh"]:
+        return tr(key)
+    return fallback
+
+
+def weekday_label(idx: int) -> str:
+    return tr(f"weekday.{idx}")
 
 
 def offset_text(hours):

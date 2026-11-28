@@ -10,7 +10,8 @@ from PySide6.QtWidgets import (
 from ..theme import Theme
 from ..components import PrimaryButton, SecondaryButton, SearchInput
 from ...core import clock_store
-from ...core.clock_store import MAX_CITIES
+from ...core.clock_store import MAX_CITIES, city_label
+from ...core.i18n import tr
 
 
 class ClockSetPanel(QWidget):
@@ -27,11 +28,11 @@ class ClockSetPanel(QWidget):
         outer.setContentsMargins(20, 16, 20, 16)
         outer.setSpacing(10)
 
-        title = QLabel("选择世界时间城市")
+        title = QLabel(tr("cset.title"))
         title.setObjectName("hero")
         outer.addWidget(title)
 
-        hint = QLabel("勾选要显示的城市（本地永远在第一张）")
+        hint = QLabel(tr("cset.hint"))
         hint.setObjectName("muted")
         outer.addWidget(hint)
 
@@ -39,7 +40,7 @@ class ClockSetPanel(QWidget):
         self.cnt.setObjectName("cntAccent")
         outer.addWidget(self.cnt)
 
-        self.search = SearchInput("搜索城市，如 Tokyo、Sydney")
+        self.search = SearchInput(tr("cset.search_ph"))
         self.search.textChanged.connect(self.render)
         outer.addWidget(self.search)
 
@@ -55,9 +56,9 @@ class ClockSetPanel(QWidget):
 
         bar = QHBoxLayout()
         bar.addStretch()
-        cancel = SecondaryButton("取消", icon_name="close")
+        cancel = SecondaryButton(tr("common.cancel"), icon_name="close")
         cancel.clicked.connect(self._cancel)
-        ok = PrimaryButton("确定", icon_name="check")
+        ok = PrimaryButton(tr("common.ok"), icon_name="check")
         ok.clicked.connect(self.confirm)
         bar.addWidget(cancel); bar.addWidget(ok)
         outer.addLayout(bar)
@@ -73,11 +74,12 @@ class ClockSetPanel(QWidget):
         self._clear()
         rows = clock_store.search_cities(self.search.text())
         if not rows:
-            miss = QLabel("没找到这个城市，换个关键词试试")
+            miss = QLabel(tr("cset.not_found"))
             miss.setObjectName("muted")
             self.list_lay.addWidget(miss)
         for name, tz, off in rows:
-            cb = QCheckBox(f"{name}  ({off})" if off else f"{name}  ·  {tz}")
+            disp = city_label(tz, name)
+            cb = QCheckBox(f"{disp}  ({off})" if off else f"{disp}  ·  {tz}")
             cb.setObjectName("cityCheck")
             cb.setChecked(tz in self.selected)
             cb.toggled.connect(lambda checked, t=tz: self._toggle(t, checked))
@@ -101,7 +103,7 @@ class ClockSetPanel(QWidget):
                 cb = self._checks.get(tz)
                 if cb is not None:
                     cb.blockSignals(True); cb.setChecked(False); cb.blockSignals(False)
-                self._message(f"最多选 {MAX_CITIES} 个城市（本地不算）")
+                self._message(tr("cset.max_msg", n=MAX_CITIES))
                 return
             self.selected.add(tz)
         else:
@@ -109,14 +111,14 @@ class ClockSetPanel(QWidget):
         self._refresh_cnt()
 
     def _refresh_cnt(self):
-        self.cnt.setText(f"已选 {len(self.selected)} / {MAX_CITIES}")
+        self.cnt.setText(tr("cset.count", n=len(self.selected), max=MAX_CITIES))
 
     def _message(self, text):
         self.cnt.setText(text)
 
     def confirm(self):
         if not self.selected:
-            self._message("至少选一个城市")
+            self._message(tr("cset.min_one"))
             return
         picked = clock_store.order_picked(self.selected)
         if not self.config.has_section("Config"):

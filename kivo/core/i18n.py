@@ -294,6 +294,72 @@ _TABLE.update({
     "chk.hotkey_count": ("{n} 个已注册", "{n} registered"),
 })
 
+# 世界时钟
+_TABLE.update({
+    "clock.title": ("世界时钟", "World Clock"),
+    "clock.edit": ("编辑城市", "Edit Cities"),
+    "clock.local": ("本地", "Local"),
+    "clock.convert_head": ("约时间换算", "Time Conversion"),
+    "clock.peer_city": ("对方城市", "Their city"),
+    "clock.my_time": ("我的时间", "My time"),
+    "clock.convert": ("换算", "Convert"),
+    "clock.time_fmt": ("时间格式：YYYY-MM-DD HH:MM", "Time format: YYYY-MM-DD HH:MM"),
+    "clock.peer_local": ("对方当地时间：", "Their local time: "),
+    "clock.edit_entry": ("城市编辑入口（待接入城市选择面板）",
+                         "City edit entry (to be connected)"),
+    "weekday.0": ("周一", "Mon"), "weekday.1": ("周二", "Tue"),
+    "weekday.2": ("周三", "Wed"), "weekday.3": ("周四", "Thu"),
+    "weekday.4": ("周五", "Fri"), "weekday.5": ("周六", "Sat"),
+    "weekday.6": ("周日", "Sun"),
+})
+
+# 城市名（键由时区路径生成: city.<zone>）
+_TABLE.update({
+    "city.asia.shanghai": ("北京", "Beijing"),
+    "city.asia.hong_kong": ("香港", "Hong Kong"),
+    "city.asia.taipei": ("台北", "Taipei"),
+    "city.asia.singapore": ("新加坡", "Singapore"),
+    "city.asia.bangkok": ("曼谷", "Bangkok"),
+    "city.asia.jakarta": ("雅加达", "Jakarta"),
+    "city.asia.manila": ("马尼拉", "Manila"),
+    "city.asia.tokyo": ("东京", "Tokyo"),
+    "city.asia.seoul": ("首尔", "Seoul"),
+    "city.asia.kolkata": ("孟买", "Mumbai"),
+    "city.australia.sydney": ("悉尼", "Sydney"),
+    "city.australia.melbourne": ("墨尔本", "Melbourne"),
+    "city.pacific.auckland": ("奥克兰", "Auckland"),
+    "city.asia.dubai": ("迪拜", "Dubai"),
+    "city.europe.istanbul": ("伊斯坦布尔", "Istanbul"),
+    "city.europe.moscow": ("莫斯科", "Moscow"),
+    "city.africa.cairo": ("开罗", "Cairo"),
+    "city.africa.johannesburg": ("约翰内斯堡", "Johannesburg"),
+    "city.europe.london": ("伦敦", "London"),
+    "city.europe.paris": ("巴黎", "Paris"),
+    "city.europe.berlin": ("柏林", "Berlin"),
+    "city.europe.rome": ("罗马", "Rome"),
+    "city.america.new_york": ("纽约", "New York"),
+    "city.america.toronto": ("多伦多", "Toronto"),
+    "city.america.chicago": ("芝加哥", "Chicago"),
+    "city.america.denver": ("丹佛", "Denver"),
+    "city.america.los_angeles": ("洛杉矶", "Los Angeles"),
+    "city.america.vancouver": ("温哥华", "Vancouver"),
+    "city.america.sao_paulo": ("圣保罗", "Sao Paulo"),
+})
+
+# 时钟城市选择
+_TABLE.update({
+    "cset.title": ("选择世界时间城市", "Choose World Clock Cities"),
+    "cset.hint": ("勾选要显示的城市（本地永远在第一张）",
+                  "Check cities to show (local is always first)"),
+    "cset.search_ph": ("搜索城市，如 Tokyo、Sydney", "Search cities, e.g. Tokyo, Sydney"),
+    "cset.not_found": ("没找到这个城市，换个关键词试试",
+                       "City not found; try another keyword"),
+    "cset.max_msg": ("最多选 {n} 个城市（本地不算）",
+                     "Choose at most {n} cities (excluding local)"),
+    "cset.count": ("已选 {n} / {max}", "Selected {n} / {max}"),
+    "cset.min_one": ("至少选一个城市", "Select at least one city"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
