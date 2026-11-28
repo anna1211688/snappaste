@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, SecondaryButton
 from ..icons import icon
+from ...core.i18n import tr
 
 AUTO_CLOSE_MS = 20_000
 
@@ -51,7 +52,7 @@ class CopyTransCard(QDialog):
         self.orig_label.setObjectName("ctOrig")
         self.orig_label.setWordWrap(True)
         cl.addWidget(self.orig_label)
-        self.tran_label = QLabel("翻译中…")
+        self.tran_label = QLabel(tr("common.translating"))
         self.tran_label.setObjectName("ctTrans")
         self.tran_label.setWordWrap(True)
         cl.addWidget(self.tran_label)
@@ -72,7 +73,7 @@ class CopyTransCard(QDialog):
         bar.setObjectName("ctTitleBar")
         lay = QHBoxLayout(bar)
         lay.setContentsMargins(14, 10, 10, 6)
-        title = QLabel("复制即译")
+        title = QLabel(tr("ct.title"))
         title.setObjectName("ctTitle")
         lay.addWidget(title)
         lay.addStretch()
@@ -88,9 +89,9 @@ class CopyTransCard(QDialog):
         row = QHBoxLayout()
         row.setContentsMargins(14, 4, 14, 0)
         row.addStretch()
-        both = SecondaryButton("复制双语", icon_name="copy")
+        both = SecondaryButton(tr("ct.copy_both"), icon_name="copy")
         both.clicked.connect(self._copy_both)
-        one = PrimaryButton("复制译文", icon_name="copy")
+        one = PrimaryButton(tr("ct.copy_trans"), icon_name="copy")
         one.clicked.connect(self._copy_one)
         row.addWidget(both); row.addWidget(one)
         return row
@@ -100,7 +101,7 @@ class CopyTransCard(QDialog):
         self._gen += 1
         gen = self._gen
         self.orig_label.setText(orig)
-        self.tran_label.setText("翻译中…")
+        self.tran_label.setText(tr("common.translating"))
         self.tran_label.setObjectName("ctTrans")
         self._restyle(self.tran_label)
         self.show()
@@ -118,7 +119,7 @@ class CopyTransCard(QDialog):
                 if r:
                     signals.result.emit(r)
                 else:
-                    signals.failed.emit("翻译失败：检查网络后重试")
+                    signals.failed.emit(tr("ct.fail"))
             except Exception as e:
                 if gen == self._gen:
                     signals.failed.emit(str(e))

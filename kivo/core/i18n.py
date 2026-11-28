@@ -595,6 +595,27 @@ _TABLE.update({
     "qr.save_title": ("保存二维码", "Save QR Code"),
 })
 
+# 划词翻译结果卡
+_TABLE.update({
+    "ct.title": ("复制即译", "Quick Translate"),
+    "ct.copy_both": ("复制双语", "Copy Both"),
+    "ct.copy_trans": ("复制译文", "Copy Translation"),
+    "ct.fail": ("翻译失败：检查网络后重试",
+                "Translation failed: check your network and retry"),
+})
+
+# AI 长期记忆弹窗
+_TABLE.update({
+    "mem.title": ("AI 长期记忆", "AI Long-Term Memory"),
+    "mem.hint": ("保存希望 AI 长期记住的信息（偏好、背景、常用资料），每次聊天会自动带上，无关条目 AI 会自行忽略。",
+                 "Save information you want the AI to remember long-term (preferences, background, common references). It is sent with every chat; the AI ignores irrelevant entries."),
+    "mem.ph": ("输入要记住的内容，回车添加…",
+               "Enter what to remember, press Enter to add…"),
+    "mem.delete_sel": ("删除选中", "Delete Selected"),
+    "mem.clear_all": ("清空全部", "Clear All"),
+    "mem.confirm": ("再点一次确认", "Click again to confirm"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

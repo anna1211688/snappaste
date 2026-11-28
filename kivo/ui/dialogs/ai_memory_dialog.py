@@ -8,18 +8,17 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
 from .base import Dialog
 from ..components import PrimaryButton, SecondaryButton, DangerButton
 from ...core import memory_store
+from ...core.i18n import tr
 
 
 class AiMemoryDialog(Dialog):
     def __init__(self, parent, memory_path):
-        super().__init__(parent, "AI 长期记忆", width=520)
+        super().__init__(parent, tr("mem.title"), width=520)
         self.path = memory_path
         self.items = memory_store.load_memory(memory_path)
         self._confirming_clear = False
 
-        hint = ("保存希望 AI 长期记住的信息（偏好、背景、常用资料），"
-                "每次聊天会自动带上，无关条目 AI 会自行忽略。")
-        h = self._muted(hint)
+        h = self._muted(tr("mem.hint"))
         self.body.addWidget(h)
 
         self.list = QListWidget()
@@ -27,15 +26,15 @@ class AiMemoryDialog(Dialog):
         self.body.addWidget(self.list)
 
         self.entry = QLineEdit()
-        self.entry.setPlaceholderText("输入要记住的内容，回车添加…")
+        self.entry.setPlaceholderText(tr("mem.ph"))
         self.entry.returnPressed.connect(self._add)
         self.body.addWidget(self.entry)
 
-        add_b = PrimaryButton("添加", icon_name="plus")
+        add_b = PrimaryButton(tr("common.add"), icon_name="plus")
         add_b.clicked.connect(self._add)
-        del_b = SecondaryButton("删除选中", icon_name="trash")
+        del_b = SecondaryButton(tr("mem.delete_sel"), icon_name="trash")
         del_b.clicked.connect(self._delete)
-        self.clear_b = DangerButton("清空全部", icon_name="trash")
+        self.clear_b = DangerButton(tr("mem.clear_all"), icon_name="trash")
         self.clear_b.clicked.connect(self._clear)
         self.add_button(self.clear_b); self.add_button(del_b); self.add_button(add_b)
 
@@ -70,7 +69,7 @@ class AiMemoryDialog(Dialog):
         # 二次确认：第一次进入确认态，3 秒内再点才执行
         if not self._confirming_clear:
             self._confirming_clear = True
-            self.clear_b.setText("再点一次确认")
+            self.clear_b.setText(tr("mem.confirm"))
             QTimer.singleShot(3000, self._reset_confirm)
             return
         memory_store.clear_memory(self.items)
@@ -80,4 +79,4 @@ class AiMemoryDialog(Dialog):
 
     def _reset_confirm(self):
         self._confirming_clear = False
-        self.clear_b.setText("清空全部")
+        self.clear_b.setText(tr("mem.clear_all"))
