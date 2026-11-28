@@ -11,15 +11,16 @@ from ..theme import Theme
 from ..components import PrimaryButton, SecondaryButton, MutedLabel
 from .base import Dialog, show_toast
 from ...core.translate import TranslateClient
+from ...core.i18n import tr
 
 TEST_SENTENCE = "Hello, nice to meet you."
 
-# (key, 显示名)
+# (key, i18n key)
 SERVICES = [
-    ("free", "免费接口（无需密钥）"),
-    ("baidu", "百度翻译开放平台"),
-    ("youdao", "有道翻译"),
-    ("google", "谷歌翻译（Google Cloud）"),
+    ("free", "ts.free"),
+    ("baidu", "ts.baidu"),
+    ("youdao", "ts.youdao"),
+    ("google", "ts.google"),
 ]
 
 
@@ -30,7 +31,7 @@ class _Signals(QObject):
 
 class TranslateServiceDialog(Dialog):
     def __init__(self, parent, theme: Theme, config, client=None):
-        super().__init__(parent, "翻译服务", width=480)
+        super().__init__(parent, tr("ts.title"), width=480)
         self.theme = theme
         self.config = config
         self.client = client or TranslateClient(config)
@@ -43,24 +44,22 @@ class TranslateServiceDialog(Dialog):
         self._busy = False
 
         self.svc = QComboBox()
-        for key, name in SERVICES:
-            self.svc.addItem(name, key)
+        for key, name_key in SERVICES:
+            self.svc.addItem(tr(name_key), key)
         idx = max(0, [k for k, _ in SERVICES].index(tc["service"]))
         self.svc.setCurrentIndex(idx)
         self._svc_key = tc["service"]
         self.svc.currentIndexChanged.connect(self._on_svc_changed)
-        self._row("翻译服务", self.svc)
+        self._row(tr("ts.title"), self.svc)
 
         self.app_id = QLineEdit()
-        self._row("APP ID", self.app_id)
+        self._row(tr("ts.app_id"), self.app_id)
 
         self.key = QLineEdit()
         self.key.setEchoMode(QLineEdit.Password)
-        self._row("密钥", self.key)
+        self._row(tr("ts.secret"), self.key)
 
-        note = MutedLabel(
-            "百度/有道到开放平台免费申请 APP ID 和密钥；谷歌只需填 API 密钥。"
-            "密钥只存本机，没填或出错时自动用免费接口。")
+        note = MutedLabel(tr("ts.note"))
         note.setWordWrap(True)
         self.body.addWidget(note)
 
@@ -69,10 +68,10 @@ class TranslateServiceDialog(Dialog):
         self.test_result.setWordWrap(True)
         self.body.addWidget(self.test_result)
 
-        test = SecondaryButton("测试", icon_name="zap")
+        test = SecondaryButton(tr("ts.test_btn"), icon_name="zap")
         test.clicked.connect(self._do_test)
         self.add_button(test)
-        save = PrimaryButton("保存", icon_name="save")
+        save = PrimaryButton(tr("common.save"), icon_name="save")
         save.clicked.connect(self._do_save)
         self.add_button(save)
 
@@ -127,7 +126,7 @@ class TranslateServiceDialog(Dialog):
         k = self.service_key
         pair = self.creds.get(k, ["", ""])
         self._busy = True
-        self.test_result.setText("测试中…")
+        self.test_result.setText(tr("ts.testing"))
         client = self.client
         signals = self.signals
 
@@ -135,24 +134,25 @@ class TranslateServiceDialog(Dialog):
             try:
                 if k == "baidu":
                     if not all(pair):
-                        raise RuntimeError("先填 APP ID 和密钥")
+                        raise RuntimeError(tr("ts.need_creds"))
                     r = client.baidu_translate(TEST_SENTENCE, "zh-CN", pair[0], pair[1])
                 elif k == "youdao":
                     if not all(pair):
-                        raise RuntimeError("先填 APP ID 和密钥")
+                        raise RuntimeError(tr("ts.need_creds"))
                     r = client.youdao_translate(TEST_SENTENCE, "zh-CN", pair[0], pair[1])
                 elif k == "google":
                     if not pair[1]:
-                        raise RuntimeError("先填 API 密钥")
+                        raise RuntimeError(tr("ts.need_google"))
                     r = client.google_translate(TEST_SENTENCE, "zh-CN", pair[1])
                 else:
                     r = client.translate_to(TEST_SENTENCE, "zh-CN")
                 if r:
-                    signals.message.emit(f"测试成功：{TEST_SENTENCE} → {r}")
+                    signals.message.emit(
+                        tr("ts.test_ok") + f"{TEST_SENTENCE} → {r}")
                 else:
-                    signals.message.emit("测试失败：没拿到译文")
+                    signals.message.emit(tr("ts.test_fail_empty"))
             except Exception as e:
-                signals.message.emit(f"测试失败：{e}")
+                signals.message.emit(tr("ts.test_fail") + str(e))
             finally:
                 signals.finished.emit()
 
@@ -167,5 +167,5 @@ class TranslateServiceDialog(Dialog):
         self.config.set("Translate", "YoudaoSecret", self.creds["youdao"][1])
         self.config.set("Translate", "GoogleKey", self.creds["google"][1])
         self.config.save()
-        show_toast(self, "翻译服务已保存")
+        show_toast(self, tr("ts.saved"))
         self.accept()

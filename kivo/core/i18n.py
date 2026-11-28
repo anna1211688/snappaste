@@ -686,6 +686,28 @@ _TABLE.update({
     "hk.global_toggle": ("全局切换热键", "Global Toggle Hotkey"),
 })
 
+# 翻译服务设置弹窗
+_TABLE.update({
+    "ts.free": ("免费接口（无需密钥）", "Free API (no key needed)"),
+    "ts.baidu": ("百度翻译开放平台", "Baidu Translate Open Platform"),
+    "ts.youdao": ("有道翻译", "Youdao Translate"),
+    "ts.google": ("谷歌翻译（Google Cloud）", "Google Translate (Google Cloud)"),
+    "ts.title": ("翻译服务", "Translation Service"),
+    "ts.app_id": ("APP ID", "APP ID"),
+    "ts.secret": ("密钥", "Secret Key"),
+    "ts.note": ("百度/有道到开放平台免费申请 APP ID 和密钥；谷歌只需填 API 密钥。密钥只存本机，没填或出错时自动用免费接口。",
+                "Apply for a free APP ID and key on the Baidu/Youdao open platforms; Google only needs an API key. Keys are stored locally. If missing or failing, the free API is used automatically."),
+    "ts.testing": ("测试中…", "Testing…"),
+    "ts.test_btn": ("测试", "Test"),
+    "ts.need_creds": ("先填 APP ID 和密钥", "Enter APP ID and key first"),
+    "ts.need_google": ("先填 API 密钥", "Enter API key first"),
+    "ts.test_ok": ("测试成功：", "Test succeeded: "),
+    "ts.test_fail_empty": ("测试失败：没拿到译文",
+                           "Test failed: no translation returned"),
+    "ts.test_fail": ("测试失败：", "Test failed: "),
+    "ts.saved": ("翻译服务已保存", "Translation service saved"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
