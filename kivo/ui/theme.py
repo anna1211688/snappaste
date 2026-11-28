@@ -57,9 +57,6 @@ class Theme:
     def c(self, key: str) -> str:
         return self.tokens[key]
 
-    def qcolor(self, key: str) -> QColor:
-        return QColor(self.tokens[key])
-
     def font(self, size_key: str = "md", bold: bool = False, mono: bool = False) -> QFont:
         f = QFont()
         f.setFamilies((FONT_MONO if mono else FONT_FAMILY).strip('"').split('","'))

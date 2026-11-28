@@ -60,7 +60,6 @@ class AnnotationEditor(QDialog):
 
         self._start = None
         self._points = []
-        self._cur_end = None
 
         self.setWindowTitle(tr("anno.window_title"))
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
@@ -180,7 +179,6 @@ class AnnotationEditor(QDialog):
     def _on_press(self, pos):
         self._start = self._to_img(pos)
         self._points = [self._start]
-        self._cur_end = self._start
         if self.current_tool == "text":
             text, ok = QInputDialog.getText(
                 self, tr("anno.text_title"), tr("anno.text_prompt"))
@@ -201,7 +199,6 @@ class AnnotationEditor(QDialog):
         if self._start is None:
             return
         img_pt = self._to_img(pos)
-        self._cur_end = img_pt
         if self.current_tool == "pen":
             self._points.append(img_pt)
 

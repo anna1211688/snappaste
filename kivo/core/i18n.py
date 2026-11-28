@@ -940,17 +940,6 @@ def set_language(lang: str) -> None:
     _current = lang if lang in (ZH, EN) else ZH
 
 
-def get_language() -> str:
-    return _current
-
-
-def register(pairs: dict[str, tuple[str, str]]) -> None:
-    """把一组 (key -> (中文, English)) 注册进字典。"""
-    for key, (zh, en) in pairs.items():
-        MESSAGES[ZH][key] = zh
-        MESSAGES[EN][key] = en
-
-
 def tr(key: str, **kwargs) -> str:
     """取当前语言文案; 缺键回退中文再回退 key 本身。"""
     table = MESSAGES.get(_current, MESSAGES[ZH])
@@ -963,10 +952,6 @@ def tr(key: str, **kwargs) -> str:
         except (KeyError, IndexError, ValueError):
             return text
     return text
-
-
-def all_keys() -> set[str]:
-    return set(MESSAGES[ZH]) | set(MESSAGES[EN])
 
 
 def missing_keys() -> dict[str, list[str]]:

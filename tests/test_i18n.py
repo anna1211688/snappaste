@@ -18,8 +18,7 @@ def has_cjk(text):
 _NATIVE_LANG_NAMES = {name for name, _code in TRANS_TARGETS}
 
 _PATH_NAMES = ("CONFIG_PATH", "RECORDS_PATH", "PHRASES_PATH", "AI_CHATS_PATH",
-               "AI_MEMORY_PATH", "AI_PROMPTS_PATH", "PROJECTS_PATH",
-               "CALC_HISTORY_PATH", "CRASH_LOG_PATH")
+               "PROJECTS_PATH", "CALC_HISTORY_PATH", "CRASH_LOG_PATH")
 _PANEL_KEYS = ("ai", "voice", "trans", "clip", "phrases", "project", "fx",
                "clock", "calc", "dl", "pomo", "winman", "batch", "dev")
 
@@ -50,7 +49,6 @@ def _visible_texts(root):
 def _install_isolation(tmp_path, monkeypatch):
     for name in _PATH_NAMES:
         monkeypatch.setattr(paths, name, str(tmp_path / f"{name}.dat"))
-    monkeypatch.setattr(paths, "SHOTS_DIR", str(tmp_path / "shots"))
 
 
 # ---------- 单元行为 ----------

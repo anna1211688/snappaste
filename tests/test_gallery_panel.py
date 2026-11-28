@@ -2,7 +2,6 @@
 """画廊数据层与面板测试。"""
 import os
 
-from PySide6.QtWidgets import QFrame
 
 from kivo.core import gallery_store
 from kivo.ui.theme import Theme

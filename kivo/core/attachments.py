@@ -193,7 +193,8 @@ def read_attach_text(path):
     if ext in (".doc", ".xls", ".ppt", ".rtf"):
         return "", tr("att.unsupported")
     try:
-        data = open(path, "rb").read()
+        with open(path, "rb") as af:
+            data = af.read()
     except OSError:
         return "", fail
     try:

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """核心逻辑层单元测试 (不联网、不依赖桌面)。"""
-import json
 import os
 
 import pytest

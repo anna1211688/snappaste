@@ -90,7 +90,8 @@ class ConfigManager:
             atomic_write(paths.CONFIG_PATH, buf.getvalue())
             return
 
-        raw = open(paths.CONFIG_PATH, "rb").read()
+        with open(paths.CONFIG_PATH, "rb") as cf:
+            raw = cf.read()
         lines = []
         for enc in ("utf-8-sig", "gbk"):
             try:

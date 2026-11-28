@@ -29,8 +29,6 @@ CLOCK_DEFAULT = ["Asia/Shanghai", "Asia/Tokyo", "Asia/Seoul", "Asia/Singapore",
                   "Europe/London", "Europe/Paris", "America/New_York",
                   "America/Los_Angeles"]
 
-WEEKDAYS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
-
 MAX_CITIES = 15
 SEARCH_LIMIT = 100
 

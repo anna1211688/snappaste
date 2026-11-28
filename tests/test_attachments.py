@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """附件解析单元测试 (不联网)。"""
-import io
-import os
 import zipfile
 
 from kivo.core import attachments

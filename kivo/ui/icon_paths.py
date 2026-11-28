@@ -246,6 +246,3 @@ ICON_PATHS: dict[str, str] = {
         '<path d="M3 9h18"/><path d="M9 21V9"/>'
     ),
 }
-
-# 兼容旧名: 历史代码可能引用的别名
-ICON_ALIASES: dict[str, str] = {}

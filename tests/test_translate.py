@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """翻译引擎单元测试 (不联网)。"""
-import time
 
 from kivo.core import translate
 

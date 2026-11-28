@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import re
-import sys
 import time
 import traceback
 
@@ -34,35 +33,6 @@ def log_crash(where, exc_type, exc, tb):
             pass
         with open(paths.CRASH_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(f"\n===== {time.strftime('%Y-%m-%d %H:%M:%S')} [{where}] =====\n{text}\n")
-    except Exception:
-        pass
-
-
-def install_crash_logging():
-    """装主线程/后台线程异常钩子 + faulthandler 原生崩溃记录。"""
-    import threading
-
-    def _sys_hook(exc_type, exc, tb):
-        log_crash("main", exc_type, exc, tb)
-        sys.__excepthook__(exc_type, exc, tb)
-
-    sys.excepthook = _sys_hook
-
-    def _thr_hook(args):
-        log_crash(f"thread:{getattr(args.thread, 'name', '?')}",
-                  args.exc_type, args.exc_value, args.exc_traceback)
-
-    threading.excepthook = _thr_hook
-    try:
-        import faulthandler
-        np = os.path.join(paths.BASE, "crash_native.log")
-        if os.path.exists(np) and os.path.getsize(np) > 2_000_000:
-            with open(np, encoding="utf-8", errors="replace") as f:
-                tail = f.read()[-200_000:]
-            atomic_write(np, tail)
-        fh = open(np, "a", encoding="utf-8")
-        faulthandler.enable(file=fh)
-        globals()["_faulthandler_file"] = fh
     except Exception:
         pass
 

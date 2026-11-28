@@ -85,4 +85,5 @@ def test_drag_moves_window(pin, qapp):
     qapp.processEvents()
     QTest.mouseRelease(w, Qt.LeftButton, pos=QPoint(40, 40))
     # 拖动后窗口位置发生变化（全局坐标偏移）
+    assert w.pos() != before
     assert w._drag_pos is None

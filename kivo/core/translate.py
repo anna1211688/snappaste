@@ -81,7 +81,7 @@ class TranslateClient:
         if hard:
             self._dead[name] = (time.time() + 8, 0)
             return
-        until, cnt = self._dead.get(name, (0, 0))
+        _until, cnt = self._dead.get(name, (0, 0))
         cnt += 1
         self._dead[name] = (time.time() + 60, 0) if cnt >= 3 else (0, cnt)
 

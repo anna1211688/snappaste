@@ -273,7 +273,7 @@ class AiSettingsDialog(QDialog):
             combo.addItem(tr("ais.follow"), ("", ""))
             for k in names:
                 combo.addItem(provider_label(k), (k, ""))
-            svc, model = saved[rk]
+            svc, _model = saved[rk]
             if svc:
                 idx = names.index(svc) + 1
                 combo.setCurrentIndex(idx)

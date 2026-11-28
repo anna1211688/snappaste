@@ -325,12 +325,3 @@ class AIClient:
             payload["chat_template_kwargs"] = {"enable_thinking": False}
             content, reasoning = _extract(_send(payload))
         return content
-
-    def chat_image(self, img, prompt, cfg=None, temperature=0.7, timeout=90, route=None):
-        """图 + 提示词发视觉模型; img 为 PIL.Image。"""
-        from .ai_image import image_dataurl
-        return self.chat_messages(
-            [{"role": "user", "content": [
-                {"type": "text", "text": prompt},
-                {"type": "image_url", "image_url": {"url": image_dataurl(img)}}]}],
-            cfg=cfg, temperature=temperature, timeout=timeout, route=route)

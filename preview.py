@@ -2,13 +2,15 @@
 """组件库视觉预览 (开发期使用)。"""
 import sys
 
-from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QScrollArea, QFrame
+from PySide6.QtWidgets import (
+    QApplication, QWidget, QHBoxLayout, QVBoxLayout, QScrollArea, QFrame,
+)
 
-from kivo.ui.theme import Theme, add_shadow
+from kivo.ui.theme import Theme
 from kivo.ui.components import (
-    Card, PrimaryButton, SecondaryButton, DangerButton, GhostButton, IconButton,
-    IconBadge, SectionHeader, MutedLabel, Switch, Chip, SearchInput, ListRow,
-    NavItem, ChatBubble, HLine,
+    PrimaryButton, SecondaryButton, DangerButton, GhostButton,
+    SectionHeader, MutedLabel, Switch, SearchInput, NavItem,
+    EmptyState, MessageActionBar,
 )
 
 
@@ -42,7 +44,8 @@ def build(theme: Theme) -> QWidget:
     # 内容滚动区
     scroll = QScrollArea()
     scroll.setWidgetResizable(True)
-    card = Card(shadow=True)
+    card = QFrame()
+    card.setObjectName("card")
     cl = QVBoxLayout(card)
     cl.setContentsMargins(24, 22, 24, 24)
     cl.setSpacing(14)
@@ -50,50 +53,36 @@ def build(theme: Theme) -> QWidget:
     cl.addWidget(SectionHeader("按钮"))
     row = QHBoxLayout()
     row.setSpacing(10)
-    for b in (PrimaryButton("主按钮"), SecondaryButton("次按钮"),
-              DangerButton("危险"), GhostButton("幽灵"), IconButton("gear")):
+    for b in (PrimaryButton("主按钮", icon_name="copy"),
+              SecondaryButton("次按钮", icon_name="gear"),
+              DangerButton("危险", icon_name="close"),
+              GhostButton("幽灵")):
         row.addWidget(b)
     row.addStretch()
     cl.addLayout(row)
 
-    cl.addWidget(HLine())
-    cl.addWidget(SectionHeader("图标底 / 开关 / 标签"))
+    cl.addWidget(SectionHeader("开关 / 辅助文字"))
     row = QHBoxLayout()
     row.setSpacing(10)
-    for n in ("copy", "translate", "ai", "fx", "clock", "calc", "star"):
-        row.addWidget(IconBadge(n))
     sw = Switch(True)
     sw._on_color = theme.c("success")
     sw._off_color = theme.c("border_strong")
     row.addWidget(sw)
-    row.addWidget(Chip("标签一"))
-    row.addWidget(Chip("标签二"))
+    row.addWidget(MutedLabel("这是一段弱化说明文字"))
     row.addStretch()
     cl.addLayout(row)
 
-    cl.addWidget(HLine())
     cl.addWidget(SectionHeader("搜索"))
     cl.addWidget(SearchInput("搜索剪贴板 / 对话"))
 
-    cl.addWidget(HLine())
-    cl.addWidget(SectionHeader("列表行"))
-    for n, t, s in [
-        ("copy", "剪贴板记录", "2 分钟前 · 文本"),
-        ("ai", "AI 对话", "昨天 · 关于方案的讨论"),
-        ("translate", "翻译结果", "Hello → 你好"),
-    ]:
-        cl.addWidget(ListRow(n, t, s))
+    cl.addWidget(SectionHeader("AI 回复操作栏"))
+    bar = MessageActionBar()
+    bar.action_triggered.connect(lambda key: print("action:", key))
+    cl.addWidget(bar)
 
-    cl.addWidget(HLine())
-    cl.addWidget(SectionHeader("气泡"))
-    bw = QWidget()
-    bwl = QVBoxLayout(bw)
-    bwl.setContentsMargins(0, 0, 0, 0)
-    b1 = ChatBubble("帮我把这段文字翻译成英文", True)
-    b2 = ChatBubble("好的，这是英文翻译结果。", False)
-    bwl.addWidget(b1, 0, __import__("PySide6").QtCore.Qt.AlignRight)
-    bwl.addWidget(b2, 0, __import__("PySide6").QtCore.Qt.AlignLeft)
-    cl.addWidget(bw)
+    cl.addWidget(SectionHeader("空状态"))
+    cl.addWidget(EmptyState("folder-open", "暂无内容", "这里还没有任何记录",
+                            action_text="立即新建", on_action=lambda: None))
 
     cl.addStretch()
     scroll.setWidget(card)

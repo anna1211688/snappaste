@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """AI 客户端单元测试 (不联网)。"""
-import io
 
 import pytest
 from PIL import Image

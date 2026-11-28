@@ -2,7 +2,7 @@
 """剪贴板面板: 记录列表、搜索、锁定/去重/删除、多次复制与顺序粘贴、粘贴选项。"""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QWidget, QFrame, QLabel, QListWidget, QListWidgetItem, QLineEdit,
     QVBoxLayout, QHBoxLayout, QComboBox,
@@ -36,7 +36,12 @@ class ClipPanel(QWidget):
         self.search = QLineEdit()
         self.search.setPlaceholderText(tr("clip.search_ph"))
         self.search.setFixedWidth(220)
-        self.search.textChanged.connect(self.refresh)
+        # 搜索防抖：停笔 250ms 才重建列表，避免连续按键时反复全量重建
+        self.search_timer = QTimer(self)
+        self.search_timer.setSingleShot(True)
+        self.search_timer.setInterval(250)
+        self.search_timer.timeout.connect(self.refresh)
+        self.search.textChanged.connect(self.search_timer.start)
         head.addWidget(self.search)
         root.addLayout(head)
 

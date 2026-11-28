@@ -117,8 +117,11 @@ class ClockPanel(QWidget):
             wd = weekday_label(now.weekday())
             date_lab.setText(f"{now.strftime('%Y-%m-%d')}  {wd}")
             day = (6 <= now.hour < 19) if tz is None else self.store.is_day(tz)
-            dot.setStyleSheet("color:%s; background:transparent"
-                              % ("#F5A623" if day else "#5B6B82"))
+            # 只在昼夜切换时重设样式，避免每秒重复触发样式重算
+            if getattr(dot, "_day_state", None) != day:
+                dot.setStyleSheet("color:%s; background:transparent"
+                                  % ("#F5A623" if day else "#5B6B82"))
+                dot._day_state = day
 
     # ---------- 时间换算 ----------
     def _convert_card(self):

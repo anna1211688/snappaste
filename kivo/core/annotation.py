@@ -8,7 +8,6 @@ import os
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 SHAPE_TOOLS = ("rect", "ellipse", "line", "arrow", "mosaic", "blur")
-ALL_TOOLS = SHAPE_TOOLS + ("pen", "text", "seq")
 PALETTE = ("#FF0000", "#FFD800", "#00B050", "#0070FF", "#000000", "#FFFFFF")
 DEFAULT_COLOR = "#FF0000"
 WIDTH_MIN, WIDTH_MAX = 1, 20

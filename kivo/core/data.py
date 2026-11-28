@@ -15,7 +15,8 @@ def load_json(path: str, default: Any, validator=None):
     for p in (path, path + ".bak"):
         if os.path.exists(p):
             try:
-                obj = json.loads(open(p, encoding="utf-8").read())
+                with open(p, encoding="utf-8") as f:
+                    obj = json.loads(f.read())
                 if validator is None or validator(obj):
                     return obj
             except Exception:

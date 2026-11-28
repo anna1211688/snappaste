@@ -5,33 +5,14 @@ from __future__ import annotations
 from typing import Optional
 
 from PySide6.QtCore import Qt, Signal, QSize
-from PySide6.QtGui import QPainter, QColor, QPixmap
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
-    QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
+    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QLineEdit, QCheckBox,
 )
 
 from . import icons as iconlib
-from .theme import add_shadow, RADIUS
 from ..core.i18n import tr
-
-
-# ---------- 容器 ----------
-class Card(QFrame):
-    """圆角卡片, 可选阴影。"""
-
-    def __init__(self, shadow: bool = False, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self.setObjectName("card")
-        if shadow:
-            add_shadow(self)
-
-
-class HLine(QFrame):
-    def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self.setObjectName("divider")
-        self.setFrameShape(QFrame.HLine)
 
 
 # ---------- 按钮 ----------
@@ -70,56 +51,6 @@ class DangerButton(_TextIconButton):
 
 class GhostButton(_TextIconButton):
     OBJECT_NAME = "ghost"
-
-
-class IconButton(QPushButton):
-    """纯图标按钮。"""
-
-    def __init__(self, icon_name: str, size: int = 22, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self.setObjectName("iconBtn")
-        self.setCursor(Qt.PointingHandCursor)
-        self.setIcon(iconlib.icon(icon_name))
-        self.setIconSize(QSize(size, size))
-        self.setFixedSize(36, 36)
-
-
-# ---------- 图标底 ----------
-class IconBadge(QWidget):
-    """圆角方形图标底 (列表行/工具入口用)。"""
-
-    def __init__(self, icon_name: str, side: int = 38, radius: int = RADIUS["md"],
-                 parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self._icon_name = icon_name
-        self._side = side
-        self._radius = radius
-        self.setFixedSize(side, side)
-        main_color, soft = iconlib.tool_colors(icon_name)
-        self._main = QColor(main_color)
-        self._soft = QColor(soft)
-
-    def paintEvent(self, event):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
-        p.setBrush(self._soft)
-        p.drawRoundedRect(self.rect(), self._radius, self._radius)
-        pm = iconlib._raw_pixmap(self._icon_name)
-        want = int(self._side * 0.58)
-        pm = pm.scaled(want, want, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        # 着色为主色
-        tinted = QPixmap(pm.size())
-        tinted.fill(Qt.transparent)
-        tp = QPainter(tinted)
-        tp.drawPixmap(0, 0, pm)
-        tp.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        tp.fillRect(tinted.rect(), self._main)
-        tp.end()
-        x = (self.width() - want) // 2
-        y = (self.height() - want) // 2
-        p.drawPixmap(x, y, tinted)
-        p.end()
 
 
 # ---------- 文字 ----------
@@ -198,20 +129,6 @@ class Switch(QCheckBox):
         return getattr(self, "_on_color", "#34C759") if on else getattr(self, "_off_color", "#E5E5EA")
 
 
-# ---------- 标签 ----------
-class Chip(QFrame):
-    """胶囊标签。"""
-
-    def __init__(self, text: str, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self.setObjectName("chip")
-        lay = QHBoxLayout(self)
-        lay.setContentsMargins(10, 4, 10, 4)
-        self._label = QLabel(text)
-        self._label.setObjectName("chipText")
-        lay.addWidget(self._label)
-
-
 # ---------- 搜索框 ----------
 class SearchInput(QLineEdit):
     def __init__(self, placeholder: Optional[str] = None,
@@ -220,45 +137,6 @@ class SearchInput(QLineEdit):
         self.setObjectName("search")
         self.setPlaceholderText(placeholder or tr("common.search"))
         self.setClearButtonEnabled(True)
-
-
-# ---------- 列表行 ----------
-class ListRow(QFrame):
-    """通用列表行: 图标底 + 标题/副标题 + 右侧控件。"""
-
-    clicked = Signal()
-
-    def __init__(self, icon_name: Optional[str], title: str, subtitle: str = "",
-                 clickable: bool = True, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self.setObjectName("listRow")
-        self.setCursor(Qt.PointingHandCursor if clickable else Qt.ArrowCursor)
-        lay = QHBoxLayout(self)
-        lay.setContentsMargins(10, 8, 10, 8)
-        lay.setSpacing(12)
-        if icon_name:
-            lay.addWidget(IconBadge(icon_name))
-        text_box = QVBoxLayout()
-        text_box.setSpacing(2)
-        self.title = QLabel(title)
-        self.title.setObjectName("rowTitle")
-        text_box.addWidget(self.title)
-        if subtitle:
-            self.subtitle = QLabel(subtitle)
-            self.subtitle.setObjectName("rowSubtitle")
-            text_box.addWidget(self.subtitle)
-        lay.addLayout(text_box, 1)
-        self._right = QHBoxLayout()
-        self._right.setSpacing(6)
-        lay.addLayout(self._right)
-
-    def add_right(self, w: QWidget):
-        self._right.addWidget(w)
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.clicked.emit()
-        super().mousePressEvent(event)
 
 
 # ---------- 导航项 ----------
@@ -285,20 +163,6 @@ class NavItem(QPushButton):
             self.setIcon(iconlib.tinted_icon(self._icon_name, self._active_color))
         else:
             self.setIcon(iconlib.icon(self._icon_name))
-
-
-# ---------- 聊天气泡 ----------
-class ChatBubble(QFrame):
-    def __init__(self, text: str, user: bool, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self.setObjectName("userBubble" if user else "botBubble")
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(14, 10, 14, 10)
-        label = QLabel(text)
-        label.setObjectName("userText" if user else "botText")
-        label.setTextFormat(Qt.RichText)
-        label.setWordWrap(True)
-        lay.addWidget(label)
 
 
 # ---------- AI 回复操作栏 ----------

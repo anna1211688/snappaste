@@ -95,7 +95,7 @@ class Dialog(QDialog):
 class Toast(QFrame):
     """居中轻提示, 自动消失。"""
 
-    def __init__(self, parent: QWidget, text: str, duration_ms: int = 1800):
+    def __init__(self, parent: QWidget, text: str):
         super().__init__(parent)
         self.setObjectName("toast")
         add_shadow(self, blur=18, dy=4, alpha=60)

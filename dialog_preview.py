@@ -2,7 +2,7 @@
 """弹窗视觉预览。"""
 import sys
 
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton
 
 from kivo.ui.theme import Theme
 from kivo.ui.dialogs.base import Dialog, show_toast

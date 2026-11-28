@@ -20,10 +20,10 @@ class FakeMenu:
 class FakeIcon:
     def __init__(self, name, image, tooltip, menu):
         self.name = name; self.image = image; self.tooltip = tooltip
-        self.menu = menu; self.ran = False; self.stopped = False
+        self.menu = menu; self.stopped = False
 
     def run(self):
-        self.ran = True
+        pass  # 模拟 pystray 阻塞运行；start() 在后台线程调用它
 
     def stop(self):
         self.stopped = True

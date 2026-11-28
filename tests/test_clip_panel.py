@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """剪贴板记录数据层与面板测试。"""
-import os
 
 import pytest
 
