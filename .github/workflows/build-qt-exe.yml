@@ -1,0 +1,104 @@
+name: Build KIVO Qt EXE
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.repository == 'anna1211688/KIVO'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Verify release version
+        id: ver
+        shell: python
+        run: |
+          import os, re
+          ref = os.environ["GITHUB_REF"]
+          tag_ver = ref.rsplit("/v", 1)[-1]
+          src = open("kivo/core/paths.py", encoding="utf-8").read()
+          ver = re.search(r'^VERSION = "([^"]+)"', src, re.M).group(1)
+          if ver != tag_ver:
+              raise SystemExit(f"tag v{tag_ver} 与 paths.py VERSION={ver} 不一致")
+          if not os.path.exists("KIVO.spec"):
+              raise SystemExit("仅 Qt 工程可触发本工作流")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write(f"version={ver}\n")
+          print("version:", ver)
+      - run: pip install -r requirements.txt pyinstaller==6.22.3 pytest==9.2.0
+      - name: Source tests (offscreen)
+        run: python -m pytest -q
+      - name: Build onefile EXE
+        run: pyinstaller --noconfirm --clean KIVO.spec
+      - name: Verify EXE
+        shell: powershell
+        run: |
+          if (-not (Test-Path dist/KIVO.exe)) { throw "EXE 未生成" }
+          $size = (Get-Item dist/KIVO.exe).Length
+          if ($size -lt 10MB) { throw "EXE 异常过小: $size" }
+          Write-Host "KIVO.exe size: $size bytes"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: KIVO-Qt-Windows-${{ steps.ver.outputs.version }}
+          path: dist/KIVO.exe
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Fetch Chinese installer language file
+        run: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/ChineseSimplified.isl" -OutFile "C:\Program Files (x86)\Inno Setup 6\Languages\ChineseSimplified.isl"
+      - name: Build installer
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=${{ steps.ver.outputs.version }} KIVO.iss'
+      - name: Sign update manifest (.sig for in-app one-click update)
+        shell: bash
+        env:
+          KIVO_SIGNING_KEY_PEM: ${{ secrets.KIVO_SIGNING_KEY_PEM }}
+          KIVO_VER: ${{ steps.ver.outputs.version }}
+        run: |
+          if [ -z "$KIVO_SIGNING_KEY_PEM" ]; then
+            echo "::warning::KIVO_SIGNING_KEY_PEM secret is not set - skipping .sig generation. In-app one-click update will be unavailable for this release (manual download still works). Add the update signing private key (PEM) as a repository secret named KIVO_SIGNING_KEY_PEM to enable it."
+            exit 0
+          fi
+          pip install cryptography==50.0.2
+          python - <<'PYEOF'
+          import base64, hashlib, json, os
+          from cryptography.hazmat.primitives import hashes, serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          ver = os.environ["KIVO_VER"]
+          name = f"KIVO-Setup-{ver}.exe"
+          path = os.path.join("installer", name)
+          digest = hashlib.sha256(open(path, "rb").read()).hexdigest()
+          key = serialization.load_pem_private_key(os.environ["KIVO_SIGNING_KEY_PEM"].encode("utf-8"), password=None)
+          sig = key.sign(f"{name}\n{ver}\n{digest}".encode("utf-8"), padding.PKCS1v15(), hashes.SHA256())
+          manifest = {"name": name, "version": ver, "sha256": digest, "sig": base64.b64encode(sig).decode("ascii")}
+          with open(path + ".sig", "w", encoding="utf-8") as f:
+              json.dump(manifest, f, indent=2)
+          print("signed:", path + ".sig")
+          PYEOF
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KIVO_VER: ${{ steps.ver.outputs.version }}
+        run: |
+          printf '%s\n' \
+            "KIVO v$KIVO_VER — PySide6 全面重写" \
+            '- 全新 Sonoma 风格界面：圆角、阴影、图标与中英双语。' \
+            '- 面板懒加载与空闲预热，首屏构建显著提速。' \
+            '- 数据层异步合并写盘，主线程只负责界面响应。' \
+            '- 启动屏、画廊缩略图后台加载与缓存。' \
+            '- 线程生命周期与异常处理加固。' \
+            '' \
+            '下载 KIVO.exe 双击即可运行，无需安装 Python。' \
+            'KIVO-Setup 安装包支持软件内一键更新 (需同发布附带 .sig 签名文件)。' \
+            '首次打开若弹出 SmartScreen，点「更多信息 → 仍要运行」。' > notes.txt
+          files=("dist/KIVO.exe" "installer/KIVO-Setup-$KIVO_VER.exe")
+          if [ -f "installer/KIVO-Setup-$KIVO_VER.exe.sig" ]; then files+=("installer/KIVO-Setup-$KIVO_VER.exe.sig"); fi
+          gh release create "v$KIVO_VER" "${files[@]}" --title "KIVO v$KIVO_VER" --notes-file notes.txt || gh release upload "v$KIVO_VER" "${files[@]}" --clobber

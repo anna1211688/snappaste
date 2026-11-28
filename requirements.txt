@@ -1,0 +1,10 @@
+# KIVO Qt (PySide6) 依赖锁定；升级后需跑全量 pytest。
+PySide6==6.12.0
+Pillow==13.0.0
+pystray==0.19.5
+keyboard==0.13.5 ; sys_platform == "win32"
+tzdata==2026.6
+yt-dlp==2026.11.23
+qrcode==8.2
+# 自检预留 OCR 接口，Qt 版当前未接入识别引擎，不打包 rapidocr/onnxruntime。
+# 构建: pip install pyinstaller==6.22.3
