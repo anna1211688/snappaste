@@ -7,22 +7,23 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QTextEdit
 from .base import Dialog
 from ..components import PrimaryButton, SecondaryButton, DangerButton
 from ...core import prompt_store
+from ...core.i18n import tr
 
 
 class PromptEditDialog(Dialog):
     """新增提示词的二级弹窗。"""
 
     def __init__(self, parent):
-        super().__init__(parent, "新增提示词", width=420)
+        super().__init__(parent, tr("plib.new_prompt"), width=420)
         self.title_in = QLineEdit()
-        self.title_in.setPlaceholderText("标题")
+        self.title_in.setPlaceholderText(tr("common.title"))
         self.body.addWidget(self.title_in)
         self.prompt_in = QTextEdit()
-        self.prompt_in.setPlaceholderText("提示词内容…")
+        self.prompt_in.setPlaceholderText(tr("plib.prompt_ph"))
         self.prompt_in.setFixedHeight(180)
         self.body.addWidget(self.prompt_in)
 
-        save = PrimaryButton("保存", icon_name="save")
+        save = PrimaryButton(tr("common.save"), icon_name="save")
         save.clicked.connect(self.accept)
         self.add_button(save, accept=False)
 
@@ -33,7 +34,7 @@ class PromptEditDialog(Dialog):
 class PromptLibraryDialog(Dialog):
     def __init__(self, parent, prompts_path, apply_callback=None,
                  clear_callback=None):
-        super().__init__(parent, "角色 / 提示词库", width=520)
+        super().__init__(parent, tr("plib.library_title"), width=520)
         self.path = prompts_path
         self.apply_callback = apply_callback
         self.clear_callback = clear_callback
@@ -44,13 +45,13 @@ class PromptLibraryDialog(Dialog):
         self.body.addWidget(self.list)
         self._refresh()
 
-        apply_b = PrimaryButton("选用角色", icon_name="check")
+        apply_b = PrimaryButton(tr("plib.apply_role"), icon_name="check")
         apply_b.clicked.connect(self._apply)
-        add_b = SecondaryButton("新增", icon_name="plus")
+        add_b = SecondaryButton(tr("common.new"), icon_name="plus")
         add_b.clicked.connect(self._add)
-        del_b = DangerButton("删除选中", icon_name="trash")
+        del_b = DangerButton(tr("plib.delete_sel"), icon_name="trash")
         del_b.clicked.connect(self._delete)
-        clear_b = SecondaryButton("清除角色", icon_name="trash")
+        clear_b = SecondaryButton(tr("plib.clear_role"), icon_name="trash")
         clear_b.clicked.connect(self._clear)
         self.add_button(clear_b); self.add_button(del_b)
         self.add_button(add_b); self.add_button(apply_b)
@@ -58,7 +59,8 @@ class PromptLibraryDialog(Dialog):
     def _refresh(self):
         self.list.clear()
         for it in self.items:
-            self.list.addItem(QListWidgetItem(it["title"]))
+            self.list.addItem(QListWidgetItem(
+                prompt_store.role_title_label(it["title"])))
         if self.list.count():
             self.list.setCurrentRow(0)
 

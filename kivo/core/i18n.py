@@ -616,6 +616,26 @@ _TABLE.update({
     "mem.confirm": ("再点一次确认", "Click again to confirm"),
 })
 
+# 角色 / 提示词库弹窗
+_TABLE.update({
+    "plib.new_prompt": ("新增提示词", "New Prompt"),
+    "plib.prompt_ph": ("提示词内容…", "Prompt content…"),
+    "plib.library_title": ("角色 / 提示词库", "Roles / Prompt Library"),
+    "plib.apply_role": ("选用角色", "Use Role"),
+    "plib.delete_sel": ("删除选中", "Delete Selected"),
+    "plib.clear_role": ("清除角色", "Clear Role"),
+})
+
+# 内置角色名
+_TABLE.update({
+    "role.general": ("通用助手", "General Assistant"),
+    "role.translator": ("专业翻译", "Professional Translator"),
+    "role.code_review": ("代码审查", "Code Reviewer"),
+    "role.writing": ("写作教练", "Writing Coach"),
+    "role.pm": ("产品经理", "Product Manager"),
+    "role.analyst": ("数据分析师", "Data Analyst"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

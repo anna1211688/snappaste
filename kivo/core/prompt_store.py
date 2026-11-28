@@ -3,10 +3,27 @@
 from __future__ import annotations
 
 from .data import load_json, save_json
+from .i18n import tr
 
 TITLE_MAX = 80
 PROMPT_MAX = 4000
 LIB_MAX = 100
+
+# 内置角色中文 title -> i18n key（用户自定义角色不在此表，保持原文）
+_ROLE_KEYS = {
+    "通用助手": "role.general",
+    "专业翻译": "role.translator",
+    "代码审查": "role.code_review",
+    "写作教练": "role.writing",
+    "产品经理": "role.pm",
+    "数据分析师": "role.analyst",
+}
+
+
+def role_title_label(title):
+    """内置角色名按当前语言显示；自定义角色名原样返回。"""
+    key = _ROLE_KEYS.get(title)
+    return tr(key) if key else title
 
 BUILTIN_PROMPTS = [
     {"title": "通用助手", "prompt": "你是一个乐于助人的 AI 助手，回答准确、条理清晰、语言简洁。"},
