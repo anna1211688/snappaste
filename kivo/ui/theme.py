@@ -139,6 +139,13 @@ QLabel#miniTitle {{ background: transparent; color: {t['text']}; font-size: {FON
 QLabel#miniClose {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['md']}px; }}
 QLabel#miniStatus {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['xs']}px; }}
 QTextEdit#miniEdit {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; padding: 6px 8px; font-size: {FONT_SIZE['md']}px; color: {t['text']}; }}
+QFrame#ctCard {{ background: {t['surface']}; border: 1px solid {t['border']}; border-radius: {RADIUS['lg']}px; }}
+QFrame#ctTitleBar {{ background: {t['head_bg']}; border-top-left-radius: {RADIUS['lg']}px; border-top-right-radius: {RADIUS['lg']}px; }}
+QLabel#ctTitle {{ background: transparent; color: {t['accent']}; font-size: {FONT_SIZE['sm']}px; font-weight: 600; }}
+QLabel#ctClose {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['sm']}px; }}
+QLabel#ctOrig {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['sm']}px; padding: 2px 14px; }}
+QLabel#ctTrans {{ background: transparent; color: {t['text']}; font-size: {FONT_SIZE['md']}px; padding: 2px 14px; }}
+QLabel#ctFail {{ background: transparent; color: {t['danger']}; font-size: {FONT_SIZE['sm']}px; padding: 2px 14px; }}
 QTextEdit#qrInput {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; padding: 8px; font-size: {FONT_SIZE['md']}px; color: {t['text']}; }}
 QListWidget#promptList {{ background: {t['bg']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; outline: none; font-size: {FONT_SIZE['md']}px; }}
 QListWidget#promptList::item {{ padding: 8px 10px; border-radius: {RADIUS['sm']}px; color: {t['text']}; }}
