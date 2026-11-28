@@ -108,6 +108,22 @@ QTextEdit#detailBox {{
     background: {t['stripe']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px;
     font-size: {FONT_SIZE['md']}px; padding: 8px;
 }}
+QLabel#fxResult {{ background: transparent; font-weight: 700; font-size: {FONT_SIZE['xl']}px; color: {t['accent']}; }}
+QLabel#cityName, QLabel#localName {{ background: transparent; font-weight: 600; font-size: {FONT_SIZE['md']}px; color: {t['text']}; }}
+QLabel#localName {{ color: {t['accent']}; }}
+QLabel#clockTime {{ background: transparent; font-weight: 700; font-size: {FONT_SIZE['title']}px; color: {t['text']}; }}
+QLabel#dayDot {{ background: transparent; font-size: {FONT_SIZE['sm']}px; }}
+QLabel#calcTrail {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['md']}px; }}
+QLabel#calcDisplay {{ background: transparent; color: {t['text']}; font-size: 40px; font-weight: 700; }}
+QPushButton#calcDigit {{ background: {t['stripe']}; color: {t['text']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
+QPushButton#calcDigit:hover {{ background: {t['soft']}; }}
+QPushButton#calcOp {{ background: {t['soft']}; color: {t['accent']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
+QPushButton#calcOp:hover {{ background: {t['border']}; }}
+QPushButton#calcDanger {{ background: {t['soft']}; color: {t['danger']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
+QPushButton#calcAccent {{ background: {t['accent']}; color: #FFFFFF; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 700; }}
+QPushButton#calcAccent:hover {{ background: {t['accent_hover']}; }}
+QListWidget#calcHist {{ background: {t['stripe']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['sm']}px; padding: 4px; }}
+QPushButton#calcClearHist {{ background: transparent; color: {t['muted']}; border: none; font-size: {FONT_SIZE['sm']}px; }}
 QLabel#swapIcon {{ background: transparent; font-size: 18px; color: {t['muted']}; padding: 0 4px; }}
 QLabel#mutedLabel {{ color: {t['text_2']}; background: transparent; }}
 QLabel#hero {{ font-size: {FONT_SIZE['hero']}px; font-weight: 700; background: transparent; }}

@@ -6,3 +6,15 @@ build/
 dist/
 *.spec.bak
 .DS_Store
+
+# 运行时数据文件（源码运行时落在工程根，不入库）
+Config.ini
+records.json
+phrases.json
+ai_chats.json
+ai_memory.json
+ai_prompts.json
+projects.json
+calc_history.json
+crash.log
+*.json.bak
