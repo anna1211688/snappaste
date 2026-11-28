@@ -360,6 +360,59 @@ _TABLE.update({
     "cset.min_one": ("至少选一个城市", "Select at least one city"),
 })
 
+# 货币名（键为货币代码）
+_TABLE.update({
+    "currency.USD": ("美元", "US Dollar"),
+    "currency.CNY": ("人民币", "Chinese Yuan"),
+    "currency.HKD": ("港币", "Hong Kong Dollar"),
+    "currency.EUR": ("欧元", "Euro"),
+    "currency.GBP": ("英镑", "British Pound"),
+    "currency.JPY": ("日元", "Japanese Yen"),
+    "currency.KRW": ("韩元", "Korean Won"),
+    "currency.TWD": ("新台币", "New Taiwan Dollar"),
+    "currency.MOP": ("澳门元", "Macanese Pataca"),
+    "currency.AUD": ("澳元", "Australian Dollar"),
+    "currency.CAD": ("加元", "Canadian Dollar"),
+    "currency.CHF": ("瑞士法郎", "Swiss Franc"),
+    "currency.SGD": ("新加坡元", "Singapore Dollar"),
+    "currency.NZD": ("新西兰元", "New Zealand Dollar"),
+    "currency.THB": ("泰币", "Thai Baht"),
+    "currency.MYR": ("马来西亚林吉特", "Malaysian Ringgit"),
+    "currency.IDR": ("印尼盾", "Indonesian Rupiah"),
+    "currency.PHP": ("菲律宾比索", "Philippine Peso"),
+    "currency.VND": ("越南盾", "Vietnamese Dong"),
+    "currency.INR": ("印度卢比", "Indian Rupee"),
+    "currency.AED": ("阿联酋迪拉姆", "UAE Dirham"),
+    "currency.SAR": ("沙特里亚尔", "Saudi Riyal"),
+    "currency.RUB": ("俄罗斯卢布", "Russian Ruble"),
+    "currency.BRL": ("巴西雷亚尔", "Brazilian Real"),
+    "currency.MXN": ("墨西哥比索", "Mexican Peso"),
+    "currency.ZAR": ("南非兰特", "South African Rand"),
+    "currency.TRY": ("土耳其里拉", "Turkish Lira"),
+    "currency.SEK": ("瑞典克朗", "Swedish Krona"),
+    "currency.NOK": ("挪威克朗", "Norwegian Krone"),
+    "currency.DKK": ("丹麦克朗", "Danish Krone"),
+    "currency.PLN": ("波兰兹罗提", "Polish Zloty"),
+})
+
+# 汇率换算面板
+_TABLE.update({
+    "fx.title": ("汇率换算", "Currency Converter"),
+    "fx.loading": ("正在获取最新汇率…", "Fetching latest rates…"),
+    "fx.convert_head": ("货币换算", "Currency Conversion"),
+    "fx.table_head": ("各币种汇率", "Exchange Rates"),
+    "fx.base": ("基准", "Base"),
+    "fx.col_currency": ("货币", "Currency"),
+    "fx.col_code": ("代码", "Code"),
+    "fx.col_rate": ("汇率", "Rate"),
+    "fx.amount_num": ("金额填数字", "Enter a numeric amount"),
+    "fx.updated": ("更新时间：", "Updated: "),
+    "fx.source": ("数据来源：open.er-api.com（免费接口，每日更新）",
+                  "Source: open.er-api.com (free, updated daily)"),
+    "fx.fetch_failed": ("汇率获取失败：", "Failed to fetch rates: "),
+    "fx.api_error": ("汇率接口返回异常", "Unexpected rates API response"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

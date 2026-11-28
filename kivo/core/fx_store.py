@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 
 from . import network
+from .i18n import tr
 
 FX_CURRENCIES = [
     ("USD", "美元"), ("CNY", "人民币"), ("HKD", "港币"), ("EUR", "欧元"),
@@ -20,13 +21,18 @@ FX_CURRENCIES = [
 ]
 
 
+def currency_label(code: str) -> str:
+    """货币代码对应的当前语言名称。"""
+    return tr(f"currency.{code}")
+
+
 class FxStore:
     def __init__(self):
         self.rates = None
         self.updated = ""
 
     def label(self, code):
-        return f"{code} {dict(FX_CURRENCIES).get(code, '')}"
+        return f"{code} {currency_label(code)}"
 
     def fetch(self):
         import urllib.request
@@ -36,7 +42,7 @@ class FxStore:
         with network.open_url_loose(req, timeout=20) as r:
             data = json.loads(r.read().decode("utf-8"))
         if data.get("result") != "success" or not isinstance(data.get("rates"), dict):
-            raise RuntimeError("汇率接口返回异常")
+            raise RuntimeError(tr("fx.api_error"))
         self.rates = data["rates"]
         self.updated = data.get("time_last_update_utc", "")
         return self.rates, self.updated

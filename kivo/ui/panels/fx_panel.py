@@ -13,7 +13,8 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import SecondaryButton, SectionHeader, MutedLabel
-from ...core.fx_store import FX_CURRENCIES
+from ...core.fx_store import FX_CURRENCIES, currency_label
+from ...core.i18n import tr
 
 
 class _Signals(QObject):
@@ -34,10 +35,10 @@ class FxPanel(QWidget):
         root.setSpacing(12)
 
         head = QHBoxLayout()
-        title = QLabel("汇率换算")
+        title = QLabel(tr("fx.title"))
         title.setObjectName("hero")
         self.updated_label = MutedLabel("")
-        refresh = SecondaryButton("刷新", icon_name="refresh")
+        refresh = SecondaryButton(tr("common.refresh"), icon_name="refresh")
         refresh.clicked.connect(self.reload)
         head.addWidget(title)
         head.addWidget(self.updated_label)
@@ -48,7 +49,7 @@ class FxPanel(QWidget):
         root.addWidget(self._convert_card())
         root.addWidget(self._table_card(), 1)
 
-        self.status = MutedLabel("正在获取最新汇率…")
+        self.status = MutedLabel(tr("fx.loading"))
         root.addWidget(self.status)
 
         self.signals = _Signals()
@@ -58,8 +59,8 @@ class FxPanel(QWidget):
 
     def _currency_combo(self):
         cb = QComboBox()
-        for code, name in FX_CURRENCIES:
-            cb.addItem(f"{code} {name}", code)
+        for code, _name in FX_CURRENCIES:
+            cb.addItem(f"{code} {currency_label(code)}", code)
         return cb
 
     def _convert_card(self):
@@ -69,7 +70,7 @@ class FxPanel(QWidget):
         lay = QVBoxLayout(card)
         lay.setContentsMargins(16, 14, 16, 14)
         lay.setSpacing(10)
-        lay.addWidget(SectionHeader("货币换算"))
+        lay.addWidget(SectionHeader(tr("fx.convert_head")))
 
         row = QHBoxLayout()
         self.amount = QLineEdit("100")
@@ -107,16 +108,17 @@ class FxPanel(QWidget):
         lay.setSpacing(8)
 
         top = QHBoxLayout()
-        top.addWidget(SectionHeader("各币种汇率"))
+        top.addWidget(SectionHeader(tr("fx.table_head")))
         top.addStretch()
-        top.addWidget(QLabel("基准"))
+        top.addWidget(QLabel(tr("fx.base")))
         self.base_cb = self._currency_combo()  # USD
         self.base_cb.currentIndexChanged.connect(self._fill_table)
         top.addWidget(self.base_cb)
         lay.addLayout(top)
 
         self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(["货币", "代码", "汇率"])
+        self.table.setHorizontalHeaderLabels(
+            [tr("fx.col_currency"), tr("fx.col_code"), tr("fx.col_rate")])
         self.table.verticalHeader().setVisible(False)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setSelectionMode(QTableWidget.NoSelection)
@@ -138,7 +140,7 @@ class FxPanel(QWidget):
             amt = float(self.amount.text().strip())
         except (ValueError, AttributeError):
             self.result.setText("")
-            self.hint.setText("金额填数字")
+            self.hint.setText(tr("fx.amount_num"))
             return
         fr, to = self.from_cb.currentData(), self.to_cb.currentData()
         res = self.fx.convert(amt, fr, to)
@@ -154,13 +156,13 @@ class FxPanel(QWidget):
         self.table.setRowCount(0)
         if not self.fx.rates:
             return
-        for i, (code, name) in enumerate(FX_CURRENCIES):
+        for i, (code, _name) in enumerate(FX_CURRENCIES):
             r = self.fx.table_rate(base, code)
             if r is None:
                 continue
             row = self.table.rowCount()
             self.table.insertRow(row)
-            self.table.setItem(row, 0, QTableWidgetItem(name))
+            self.table.setItem(row, 0, QTableWidgetItem(currency_label(code)))
             self.table.setItem(row, 1, QTableWidgetItem(code))
             self.table.setItem(row, 2, QTableWidgetItem(self.fx.fmt(r)))
             if row % 2:
@@ -171,7 +173,7 @@ class FxPanel(QWidget):
         if self.loading:
             return
         self.loading = True
-        self.status.setText("正在获取最新汇率…")
+        self.status.setText(tr("fx.loading"))
         signals = self.signals
 
         def work():
@@ -185,11 +187,11 @@ class FxPanel(QWidget):
 
     def _after_fetch(self):
         self.loading = False
-        self.updated_label.setText("更新时间：" + self.fx.updated)
-        self.status.setText("数据来源：open.er-api.com（免费接口，每日更新）")
+        self.updated_label.setText(tr("fx.updated") + self.fx.updated)
+        self.status.setText(tr("fx.source"))
         self._fill_table()
         self._convert()
 
     def _fetch_failed(self, msg):
         self.loading = False
-        self.status.setText("汇率获取失败：" + msg)
+        self.status.setText(tr("fx.fetch_failed") + msg)
