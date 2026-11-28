@@ -121,6 +121,71 @@ _TABLE.update({
     "phrase.save": ("保存修改", "Save changes"),
 })
 
+# 画廊面板
+_TABLE.update({
+    "gallery.title": ("截图历史", "Screenshot History"),
+    "gallery.del_all": ("删除全部", "Delete all"),
+    "gallery.count_more": ("共 {total} 个（只显示最近 {limit} 个）",
+                           "{total} items (showing the latest {limit})"),
+    "gallery.count": ("共 {n} 个", "{n} items"),
+    "gallery.empty_title": ("还没有截图", "No screenshots yet"),
+    "gallery.empty_sub": ("按 F1 截一张，截完会自动存在这里",
+                          "Press F1 to capture; it will be saved here"),
+    "gallery.shot": ("截一张图", "Take a screenshot"),
+    "gallery.pin": ("钉图", "Pin"),
+    "gallery.delete": ("删除", "Delete"),
+})
+
+# 项目工作台
+_TABLE.update({
+    "project.new": ("新建项目", "New Project"),
+    "project.search_ph": ("搜索项目…", "Search projects…"),
+    "project.recent": ("最近项目", "Recent Projects"),
+    "project.head": ("项目", "Project"),
+    "project.del": ("删除项目", "Delete Project"),
+    "project.from_tpl": ("从模板创建", "Create from a template"),
+    "project.notes": ("笔记", "Notes"),
+    "project.save_note": ("保存笔记", "Save Notes"),
+    "project.todos": ("待办", "To-dos"),
+    "project.todo_ph": ("添加一条待办，回车确认", "Add a to-do, press Enter"),
+    "project.links": ("文件链接", "File Links"),
+    "project.name": ("名称", "Name"),
+    "project.url": ("URL 或路径", "URL or path"),
+    "project.progress": ("已完成 {done}/{total}", "{done}/{total} done"),
+    "project.untitled": ("未命名项目", "Untitled Project"),
+})
+
+# 项目模板（创建时按当前语言写入初始内容）
+_TABLE.update({
+    "tpl.office.title": ("通用办公写作", "General Office Writing"),
+    "tpl.office.desc": ("覆盖总结、写作、润色与翻译，结论先行、结构清晰。",
+                        "Summaries, writing, polishing and translation; conclusion first."),
+    "tpl.office.todo1": ("明确本次写作的目标与读者", "Define the goal and audience"),
+    "tpl.office.todo2": ("列出提纲，结论先行", "Outline with the conclusion first"),
+    "tpl.office.todo3": ("完成初稿并润色校对", "Draft, polish and proofread"),
+
+    "tpl.data.title": ("数据分析与可视化", "Data Analysis & Visualization"),
+    "tpl.data.desc": ("读取表格与数据、核验统计口径，输出分析结论与图表建议。",
+                      "Read data, verify metrics, and deliver insights and chart advice."),
+    "tpl.data.todo1": ("确认数据来源与统计口径", "Confirm data sources and metrics"),
+    "tpl.data.todo2": ("清洗数据并核对关键指标", "Clean data and check key indicators"),
+    "tpl.data.todo3": ("输出结论与可视化建议", "Deliver insights and visualization advice"),
+
+    "tpl.meeting.title": ("会议与信息复盘", "Meeting & Information Review"),
+    "tpl.meeting.desc": ("会议纪要、决策与待办提取，跨聊天和文档追踪进展。",
+                         "Minutes, decisions and to-dos; track progress across chats and docs."),
+    "tpl.meeting.todo1": ("整理会议纪要与关键决策", "Compile minutes and key decisions"),
+    "tpl.meeting.todo2": ("拆解待办并指定负责人和时间", "Break down to-dos with owners and dates"),
+    "tpl.meeting.todo3": ("跟进各项进展直到关闭", "Follow up until items are closed"),
+
+    "tpl.market.title": ("市场调研与竞品分析", "Market & Competitor Research"),
+    "tpl.market.desc": ("行业与竞品调研，统一维度对比，输出结论与建议。",
+                        "Industry and competitor research with consistent dimensions."),
+    "tpl.market.todo1": ("确定调研范围与对比维度", "Define scope and comparison dimensions"),
+    "tpl.market.todo2": ("收集行业与竞品资料", "Gather industry and competitor material"),
+    "tpl.market.todo3": ("统一维度对比并输出建议", "Compare and deliver recommendations"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

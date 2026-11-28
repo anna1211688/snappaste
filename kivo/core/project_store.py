@@ -5,6 +5,7 @@ from __future__ import annotations
 import time
 
 from . import data
+from .i18n import tr
 from .paths import PROJECTS_PATH
 
 PROJECT_MAX = 30
@@ -30,7 +31,7 @@ PROJECT_TEMPLATES = [
 def _sanitize(c):
     if not isinstance(c, dict) or not isinstance(c.get("id"), int):
         return None
-    title = str(c.get("title") or "未命名项目")[:80]
+    title = str(c.get("title") or tr("project.untitled"))[:80]
     notes = str(c.get("notes") or "")[:NOTES_MAX]
 
     todos, seen_t = [], set()
@@ -90,11 +91,13 @@ class ProjectStore:
         tpl = next((t for t in PROJECT_TEMPLATES if t["key"] == template_key), None)
         pid = int(time.time() * 1000)
         if tpl is not None:
-            title = title or tpl["title"]
-            todos = [{"text": x, "done": False} for x in tpl["todos"]]
-            note, tpl_key = tpl["desc"], tpl["key"]
+            k = tpl["key"]
+            title = title or tr(f"tpl.{k}.title")
+            tpl_todos = [tr(f"tpl.{k}.todo{i}") for i in (1, 2, 3)]
+            todos = [{"text": x, "done": False} for x in tpl_todos]
+            note, tpl_key = tr(f"tpl.{k}.desc"), k
         else:
-            title = title or "未命名项目"
+            title = title or tr("project.untitled")
             todos, note, tpl_key = [], "", ""
         now = time.time()
         project = {"id": pid, "title": title[:80], "notes": note, "todos": todos,

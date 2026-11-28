@@ -13,6 +13,7 @@ from ..components import (
     PrimaryButton, SecondaryButton, SectionHeader,
 )
 from ..icons import icon
+from ...core.i18n import tr
 from ...core.project_store import PROJECT_TEMPLATES
 
 
@@ -40,16 +41,16 @@ class ProjectPanel(QWidget):
         lay.setContentsMargins(14, 16, 14, 16)
         lay.setSpacing(8)
 
-        new = PrimaryButton("新建项目", icon_name="plus")
+        new = PrimaryButton(tr("project.new"), icon_name="plus")
         new.clicked.connect(lambda: self.open(self.store.create()))
         lay.addWidget(new)
 
         self.search = QLineEdit()
-        self.search.setPlaceholderText("搜索项目…")
+        self.search.setPlaceholderText(tr("project.search_ph"))
         self.search.textChanged.connect(self.refresh_list)
         lay.addWidget(self.search)
 
-        lay.addWidget(SectionHeader("最近项目"))
+        lay.addWidget(SectionHeader(tr("project.recent")))
         self.list_holder = QWidget()
         self.list_lay = QVBoxLayout(self.list_holder)
         self.list_lay.setContentsMargins(0, 0, 0, 0)
@@ -94,11 +95,11 @@ class ProjectPanel(QWidget):
         top.setFixedHeight(54)
         tl = QHBoxLayout(top)
         tl.setContentsMargins(20, 10, 18, 10)
-        self.head_title = QLabel("项目")
+        self.head_title = QLabel(tr("project.head"))
         self.head_title.setObjectName("title")
         tl.addWidget(self.head_title)
         tl.addStretch()
-        del_btn = SecondaryButton("删除项目", icon_name="trash")
+        del_btn = SecondaryButton(tr("project.del"), icon_name="trash")
         del_btn.clicked.connect(self.delete_current)
         tl.addWidget(del_btn)
         outer.addWidget(top)
@@ -142,7 +143,7 @@ class ProjectPanel(QWidget):
 
     def render_empty(self):
         self._clear_content()
-        head = QLabel("从模板创建")
+        head = QLabel(tr("project.from_tpl"))
         head.setObjectName("blockHead")
         self.content_lay.insertWidget(0, head)
         for tpl in PROJECT_TEMPLATES:
@@ -153,9 +154,9 @@ class ProjectPanel(QWidget):
             cl = QVBoxLayout(card)
             cl.setContentsMargins(16, 14, 40, 12)
             cl.setSpacing(4)
-            t = QLabel(tpl["title"])
+            t = QLabel(tr(f"tpl.{tpl['key']}.title"))
             t.setObjectName("tplTitle")
-            d = QLabel(tpl["desc"])
+            d = QLabel(tr(f"tpl.{tpl['key']}.desc"))
             d.setObjectName("tplDesc")
             d.setWordWrap(True)
             cl.addWidget(t)
@@ -181,7 +182,7 @@ class ProjectPanel(QWidget):
             pid = self.current["id"]
             self.store.delete(pid)
             self.current = None
-            self.head_title.setText("项目")
+            self.head_title.setText(tr("project.head"))
             self.refresh_list()
             self.render_empty()
 
@@ -197,25 +198,25 @@ class ProjectPanel(QWidget):
             i[0] += 1
 
         # 笔记
-        section("笔记")
+        section(tr("project.notes"))
         notes = QTextEdit()
         notes.setObjectName("detailBox")
         notes.setPlainText(p["notes"])
         notes.setFixedHeight(140)
         self.content_lay.insertWidget(i[0], notes)
         i[0] += 1
-        save_note = SecondaryButton("保存笔记", icon_name="save")
+        save_note = SecondaryButton(tr("project.save_note"), icon_name="save")
         save_note.clicked.connect(lambda: self.store.set_notes(p["id"], notes.toPlainText()))
         self.content_lay.insertWidget(i[0], save_note)
         i[0] += 1
 
         # 待办
-        section("待办")
+        section(tr("project.todos"))
         self.progress = QLabel("")
         self.progress.setObjectName("mutedLabel")
         todo_input_row = QHBoxLayout()
         todo_input = QLineEdit()
-        todo_input.setPlaceholderText("添加一条待办，回车确认")
+        todo_input.setPlaceholderText(tr("project.todo_ph"))
         todo_input.returnPressed.connect(
             lambda: self._add_todo(p["id"], todo_input, self.todo_holder))
         todo_input_row.addWidget(todo_input)
@@ -232,13 +233,13 @@ class ProjectPanel(QWidget):
         self._render_todos(p, self.todo_holder)
 
         # 链接
-        section("文件链接")
+        section(tr("project.links"))
         link_row = QHBoxLayout()
         link_name = QLineEdit()
-        link_name.setPlaceholderText("名称")
+        link_name.setPlaceholderText(tr("project.name"))
         link_path = QLineEdit()
-        link_path.setPlaceholderText("URL 或路径")
-        add_link = SecondaryButton("添加", icon_name="plus")
+        link_path.setPlaceholderText(tr("project.url"))
+        add_link = SecondaryButton(tr("common.add"), icon_name="plus")
         add_link.clicked.connect(lambda: self._add_link(p, link_name, link_path))
         link_row.addWidget(link_name)
         link_row.addWidget(link_path, 1)
@@ -287,7 +288,8 @@ class ProjectPanel(QWidget):
 
     def _update_progress(self, p):
         done = sum(1 for t in p["todos"] if t["done"])
-        self.progress.setText("已完成 %d/%d" % (done, len(p["todos"])))
+        self.progress.setText(tr("project.progress", done=done,
+                                 total=len(p["todos"])))
 
     def _add_link(self, p, name_edit, path_edit):
         if self.store.add_link(p["id"], name_edit.text(), path_edit.text()):

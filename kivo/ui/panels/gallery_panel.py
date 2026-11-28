@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 from ..theme import Theme
 from ..components import DangerButton, EmptyState
 from ...core import gallery_store
+from ...core.i18n import tr
 
 THUMB_W, THUMB_H = 160, 110
 COLUMNS = 4
@@ -34,14 +35,14 @@ class GalleryPanel(QWidget):
         outer.setSpacing(10)
 
         head = QHBoxLayout()
-        title = QLabel("截图历史")
+        title = QLabel(tr("gallery.title"))
         title.setObjectName("hero")
         head.addWidget(title)
         self.count_label = QLabel("")
         self.count_label.setObjectName("muted")
         head.addWidget(self.count_label)
         head.addStretch()
-        del_all = DangerButton("删除全部", icon_name="trash")
+        del_all = DangerButton(tr("gallery.del_all"), icon_name="trash")
         del_all.clicked.connect(self._delete_all)
         head.addWidget(del_all)
         outer.addLayout(head)
@@ -64,9 +65,11 @@ class GalleryPanel(QWidget):
         all_files = gallery_store.list_files(self.shots_dir)
         files = all_files[:gallery_store.GALLERY_MAX]
         if len(all_files) > gallery_store.GALLERY_MAX:
-            self.count_label.setText(f"共 {len(all_files)} 个（只显示最近 {gallery_store.GALLERY_MAX} 个）")
+            self.count_label.setText(tr("gallery.count_more",
+                                       total=len(all_files),
+                                       limit=gallery_store.GALLERY_MAX))
         else:
-            self.count_label.setText(f"共 {len(all_files)} 个")
+            self.count_label.setText(tr("gallery.count", n=len(all_files)))
 
         if not files:
             self._build_empty()
@@ -84,8 +87,8 @@ class GalleryPanel(QWidget):
 
     def _build_empty(self):
         box = EmptyState(
-            "browser", "还没有截图", "按 F1 截一张，截完会自动存在这里",
-            action_text="截一张图" if self.screenshot_callback else "",
+            "browser", tr("gallery.empty_title"), tr("gallery.empty_sub"),
+            action_text=tr("gallery.shot") if self.screenshot_callback else "",
             on_action=self.screenshot_callback)
         self.grid.addWidget(box, 0, 0, 1, COLUMNS)
 
@@ -113,10 +116,10 @@ class GalleryPanel(QWidget):
         lay.addWidget(lab)
 
         btn_row = QHBoxLayout()
-        pin_btn = QPushButton("钉图")
+        pin_btn = QPushButton(tr("gallery.pin"))
         pin_btn.setObjectName("miniBtn")
         pin_btn.clicked.connect(lambda: self._pin(name))
-        del_btn = QPushButton("删除")
+        del_btn = QPushButton(tr("gallery.delete"))
         del_btn.setObjectName("miniBtn")
         del_btn.clicked.connect(lambda: self._delete_one(name))
         btn_row.addWidget(pin_btn); btn_row.addWidget(del_btn)
