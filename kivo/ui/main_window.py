@@ -2,6 +2,7 @@
 """KIVO 主窗口: 侧边导航 + QStackedWidget 面板切换。各面板逐步替换占位实现。"""
 from __future__ import annotations
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QWidget, QFrame, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel,
 )
@@ -68,10 +69,12 @@ class MainWindow(QWidget):
         root.addWidget(self._build_sidebar())
         self.stack = QStackedWidget()
         self._panes = {}
+        # 懒加载: 先放轻量占位占住位置, 首次切换到某面板时才创建真实面板,
+        # 从而加快启动、降低初始内存; stack 数量始终与导航项一致
         for key, _ic, label, _grp in NAV_DEF:
-            pane = self._make_pane(key, label)
-            self._panes[key] = pane
-            self.stack.addWidget(pane)
+            placeholder = PlaceholderPane(label, self.theme)
+            self._panes[key] = placeholder
+            self.stack.addWidget(placeholder)
         root.addWidget(self.stack, 1)
 
         # 默认显示剪贴板 (与 Tkinter 版本一致)
@@ -116,21 +119,46 @@ class MainWindow(QWidget):
         return side
 
     # ---------- 面板 ----------
-    def _make_pane(self, key, label):
-        custom = self.services.get("pane_factory")
-        if custom:
-            pane = custom(key)
-            if pane is not None:
-                return pane
-        return PlaceholderPane(label, self.theme)
+    def _ensure_pane(self, key):
+        """首次切换时把占位替换为真实面板; 无工厂或工厂返回 None 则保留占位。"""
+        pane = self._panes[key]
+        if not isinstance(pane, PlaceholderPane):
+            return pane
+        factory = self.services.get("pane_factory")
+        real = factory(key) if factory else None
+        if real is None:
+            return pane
+        index = self.stack.indexOf(pane)
+        self.stack.removeWidget(pane)
+        pane.setParent(None)
+        pane.deleteLater()
+        self.stack.insertWidget(index, real)
+        self._panes[key] = real
+        return real
 
     def select(self, key):
         if key not in self._panes:
             return
+        pane = self._ensure_pane(key)
         for k, item in self._nav_items.items():
             item.setChecked(k == key)
-        self.stack.setCurrentWidget(self._panes[key])
+        self.stack.setCurrentWidget(pane)
         self._current = key
+
+    def prewarm(self):
+        """事件循环空闲时逐个预建剩余面板, 每个面板占用一个空闲槽,
+        不抢占首屏与用户交互; 已被用户打开的面板会自动跳过。"""
+        remaining = [k for k, *_ in NAV_DEF
+                     if isinstance(self._panes[k], PlaceholderPane)]
+        if not remaining:
+            return
+        key = remaining[0]
+
+        def _step():
+            self._ensure_pane(key)
+            self.prewarm()
+
+        QTimer.singleShot(0, _step)
 
     def open_settings(self):
         for k, item in self._nav_items.items():

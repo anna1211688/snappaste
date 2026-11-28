@@ -50,6 +50,8 @@ class TestNavigation:
         custom_pane = QWidget()
         win = MainWindow(Theme(False),
                          services={"pane_factory": lambda k: custom_pane if k == "ai" else None})
+        # 懒加载: 首次选中 ai 时才创建真实面板
+        win.select("ai")
         assert win._panes["ai"] is custom_pane
         # 未覆盖的仍是占位
         assert isinstance(win._panes["clip"], main_window.PlaceholderPane)

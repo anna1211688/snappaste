@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import os
 
-from PIL import Image, ImageDraw, ImageFont
-
 
 def target_size(w, h, percent=100, max_side=0):
     nw = max(1, int(round(w * percent / 100.0)))
@@ -40,6 +38,7 @@ def validate_options(percent, max_side, quality):
 
 
 def process_one(src, opts, out_dir, used):
+    from PIL import Image, ImageDraw, ImageFont
     with Image.open(src) as im:
         im.load()
         nw, nh = target_size(im.width, im.height,

@@ -56,8 +56,16 @@ class ClockPanel(QWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
+        self.tick()  # 初始化一次时间显示; 定时器在面板可见时才启动
+
+    def showEvent(self, event):
+        super().showEvent(event)
         self.timer.start(1000)
         self.tick()
+
+    def hideEvent(self, event):
+        super().hideEvent(event)
+        self.timer.stop()
 
     # ---------- 城市卡片 ----------
     def build_cards(self):
