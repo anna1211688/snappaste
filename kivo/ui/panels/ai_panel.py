@@ -9,11 +9,13 @@ from PySide6.QtCore import Qt, QObject, Signal, QEvent
 from PySide6.QtGui import QPainter, QColor, QPixmap
 from PySide6.QtWidgets import (
     QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QScrollArea,
-    QTextEdit, QLineEdit, QSizePolicy,
+    QTextEdit, QLineEdit, QApplication,
 )
 
 from ..theme import Theme, add_shadow
-from ..components import PrimaryButton, GhostButton, SectionHeader, MutedLabel
+from ..components import (
+    PrimaryButton, GhostButton, SectionHeader, MutedLabel, MessageActionBar,
+)
 
 
 # ---------- 跨线程信号 ----------
@@ -46,12 +48,13 @@ class AvatarLabel(QLabel):
 
 
 class AIPanel(QWidget):
-    def __init__(self, theme: Theme, ai_client, chat_store):
+    def __init__(self, theme: Theme, ai_client, chat_store, speak=None):
         super().__init__()
         self.setObjectName("panelRoot")
         self.theme = theme
         self.ai = ai_client
         self.store = chat_store
+        self._speak = speak  # 可选 TTS 回调, 缺省安全降级
         self.history: list = []
         self.cid = None
         self.busy = False
@@ -201,6 +204,9 @@ class AIPanel(QWidget):
             row.addWidget(AvatarLabel(True), 0, Qt.AlignTop)
         else:
             row.addWidget(AvatarLabel(False), 0, Qt.AlignTop)
+            col = QVBoxLayout()
+            col.setContentsMargins(0, 0, 0, 0)
+            col.setSpacing(4)
             bub = QFrame()
             bub.setObjectName("botBubble")
             bub.setMaximumWidth(470)
@@ -211,7 +217,12 @@ class AIPanel(QWidget):
             lab.setWordWrap(True)
             lab.setTextFormat(Qt.RichText)
             bl.addWidget(lab)
-            row.addWidget(bub)
+            col.addWidget(bub)
+            bar = MessageActionBar()
+            bar.action_triggered.connect(
+                lambda k, lb=lab: self._on_message_action(k, lb))
+            col.addWidget(bar)
+            row.addLayout(col)
             row.addStretch()
         self.msg_lay.insertLayout(self.msg_lay.count() - 1, row)
         self._scroll_bottom()
@@ -380,6 +391,30 @@ class AIPanel(QWidget):
     def stop(self):
         if self._cancel is not None:
             self._cancel.set()
+
+    # ---------- 回复消息操作 ----------
+    def _on_message_action(self, key, lab):
+        text = lab.text()
+        if key == "copy":
+            QApplication.clipboard().setText(text)
+        elif key == "speak" and self._speak:
+            self._speak(text)
+        elif key == "forward":
+            self.input.setPlainText(text)
+            self.input.setFocus()
+        elif key == "regenerate":
+            self._regenerate()
+
+    def _regenerate(self):
+        if self.busy:
+            return
+        if self.history and self.history[-1]["role"] == "assistant":
+            self.history.pop()
+            self._clear_messages()
+            for m in self.history:
+                self._add_bubble(m["role"], m["content"])
+            self._update_empty()
+            self.request_reply()
 
     # ---------- 右栏 ----------
     def _suggest_pane(self):

@@ -8,6 +8,7 @@ import pytest
 
 from kivo.core.chat_store import ChatStore, MAX_CHATS, MAX_MESSAGES
 from kivo.ui.theme import Theme
+from kivo.ui.components import MessageActionBar
 from kivo.ui.panels.ai_panel import AIPanel
 
 
@@ -174,3 +175,101 @@ def test_cancel_stops(panel, qapp):
     _pump(panel, qapp)
     assert not panel.busy
     assert panel.send_btn.text() == "发送"
+
+
+# ---------- MessageActionBar 组件 ----------
+def test_action_bar_has_six_actions(qapp):
+    bar = MessageActionBar()
+    assert len(bar._buttons) == 6
+    fired = []
+    bar.action_triggered.connect(fired.append)
+    bar._buttons["copy"].click()
+    assert fired == ["copy"]
+
+
+def test_feedback_mutually_exclusive(qapp):
+    bar = MessageActionBar()
+    bar._buttons["up"].click()
+    assert bar.feedback_state() == "up"
+    bar._buttons["down"].click()
+    assert bar.feedback_state() == "down"
+    assert not bar._buttons["up"].isChecked()
+
+
+def test_feedback_toggle_off(qapp):
+    bar = MessageActionBar()
+    bar._buttons["up"].click()
+    bar._buttons["up"].click()  # 再点取消
+    assert bar.feedback_state() is None
+
+
+def test_reset_feedback(qapp):
+    bar = MessageActionBar()
+    bar._buttons["up"].click()
+    bar.reset_feedback()
+    assert bar.feedback_state() is None
+
+
+# ---------- 面板集成 ----------
+def _send_one(panel, qapp, text="你好"):
+    panel.input.setPlainText(text)
+    panel.send()
+    _pump(panel, qapp)
+
+
+def _first_bar(panel):
+    bars = panel.msg_holder.findChildren(MessageActionBar)
+    assert bars
+    return bars[0]
+
+
+def test_bot_message_has_action_bar(panel, qapp):
+    _send_one(panel, qapp)
+    assert panel.msg_holder.findChildren(MessageActionBar)
+
+
+def test_action_copy_to_clipboard(panel, qapp):
+    _send_one(panel, qapp)
+    bar = _first_bar(panel)
+    bar._buttons["copy"].click()
+    from PySide6.QtWidgets import QApplication
+    assert QApplication.clipboard().text() == "这是回复"
+
+
+def test_action_forward_to_input(panel, qapp):
+    _send_one(panel, qapp)
+    bar = _first_bar(panel)
+    bar._buttons["forward"].click()
+    assert panel.input.toPlainText() == "这是回复"
+
+
+def test_action_speak_callback(panel, qapp):
+    spoken = []
+    panel._speak = lambda t: spoken.append(t)
+    _send_one(panel, qapp)
+    _first_bar(panel)._buttons["speak"].click()
+    assert spoken == ["这是回复"]
+
+
+def test_action_regenerate(panel, qapp):
+    calls = []
+
+    class Counting(MockAI):
+        def chat_messages(self, messages, **kw):
+            calls.append(1)
+            return super().chat_messages(messages, **kw)
+
+    panel.ai = Counting()
+    _send_one(panel, qapp)
+    assert len(calls) == 1
+    _first_bar(panel)._buttons["regenerate"].click()
+    _pump(panel, qapp)
+    assert len(calls) == 2
+    # 重新生成后仍是 user + assistant 两条
+    assert [m["role"] for m in panel.history] == ["user", "assistant"]
+
+
+def test_regenerate_ignored_when_busy(panel, qapp):
+    panel.busy = True
+    panel._regenerate()  # 不应抛异常, 也不改变历史
+    assert panel.history == []

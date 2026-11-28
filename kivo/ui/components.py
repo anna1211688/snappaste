@@ -257,3 +257,65 @@ class ChatBubble(QFrame):
         label.setTextFormat(Qt.RichText)
         label.setWordWrap(True)
         lay.addWidget(label)
+
+
+# ---------- AI 回复操作栏 ----------
+class MessageActionBar(QWidget):
+    """AI 回复下方的紧凑操作栏: 复制/朗读/点赞/点踩/转发/重新生成。"""
+
+    # (动作键, 图标名, 是否可选中)
+    ACTIONS = [
+        ("copy", "copy", False),
+        ("speak", "volume", False),
+        ("up", "thumbs-up", True),
+        ("down", "thumbs-down", True),
+        ("forward", "send", False),
+        ("regenerate", "refresh", False),
+    ]
+    FEEDBACK = ("up", "down")
+    action_triggered = Signal(str)
+
+    def __init__(self, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        lay = QHBoxLayout(self)
+        lay.setContentsMargins(0, 2, 0, 0)
+        lay.setSpacing(2)
+        self._buttons = {}
+        for key, icn, checkable in self.ACTIONS:
+            b = QPushButton()
+            b.setObjectName("msgAction")
+            b.setIcon(iconlib.icon(icn))
+            b.setIconSize(QSize(17, 17))
+            b.setFixedSize(30, 30)
+            b.setCheckable(checkable)
+            b.setCursor(Qt.PointingHandCursor)
+            b.clicked.connect(lambda _=False, k=key: self._on_click(k))
+            if checkable:
+                b.toggled.connect(lambda checked, bb=b, ic=icn:
+                    bb.setIcon(iconlib.tinted_icon(ic, "#007AFF") if checked
+                               else iconlib.icon(ic)))
+            self._buttons[key] = b
+            lay.addWidget(b)
+
+    def _on_click(self, key):
+        if key in self.FEEDBACK:
+            self._toggle_feedback(key)
+        self.action_triggered.emit(key)
+
+    def _toggle_feedback(self, key):
+        # 注意: clicked 触发时按钮已完成 toggle, 这里基于 toggle 后的状态处理
+        other = "down" if key == "up" else "up"
+        b, ob = self._buttons[key], self._buttons[other]
+        if b.isChecked():
+            ob.setChecked(False)  # 选中一个则取消另一个
+
+    def reset_feedback(self):
+        for k in self.FEEDBACK:
+            self._buttons[k].setChecked(False)
+
+    def feedback_state(self):
+        if self._buttons["up"].isChecked():
+            return "up"
+        if self._buttons["down"].isChecked():
+            return "down"
+        return None

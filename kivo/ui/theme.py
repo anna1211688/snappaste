@@ -285,6 +285,10 @@ QPushButton#annoTool:checked {{ background: {t['accent']}; color: #FFFFFF; borde
 QPushButton#annoSwatch {{ border: 1px solid {t['border_strong']}; border-radius: {RADIUS['sm']}px; }}
 QPushButton#annoSwatch:checked {{ border: 2px solid {t['accent']}; }}
 QLabel#annoCanvas {{ background: #FFFFFF; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; }}
+
+/* ---------- AI 回复操作栏 ---------- */
+QPushButton#msgAction {{ background: transparent; border: none; border-radius: {RADIUS['sm']}px; }}
+QPushButton#msgAction:hover {{ background: {t['soft']}; }}
 """
 
 
