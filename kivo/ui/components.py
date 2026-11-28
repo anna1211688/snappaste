@@ -34,32 +34,41 @@ class HLine(QFrame):
 
 
 # ---------- 按钮 ----------
-class PrimaryButton(QPushButton):
-    def __init__(self, text: str = "", parent: Optional[QWidget] = None):
+class _TextIconButton(QPushButton):
+    """文字 + 可选图标的按钮基类。"""
+
+    OBJECT_NAME = ""
+    ICON_COLOR = ""  # 空串表示使用图标默认中性色
+
+    def __init__(self, text: str = "", parent: Optional[QWidget] = None,
+                 icon_name: Optional[str] = None, icon_size: int = 16):
         super().__init__(text, parent)
-        self.setObjectName("primary")
+        self.setObjectName(self.OBJECT_NAME)
         self.setCursor(Qt.PointingHandCursor)
+        if icon_name:
+            if self.ICON_COLOR:
+                self.setIcon(iconlib.tinted_icon(icon_name, self.ICON_COLOR))
+            else:
+                self.setIcon(iconlib.icon(icon_name))
+            self.setIconSize(QSize(icon_size, icon_size))
 
 
-class SecondaryButton(QPushButton):
-    def __init__(self, text: str = "", parent: Optional[QWidget] = None):
-        super().__init__(text, parent)
-        self.setObjectName("secondary")
-        self.setCursor(Qt.PointingHandCursor)
+class PrimaryButton(_TextIconButton):
+    OBJECT_NAME = "primary"
+    ICON_COLOR = "#FFFFFF"
 
 
-class DangerButton(QPushButton):
-    def __init__(self, text: str = "", parent: Optional[QWidget] = None):
-        super().__init__(text, parent)
-        self.setObjectName("danger")
-        self.setCursor(Qt.PointingHandCursor)
+class SecondaryButton(_TextIconButton):
+    OBJECT_NAME = "secondary"
 
 
-class GhostButton(QPushButton):
-    def __init__(self, text: str = "", parent: Optional[QWidget] = None):
-        super().__init__(text, parent)
-        self.setObjectName("ghost")
-        self.setCursor(Qt.PointingHandCursor)
+class DangerButton(_TextIconButton):
+    OBJECT_NAME = "danger"
+    ICON_COLOR = "#FFFFFF"
+
+
+class GhostButton(_TextIconButton):
+    OBJECT_NAME = "ghost"
 
 
 class IconButton(QPushButton):
@@ -123,6 +132,37 @@ class MutedLabel(QLabel):
     def __init__(self, text: str = "", parent: Optional[QWidget] = None):
         super().__init__(text, parent)
         self.setObjectName("mutedLabel")
+
+
+class EmptyState(QWidget):
+    """统一空状态: 矢量图标 + 标题 + 副标题 + 可选动作按钮。"""
+
+    def __init__(self, icon_name: str, title: str, subtitle: str = "",
+                 action_text: str = "", on_action=None,
+                 parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        v = QVBoxLayout(self)
+        v.setAlignment(Qt.AlignCenter)
+        v.setContentsMargins(20, 36, 20, 36)
+        v.setSpacing(8)
+
+        ic = QLabel()
+        ic.setAlignment(Qt.AlignCenter)
+        ic.setPixmap(iconlib.tinted_icon(icon_name, "#9AA7B8").pixmap(42, 42))
+        t1 = QLabel(title)
+        t1.setAlignment(Qt.AlignCenter)
+        t1.setObjectName("emptyTitle")
+        v.addWidget(ic)
+        v.addWidget(t1)
+        if subtitle:
+            t2 = MutedLabel(subtitle)
+            t2.setAlignment(Qt.AlignCenter)
+            t2.setWordWrap(True)
+            v.addWidget(t2)
+        if action_text and on_action:
+            b = SecondaryButton(action_text, icon_name=icon_name)
+            b.clicked.connect(on_action)
+            v.addWidget(b)
 
 
 # ---------- 开关 ----------

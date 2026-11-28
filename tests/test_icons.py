@@ -91,3 +91,49 @@ def test_svg_template_shape():
     for name, body in ICON_PATHS.items():
         assert body.strip()
         assert "<" in body and "/>" in body
+
+
+# ---------- 按钮图标支持 ----------
+def test_primary_button_with_icon(qapp):
+    from kivo.ui.components import PrimaryButton
+    b = PrimaryButton("下载", icon_name="download")
+    assert not b.icon().isNull()
+    assert b.text() == "下载"
+
+
+def test_button_without_icon_backward_compat(qapp):
+    from kivo.ui.components import SecondaryButton
+    b = SecondaryButton("纯文字")
+    assert b.icon().isNull()
+
+
+@pytest.mark.parametrize("cls", ["PrimaryButton", "SecondaryButton",
+                                 "DangerButton", "GhostButton"])
+def test_all_buttons_accept_icon(qapp, cls):
+    import kivo.ui.components as comp
+    b = getattr(comp, cls)("文字", icon_name="check")
+    assert not b.icon().isNull()
+
+
+# ---------- EmptyState ----------
+def test_empty_state_basic(qapp):
+    from kivo.ui.components import EmptyState
+    from PySide6.QtWidgets import QLabel
+    e = EmptyState("browser", "还没有图片", "点击添加")
+    texts = [l.text() for l in e.findChildren(QLabel)]
+    assert "还没有图片" in texts
+    assert "点击添加" in texts
+
+
+def test_empty_state_action(qapp):
+    from kivo.ui.components import EmptyState
+    clicked = []
+    e = EmptyState("copy", "空", "副", action_text="添加",
+                   on_action=lambda: clicked.append(1))
+    e.show()
+    qapp.processEvents()
+    from kivo.ui.components import SecondaryButton
+    btns = e.findChildren(SecondaryButton)
+    assert btns and clicked == []
+    btns[0].click()
+    assert clicked == [1]
