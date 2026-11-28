@@ -289,6 +289,10 @@ QLabel#annoCanvas {{ background: #FFFFFF; border: 1px solid {t['border']}; borde
 /* ---------- AI 回复操作栏 ---------- */
 QPushButton#msgAction {{ background: transparent; border: none; border-radius: {RADIUS['sm']}px; }}
 QPushButton#msgAction:hover {{ background: {t['soft']}; }}
+
+/* ---------- AI 侧边功能菜单 ---------- */
+QPushButton#sideMenu {{ background: transparent; border: none; border-radius: {RADIUS['sm']}px; text-align: left; padding: 7px 10px; color: {t['text_2']}; font-size: {FONT_SIZE['sm']}px; }}
+QPushButton#sideMenu:hover {{ background: {t['soft']}; color: {t['text']}; }}
 """
 
 

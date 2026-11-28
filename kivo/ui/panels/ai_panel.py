@@ -5,17 +5,28 @@ from __future__ import annotations
 import threading
 from typing import Optional
 
-from PySide6.QtCore import Qt, QObject, Signal, QEvent
+from PySide6.QtCore import Qt, QObject, Signal, QEvent, QSize
 from PySide6.QtGui import QPainter, QColor, QPixmap
 from PySide6.QtWidgets import (
     QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QScrollArea,
     QTextEdit, QLineEdit, QApplication,
 )
 
+from .. import icons as iconlib
 from ..theme import Theme, add_shadow
 from ..components import (
     PrimaryButton, GhostButton, SectionHeader, MutedLabel, MessageActionBar,
 )
+
+# 侧边功能入口 (动作键, 图标, 文案), 行为由组装层经 side_actions 注入
+SIDEBAR_ACTIONS = [
+    ("task", "edit", "工作任务"),
+    ("schedule", "clock", "定时任务"),
+    ("skills", "blocks", "提示词技能"),
+    ("project", "project", "项目"),
+    ("create", "ai", "AI 创作"),
+    ("cloud", "cloud", "云盘目录"),
+]
 
 
 # ---------- 跨线程信号 ----------
@@ -48,13 +59,15 @@ class AvatarLabel(QLabel):
 
 
 class AIPanel(QWidget):
-    def __init__(self, theme: Theme, ai_client, chat_store, speak=None):
+    def __init__(self, theme: Theme, ai_client, chat_store, speak=None,
+                 side_actions=None):
         super().__init__()
         self.setObjectName("panelRoot")
         self.theme = theme
         self.ai = ai_client
         self.store = chat_store
         self._speak = speak  # 可选 TTS 回调, 缺省安全降级
+        self._side_actions = side_actions or {}
         self.history: list = []
         self.cid = None
         self.busy = False
@@ -82,6 +95,18 @@ class AIPanel(QWidget):
         new = PrimaryButton("＋ 新对话")
         new.clicked.connect(self.new_chat)
         lay.addWidget(new)
+
+        # 功能入口 (参照豆包侧边菜单)
+        self.side_menu = {}
+        for key, icn, label in SIDEBAR_ACTIONS:
+            b = QPushButton(label)
+            b.setObjectName("sideMenu")
+            b.setIcon(iconlib.icon(icn))
+            b.setIconSize(QSize(18, 18))
+            b.setCursor(Qt.PointingHandCursor)
+            b.clicked.connect(lambda _=False, k=key: self._on_side_action(k))
+            self.side_menu[key] = b
+            lay.addWidget(b)
 
         self.search = QLineEdit()
         self.search.setPlaceholderText("搜索对话…")
@@ -415,6 +440,11 @@ class AIPanel(QWidget):
                 self._add_bubble(m["role"], m["content"])
             self._update_empty()
             self.request_reply()
+
+    def _on_side_action(self, key):
+        fn = self._side_actions.get(key)
+        if fn:
+            fn()
 
     # ---------- 右栏 ----------
     def _suggest_pane(self):

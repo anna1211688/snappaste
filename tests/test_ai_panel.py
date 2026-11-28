@@ -273,3 +273,30 @@ def test_regenerate_ignored_when_busy(panel, qapp):
     panel.busy = True
     panel._regenerate()  # 不应抛异常, 也不改变历史
     assert panel.history == []
+
+
+# ---------- 侧边功能菜单 ----------
+def test_side_menu_entries(panel):
+    from kivo.ui.panels.ai_panel import SIDEBAR_ACTIONS
+    assert len(panel.side_menu) == len(SIDEBAR_ACTIONS)
+    for key, _icn, label in SIDEBAR_ACTIONS:
+        assert panel.side_menu[key].text() == label
+
+
+def test_side_menu_invokes_action(panel):
+    triggered = []
+    panel._side_actions = {"cloud": lambda: triggered.append("cloud")}
+    panel.side_menu["cloud"].click()
+    assert triggered == ["cloud"]
+
+
+def test_side_menu_missing_action_safe(panel):
+    panel._side_actions = {}
+    panel.side_menu["task"].click()  # 无回调也不应抛异常
+
+
+def test_side_menu_icons_known(panel):
+    from kivo.ui.icon_paths import ICON_PATHS
+    from kivo.ui.panels.ai_panel import SIDEBAR_ACTIONS
+    for key, icn, _label in SIDEBAR_ACTIONS:
+        assert icn in ICON_PATHS
