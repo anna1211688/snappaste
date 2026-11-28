@@ -10,6 +10,7 @@ from ..theme import Theme, add_shadow
 from ..components import SecondaryButton
 from ..dialogs.base import show_toast
 from ...core.winman import WindowManager, IS_WINDOWS
+from ...core.i18n import tr
 
 
 class WinmanPanel(QWidget):
@@ -23,17 +24,17 @@ class WinmanPanel(QWidget):
         outer.setContentsMargins(20, 18, 20, 18)
         outer.setSpacing(14)
 
-        title = QLabel("窗口管理")
+        title = QLabel(tr("winman.title"))
         title.setObjectName("hero")
         outer.addWidget(title)
 
-        hint = QLabel("先点一下要管理的窗口（让它在前台），再回来点按钮；按钮作用于最近使用的外部窗口。")
+        hint = QLabel(tr("winman.hint"))
         hint.setObjectName("mutedLabel")
         hint.setWordWrap(True)
         outer.addWidget(hint)
 
         if not IS_WINDOWS:
-            warn = QLabel("窗口管理仅在 Windows 上可用。")
+            warn = QLabel(tr("winman.win_only"))
             warn.setObjectName("mutedLabel")
             outer.addWidget(warn)
 
@@ -45,18 +46,18 @@ class WinmanPanel(QWidget):
         lay.setSpacing(10)
 
         groups = [
-            [("置顶切换", lambda h: self.wm.toggle_topmost(h)),
-             ("半透明 80%", lambda h: self.wm.set_opacity(h, 204)),
-             ("半透明 60%", lambda h: self.wm.set_opacity(h, 153)),
-             ("恢复不透明", lambda h: self.wm.set_opacity(h, 255))],
-            [("左半屏", lambda h: self.wm.snap(h, "left")),
-             ("右半屏", lambda h: self.wm.snap(h, "right")),
-             ("居中", lambda h: self.wm.snap(h, "center"))],
+            [("winman.topmost", lambda h: self.wm.toggle_topmost(h)),
+             ("winman.op80", lambda h: self.wm.set_opacity(h, 204)),
+             ("winman.op60", lambda h: self.wm.set_opacity(h, 153)),
+             ("winman.opaque", lambda h: self.wm.set_opacity(h, 255))],
+            [("winman.left", lambda h: self.wm.snap(h, "left")),
+             ("winman.right", lambda h: self.wm.snap(h, "right")),
+             ("winman.center", lambda h: self.wm.snap(h, "center"))],
         ]
         for group in groups:
             row = QHBoxLayout()
             for text, fn in group:
-                b = SecondaryButton(text)
+                b = SecondaryButton(tr(text))
                 b.setEnabled(IS_WINDOWS)
                 b.clicked.connect(lambda _=False, op=fn: self._act(op))
                 row.addWidget(b)
@@ -70,9 +71,9 @@ class WinmanPanel(QWidget):
         hwnd = self.wm.target_hwnd(foreground_is_self=(
             self.wm.foreground_hwnd() == my_hwnd))
         if not hwnd:
-            show_toast(self, "没有可管理的窗口")
+            show_toast(self, tr("winman.none"))
             return
         try:
             fn(hwnd)
         except OSError:
-            show_toast(self, "操作失败")
+            show_toast(self, tr("winman.failed"))

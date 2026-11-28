@@ -413,6 +413,24 @@ _TABLE.update({
     "fx.api_error": ("汇率接口返回异常", "Unexpected rates API response"),
 })
 
+# 窗口管理面板
+_TABLE.update({
+    "winman.title": ("窗口管理", "Window Manager"),
+    "winman.hint": ("先点一下要管理的窗口（让它在前台），再回来点按钮；按钮作用于最近使用的外部窗口。",
+                    "Focus the window you want to manage first, then use a button here."),
+    "winman.win_only": ("窗口管理仅在 Windows 上可用。",
+                        "Window management is only available on Windows."),
+    "winman.topmost": ("置顶切换", "Toggle always-on-top"),
+    "winman.op80": ("半透明 80%", "80% opacity"),
+    "winman.op60": ("半透明 60%", "60% opacity"),
+    "winman.opaque": ("恢复不透明", "Restore opacity"),
+    "winman.left": ("左半屏", "Snap left"),
+    "winman.right": ("右半屏", "Snap right"),
+    "winman.center": ("居中", "Center"),
+    "winman.none": ("没有可管理的窗口", "No window to manage"),
+    "winman.failed": ("操作失败", "Operation failed"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},
