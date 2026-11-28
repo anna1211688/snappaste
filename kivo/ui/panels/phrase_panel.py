@@ -11,6 +11,7 @@ from ..theme import Theme, add_shadow
 from ..components import (
     PrimaryButton, SecondaryButton, MutedLabel, EmptyState,
 )
+from ...core.i18n import tr
 
 
 class PhrasePanel(QWidget):
@@ -24,7 +25,7 @@ class PhrasePanel(QWidget):
         root.setContentsMargins(20, 18, 20, 18)
         root.setSpacing(12)
 
-        title = QLabel("常用语")
+        title = QLabel(tr("phrase.title"))
         title.setObjectName("hero")
         root.addWidget(title)
         root.addWidget(self._main_card(), 1)
@@ -44,10 +45,10 @@ class PhrasePanel(QWidget):
         lay.addWidget(self.listw, 1)
 
         self.empty = EmptyState(
-            "phrases", "还没有常用语", "把常回的话存成一条，之后双击就能直接粘贴")
+            "phrases", tr("phrase.empty_title"), tr("phrase.empty_sub"))
         lay.addWidget(self.empty)
 
-        hint = MutedLabel("选中一条，内容会填进编辑区；改完点「保存修改」。双击列表可直接粘贴。")
+        hint = MutedLabel(tr("phrase.hint"))
         hint.setWordWrap(True)
         lay.addWidget(hint)
 
@@ -77,21 +78,21 @@ class PhrasePanel(QWidget):
 
     def _button_row(self):
         row = QHBoxLayout()
-        paste = PrimaryButton("粘贴选中", icon_name="check")
+        paste = PrimaryButton(tr("phrase.paste"), icon_name="check")
         paste.clicked.connect(self.paste_selected)
-        copy = SecondaryButton("复制选中", icon_name="copy")
+        copy = SecondaryButton(tr("phrase.copy"), icon_name="copy")
         copy.clicked.connect(self.copy_selected)
-        add = SecondaryButton("新增", icon_name="plus")
+        add = SecondaryButton(tr("common.new"), icon_name="plus")
         add.clicked.connect(self.add)
-        from_clip = SecondaryButton("从剪贴板添加", icon_name="copy")
+        from_clip = SecondaryButton(tr("phrase.from_clip"), icon_name="copy")
         from_clip.clicked.connect(self.add_from_clipboard)
-        save = SecondaryButton("保存修改", icon_name="save")
+        save = SecondaryButton(tr("phrase.save"), icon_name="save")
         save.clicked.connect(self.save_edit)
-        delete = SecondaryButton("删除", icon_name="trash")
+        delete = SecondaryButton(tr("common.delete"), icon_name="trash")
         delete.clicked.connect(self.delete)
-        up = SecondaryButton("上移")
+        up = SecondaryButton(tr("common.move_up"))
         up.clicked.connect(lambda: self.move(-1))
-        down = SecondaryButton("下移")
+        down = SecondaryButton(tr("common.move_down"))
         down.clicked.connect(lambda: self.move(1))
         for b in (paste, copy, add, from_clip, save, delete, up, down):
             row.addWidget(b)

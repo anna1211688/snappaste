@@ -86,6 +86,41 @@ _TABLE.update({
     "group.tools": ("工具", "Tools"),
 })
 
+# 剪贴板面板
+_TABLE.update({
+    "clip.title": ("复制记录", "Clipboard Records"),
+    "clip.search_ph": ("搜索记录…", "Search records…"),
+    "clip.lock": ("锁定/解锁", "Lock / Unlock"),
+    "clip.dedupe": ("去重", "Remove duplicates"),
+    "clip.del_sel": ("删除选定", "Delete selected"),
+    "clip.del_all": ("删除全部", "Delete all"),
+    "clip.empty_title": ("还没有记录", "No records yet"),
+    "clip.empty_sub": ("直接复制一段文字，或按 F1 截一张图即可开始",
+                       "Copy some text, or press F1 to take a screenshot"),
+    "clip.multi": ("多次复制 (加入队列)", "Multi-copy (add to queue)"),
+    "clip.paste_next": ("顺序粘贴下一条", "Paste next in order"),
+    "clip.paste_all": ("全部粘贴", "Paste all"),
+    "clip.options": ("粘贴选项", "Paste options"),
+    "clip.separator": ("记录间分隔", "Separator between records"),
+    "clip.sep_enter": ("回车", "Enter"),
+    "clip.sep_none": ("无分隔", "None"),
+    "clip.interval": ("间隔(ms)", "Interval (ms)"),
+})
+
+# 常用语面板
+_TABLE.update({
+    "phrase.title": ("常用语", "Phrases"),
+    "phrase.empty_title": ("还没有常用语", "No phrases yet"),
+    "phrase.empty_sub": ("把常回的话存成一条，之后双击就能直接粘贴",
+                         "Save a common reply, then double-click to paste it"),
+    "phrase.hint": ("选中一条，内容会填进编辑区；改完点「保存修改」。双击列表可直接粘贴。",
+                    "Select an item to edit its text, then save. Double-click to paste."),
+    "phrase.paste": ("粘贴选中", "Paste selected"),
+    "phrase.copy": ("复制选中", "Copy selected"),
+    "phrase.from_clip": ("从剪贴板添加", "Add from clipboard"),
+    "phrase.save": ("保存修改", "Save changes"),
+})
+
 MESSAGES: dict[str, dict[str, str]] = {
     ZH: {k: zh for k, (zh, _en) in _TABLE.items()},
     EN: {k: en for k, (_zh, en) in _TABLE.items()},

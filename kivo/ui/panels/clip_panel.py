@@ -12,6 +12,8 @@ from ..theme import Theme, add_shadow
 from ..components import (
     PrimaryButton, SecondaryButton, DangerButton, SectionHeader, EmptyState,
 )
+from ...core.i18n import tr
+from ..icons import icon
 
 
 class ClipPanel(QWidget):
@@ -27,12 +29,12 @@ class ClipPanel(QWidget):
         root.setSpacing(12)
 
         head = QHBoxLayout()
-        title = QLabel("复制记录")
+        title = QLabel(tr("clip.title"))
         title.setObjectName("hero")
         head.addWidget(title)
         head.addStretch()
         self.search = QLineEdit()
-        self.search.setPlaceholderText("搜索记录…")
+        self.search.setPlaceholderText(tr("clip.search_ph"))
         self.search.setFixedWidth(220)
         self.search.textChanged.connect(self.refresh)
         head.addWidget(self.search)
@@ -54,13 +56,13 @@ class ClipPanel(QWidget):
         lay.setSpacing(8)
 
         top = QHBoxLayout()
-        lock = SecondaryButton("锁定/解锁", icon_name="lock")
+        lock = SecondaryButton(tr("clip.lock"), icon_name="lock")
         lock.clicked.connect(self.toggle_lock)
-        dedupe = SecondaryButton("去重", icon_name="filter")
+        dedupe = SecondaryButton(tr("clip.dedupe"), icon_name="filter")
         dedupe.clicked.connect(self.dedupe)
-        del_sel = DangerButton("删除选定", icon_name="trash")
+        del_sel = DangerButton(tr("clip.del_sel"), icon_name="trash")
         del_sel.clicked.connect(self.delete_selected)
-        del_all = DangerButton("删除全部", icon_name="trash")
+        del_all = DangerButton(tr("clip.del_all"), icon_name="trash")
         del_all.clicked.connect(self.delete_all)
         for b in (lock, dedupe):
             top.addWidget(b)
@@ -75,7 +77,7 @@ class ClipPanel(QWidget):
         lay.addWidget(self.listw)
 
         self.empty = EmptyState(
-            "copy", "还没有记录", "直接复制一段文字，或按 F1 截一张图即可开始")
+            "copy", tr("clip.empty_title"), tr("clip.empty_sub"))
         lay.addWidget(self.empty)
         return card
 
@@ -87,10 +89,10 @@ class ClipPanel(QWidget):
             if q and q not in r["text"].lower():
                 continue
             self._visible.append(i)
-            prefix = "🔒 " if r["locked"] else ""
-            item = QListWidgetItem(f"{prefix}{len(self._visible)}.  {r['text']}")
+            item = QListWidgetItem(f"{len(self._visible)}.  {r['text']}")
             if r["locked"]:
                 item.setForeground(Qt.gray)
+                item.setIcon(icon("lock"))
             self.listw.addItem(item)
         has = self.listw.count() > 0
         self.listw.setVisible(has)
@@ -130,11 +132,11 @@ class ClipPanel(QWidget):
     # ---------- 主操作行 ----------
     def _action_row(self):
         row = QHBoxLayout()
-        multi = PrimaryButton("多次复制 (加入队列)", icon_name="copy")
+        multi = PrimaryButton(tr("clip.multi"), icon_name="copy")
         multi.clicked.connect(self.multi_copy)
-        paste_one = SecondaryButton("顺序粘贴下一条", icon_name="chevron-right")
+        paste_one = SecondaryButton(tr("clip.paste_next"), icon_name="chevron-right")
         paste_one.clicked.connect(self.paste_next)
-        paste_all = SecondaryButton("全部粘贴", icon_name="check")
+        paste_all = SecondaryButton(tr("clip.paste_all"), icon_name="check")
         paste_all.clicked.connect(self.paste_all)
         row.addWidget(multi)
         row.addWidget(paste_one)
@@ -174,17 +176,17 @@ class ClipPanel(QWidget):
         lay = QVBoxLayout(card)
         lay.setContentsMargins(14, 12, 14, 12)
         lay.setSpacing(8)
-        lay.addWidget(SectionHeader("粘贴选项"))
+        lay.addWidget(SectionHeader(tr("clip.options")))
 
         row = QHBoxLayout()
-        row.addWidget(QLabel("记录间分隔"))
+        row.addWidget(QLabel(tr("clip.separator")))
         self.sep_combo = QComboBox()
-        self.sep_combo.addItem("回车", "enter")
+        self.sep_combo.addItem(tr("clip.sep_enter"), "enter")
         self.sep_combo.addItem("TAB", "tab")
-        self.sep_combo.addItem("无分隔", "none")
+        self.sep_combo.addItem(tr("clip.sep_none"), "none")
         row.addWidget(self.sep_combo)
         row.addSpacing(16)
-        row.addWidget(QLabel("间隔(ms)"))
+        row.addWidget(QLabel(tr("clip.interval")))
         self.interval = QLineEdit("0")
         self.interval.setFixedWidth(80)
         row.addWidget(self.interval)
