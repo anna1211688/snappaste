@@ -37,7 +37,7 @@ class FxPanel(QWidget):
         title = QLabel("汇率换算")
         title.setObjectName("hero")
         self.updated_label = MutedLabel("")
-        refresh = SecondaryButton("刷新")
+        refresh = SecondaryButton("刷新", icon_name="refresh")
         refresh.clicked.connect(self.reload)
         head.addWidget(title)
         head.addWidget(self.updated_label)

@@ -44,9 +44,9 @@ class DevPanel(QWidget):
         now = QLineEdit(str(int(time.time())))
         r1 = QHBoxLayout()
         r1.addWidget(now, 1)
-        refresh = SecondaryButton("刷新")
+        refresh = SecondaryButton("刷新", icon_name="refresh")
         refresh.clicked.connect(lambda: now.setText(str(int(time.time()))))
-        copy = SecondaryButton("复制")
+        copy = SecondaryButton("复制", icon_name="copy")
         copy.clicked.connect(lambda: self._copy(now.text()))
         r1.addWidget(refresh); r1.addWidget(copy)
         lay.addLayout(r1)
@@ -109,7 +109,7 @@ class DevPanel(QWidget):
         lay.addWidget(x_in)
         out = QLabel("")
         out.setWordWrap(True)
-        go = SecondaryButton("测试匹配")
+        go = SecondaryButton("测试匹配", icon_name="search")
         go.clicked.connect(lambda: self._safe(
             lambda: (lambda hits: out.setText(
                 f"{len(hits)} 处匹配: " + " | ".join(hits[:20])))(
@@ -157,7 +157,7 @@ class DevPanel(QWidget):
 
         cat.currentTextChanged.connect(sync_units)
         sync_units()
-        go = SecondaryButton("换算")
+        go = SecondaryButton("换算", icon_name="check")
         go.clicked.connect(lambda: self._safe(
             lambda: out.setText(
                 f"{devtools.unit_convert(val.text(), cat.currentText(), frm.currentText(), to.currentText()):g} {to.currentText()}"),

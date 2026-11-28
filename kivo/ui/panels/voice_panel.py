@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import threading
 
-from PySide6.QtCore import Qt, QObject, Signal
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import (
-    QWidget, QFrame, QLabel, QComboBox, QLineEdit, QPushButton, QVBoxLayout,
+    QWidget, QFrame, QLabel, QComboBox, QLineEdit, QVBoxLayout,
     QHBoxLayout, QTextEdit, QFileDialog,
 )
 
 from ..theme import Theme, add_shadow
-from ..components import PrimaryButton, SecondaryButton, SectionHeader, MutedLabel
+from ..components import PrimaryButton, SecondaryButton, MutedLabel
 from ...core.voice import TRANS_TARGETS
 
 
@@ -61,7 +61,7 @@ class VoicePanel(QWidget):
         lay.setSpacing(10)
 
         r1 = QHBoxLayout()
-        pick = SecondaryButton("选择音频文件")
+        pick = SecondaryButton("选择音频文件", icon_name="folder-open")
         pick.clicked.connect(self.choose)
         self.file_label = QLabel("未选择文件")
         self.file_label.setObjectName("mutedLabel")
@@ -93,7 +93,7 @@ class VoicePanel(QWidget):
         lay.addLayout(r2)
 
         r3 = QHBoxLayout()
-        self.start_btn = PrimaryButton("开始转写翻译")
+        self.start_btn = PrimaryButton("开始转写翻译", icon_name="voice")
         self.start_btn.clicked.connect(self.start)
         self.status_label = QLabel("")
         self.status_label.setObjectName("mutedLabel")
@@ -113,7 +113,7 @@ class VoicePanel(QWidget):
         top = QHBoxLayout()
         head = QLabel(title)
         head.setObjectName("blockHead")
-        copy = SecondaryButton("复制")
+        copy = SecondaryButton("复制", icon_name="copy")
         copy.clicked.connect(lambda: self._copy(card))
         top.addWidget(head)
         top.addStretch()

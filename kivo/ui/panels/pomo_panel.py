@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import PrimaryButton, SecondaryButton
+from ..icons import icon
 from ..dialogs.base import show_toast
 from ...core.pomo_store import PomoStore
 
@@ -57,11 +58,11 @@ class PomoPanel(QWidget):
         lay.addWidget(self.time_lab)
 
         brow = QHBoxLayout()
-        self.main_btn = PrimaryButton("开始")
+        self.main_btn = PrimaryButton("开始", icon_name="play")
         self.main_btn.clicked.connect(self._toggle)
-        reset = SecondaryButton("重置")
+        reset = SecondaryButton("重置", icon_name="refresh")
         reset.clicked.connect(self._reset)
-        skip = SecondaryButton("跳过")
+        skip = SecondaryButton("跳过", icon_name="skip")
         skip.clicked.connect(self._advance)
         brow.addWidget(self.main_btn)
         brow.addWidget(reset)
@@ -77,7 +78,7 @@ class PomoPanel(QWidget):
         self.break_edit = QLineEdit(str(self.store.break_min))
         self.break_edit.setFixedWidth(60)
         srow.addWidget(self.break_edit)
-        apply = SecondaryButton("应用")
+        apply = SecondaryButton("应用", icon_name="check")
         apply.clicked.connect(self._apply)
         srow.addWidget(apply)
         lay.addLayout(srow)
@@ -124,3 +125,4 @@ class PomoPanel(QWidget):
         self.time_lab.setText(self.store.display())
         self.mode_lab.setText("专注中" if self.store.mode == "focus" else "休息中")
         self.main_btn.setText("暂停" if self.store.running else "开始")
+        self.main_btn.setIcon(icon("pause" if self.store.running else "play"))

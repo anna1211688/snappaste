@@ -59,7 +59,7 @@ class SelfCheckPanel(QWidget):
             lay.addLayout(row)
             self._rows[key] = result
 
-        run_btn = PrimaryButton("开始自检")
+        run_btn = PrimaryButton("开始自检", icon_name="zap")
         run_btn.clicked.connect(self.run_check)
         btn_row = QHBoxLayout()
         btn_row.addStretch(); btn_row.addWidget(run_btn)

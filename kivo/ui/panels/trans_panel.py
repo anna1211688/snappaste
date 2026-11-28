@@ -144,13 +144,13 @@ class TranslatePanel(QWidget):
     # ---------- 按钮行 ----------
     def _button_row(self):
         row = QHBoxLayout()
-        paste = SecondaryButton("粘贴原文")
+        paste = SecondaryButton("粘贴原文", icon_name="copy")
         paste.clicked.connect(self._paste)
-        clear = SecondaryButton("清空")
+        clear = SecondaryButton("清空", icon_name="trash")
         clear.clicked.connect(self._clear)
-        copy_both = SecondaryButton("复制双语")
+        copy_both = SecondaryButton("复制双语", icon_name="copy")
         copy_both.clicked.connect(self._copy_both)
-        copy_t = PrimaryButton("复制译文")
+        copy_t = PrimaryButton("复制译文", icon_name="copy")
         copy_t.clicked.connect(self._copy_target)
         row.addWidget(paste)
         row.addWidget(clear)

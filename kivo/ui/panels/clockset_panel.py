@@ -55,9 +55,9 @@ class ClockSetPanel(QWidget):
 
         bar = QHBoxLayout()
         bar.addStretch()
-        cancel = SecondaryButton("取消")
+        cancel = SecondaryButton("取消", icon_name="close")
         cancel.clicked.connect(self._cancel)
-        ok = PrimaryButton("确定")
+        ok = PrimaryButton("确定", icon_name="check")
         ok.clicked.connect(self.confirm)
         bar.addWidget(cancel); bar.addWidget(ok)
         outer.addLayout(bar)
