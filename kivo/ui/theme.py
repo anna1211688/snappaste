@@ -124,6 +124,10 @@ QPushButton#miniBtn:hover {{ background: {t['border']}; }}
 QFrame#emptyBox {{ background: transparent; border: 1px dashed {t['border_strong']}; border-radius: {RADIUS['md']}px; }}
 QLabel#emptyIcon {{ background: transparent; font-size: 30px; }}
 QLabel#emptyTitle {{ background: transparent; color: {t['text']}; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
+QFrame#quickCard {{ background: {t['surface']}; border: 1px solid {t['border']}; border-radius: {RADIUS['lg']}px; }}
+QListWidget#quickList {{ background: transparent; border: none; outline: none; font-size: {FONT_SIZE['md']}px; }}
+QListWidget#quickList::item {{ padding: 7px 8px; border-radius: {RADIUS['sm']}px; color: {t['text']}; }}
+QListWidget#quickList::item:selected {{ background: {t['soft']}; color: {t['accent']}; }}
 QLabel#calcTrail {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['md']}px; }}
 QLabel#calcDisplay {{ background: transparent; color: {t['text']}; font-size: 40px; font-weight: 700; }}
 QPushButton#calcDigit {{ background: {t['stripe']}; color: {t['text']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
