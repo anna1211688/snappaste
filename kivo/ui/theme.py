@@ -113,6 +113,9 @@ QLabel#cityName, QLabel#localName {{ background: transparent; font-weight: 600; 
 QLabel#localName {{ color: {t['accent']}; }}
 QLabel#clockTime {{ background: transparent; font-weight: 700; font-size: {FONT_SIZE['title']}px; color: {t['text']}; }}
 QLabel#dayDot {{ background: transparent; font-size: {FONT_SIZE['sm']}px; }}
+QLabel#chkWait {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['sm']}px; }}
+QLabel#chkOk {{ background: transparent; color: #28A745; font-size: {FONT_SIZE['sm']}px; font-weight: 600; }}
+QLabel#chkBad {{ background: transparent; color: {t['danger']}; font-size: {FONT_SIZE['sm']}px; font-weight: 600; }}
 QLabel#calcTrail {{ background: transparent; color: {t['muted']}; font-size: {FONT_SIZE['md']}px; }}
 QLabel#calcDisplay {{ background: transparent; color: {t['text']}; font-size: 40px; font-weight: 700; }}
 QPushButton#calcDigit {{ background: {t['stripe']}; color: {t['text']}; border: none; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['lg']}px; font-weight: 600; }}
