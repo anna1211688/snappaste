@@ -124,6 +124,9 @@ QPushButton#calcAccent {{ background: {t['accent']}; color: #FFFFFF; border: non
 QPushButton#calcAccent:hover {{ background: {t['accent_hover']}; }}
 QListWidget#calcHist {{ background: {t['stripe']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px; font-size: {FONT_SIZE['sm']}px; padding: 4px; }}
 QPushButton#calcClearHist {{ background: transparent; color: {t['muted']}; border: none; font-size: {FONT_SIZE['sm']}px; }}
+QFrame#pomoCard {{ background: {t['surface']}; border: 1px solid {t['border']}; border-radius: {RADIUS['lg']}px; }}
+QLabel#pomoMode {{ background: transparent; color: {t['accent']}; font-size: {FONT_SIZE['xl']}px; font-weight: 600; }}
+QLabel#pomoTime {{ background: transparent; color: {t['text']}; font-size: 56px; font-weight: 700; font-family: 'Consolas', monospace; }}
 QLabel#swapIcon {{ background: transparent; font-size: 18px; color: {t['muted']}; padding: 0 4px; }}
 QLabel#mutedLabel {{ color: {t['text_2']}; background: transparent; }}
 QLabel#hero {{ font-size: {FONT_SIZE['hero']}px; font-weight: 700; background: transparent; }}
