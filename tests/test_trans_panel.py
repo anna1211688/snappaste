@@ -15,6 +15,9 @@ class FakeConfig:
     def set(self, section, key, value):
         self.sets.append((key, value))
 
+    def save(self):
+        pass
+
 
 class FakeClient:
     def __init__(self):
@@ -30,7 +33,19 @@ class FakeClient:
 
 
 class FakeAI:
-    pass
+    def __init__(self, ready=False, reply=None):
+        self._ready = ready
+        self._reply = reply
+        self.calls = []
+
+    def ready(self, route=None):
+        return self._ready
+
+    def chat_messages(self, messages, **kw):
+        self.calls.append(messages)
+        if self._reply is None:
+            raise RuntimeError("ai fail")
+        return self._reply
 
 
 @pytest.fixture
@@ -109,3 +124,26 @@ def test_swap_languages(tp):
     tp._swap_languages()
     assert tp._source_edit.toPlainText() == "你好"
     assert tp.source_lang.currentData() == "zh-CN"
+
+
+def test_ai_first_used(qapp):
+    ai = FakeAI(ready=True, reply="AI译文")
+    p = TranslatePanel(Theme(False), FakeClient(), ai)
+    p.show()
+    p._source_edit.setPlainText("Hello")
+    p.translate_now()
+    _pump(qapp, p)
+    # 采用 AI 结果
+    assert p._target_edit.toPlainText() == "AI译文"
+    assert len(ai.calls) == 1
+
+
+def test_ai_failure_falls_back(qapp):
+    ai = FakeAI(ready=True, reply=None)  # AI 抛错
+    p = TranslatePanel(Theme(False), FakeClient(), ai)
+    p.show()
+    p._source_edit.setPlainText("Hello")
+    p.translate_now()
+    _pump(qapp, p)
+    # 回退在线通道
+    assert p._target_edit.toPlainText() == "译文:Hello"

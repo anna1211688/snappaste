@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 
 from ..theme import Theme, add_shadow
 from ..components import (
-    PrimaryButton, SecondaryButton, Switch, SectionHeader,
+    PrimaryButton, SecondaryButton, Switch,
 )
 from ...core.voice import TRANS_TARGETS
 
@@ -30,6 +30,7 @@ class TranslatePanel(QWidget):
         self.ai = ai_client
         self.busy = False
         self._swapping = False
+        self._switches = {}
 
         root = QVBoxLayout(self)
         root.setContentsMargins(20, 18, 20, 18)
@@ -97,6 +98,7 @@ class TranslatePanel(QWidget):
         sw = Switch(default)
         sw._on_color = self.theme.tokens["accent"]
         sw.toggled.connect(lambda on, k=cfg_key: self._save_switch(k, on))
+        self._switches[cfg_key] = sw
         lab = QLabel(label)
         h.addWidget(sw)
         h.addWidget(lab)
@@ -104,6 +106,7 @@ class TranslatePanel(QWidget):
 
     def _save_switch(self, key, on):
         self.client.config.set("Translate", key, "1" if on else "0")
+        self.client.config.save()
 
     # ---------- 双栏 ----------
     def _columns(self):
@@ -210,9 +213,16 @@ class TranslatePanel(QWidget):
         source = self.source_lang.currentData()
         signals = self.signals
 
+        use_ai = self._switches["TTUseAI"].isChecked()
+
         def work():
             try:
-                r = self.client.translate_to(text, target, source)
+                r = None
+                # 勾了 AI 且配了 key：先 AI（懂上下文），失败/空再回退在线通道
+                if use_ai and self.ai.ready("text"):
+                    r = self._ai_translate(text, target, source)
+                if not r:
+                    r = self.client.translate_to(text, target, source)
                 if r:
                     signals.result.emit(r)
                 else:
@@ -221,6 +231,21 @@ class TranslatePanel(QWidget):
                 signals.failed.emit(str(e))
 
         threading.Thread(target=work, daemon=True, name="kivo-trans").start()
+
+    def _ai_translate(self, text, target, source):
+        tgt_name = self.target_lang.currentText()
+        src_hint = ""
+        if source:
+            src_hint = f"原文是{self.source_lang.currentText()}，"
+        prompt = (f"{src_hint}把下面这段文字翻译成{tgt_name}，"
+                  "只输出译文，不要加任何解释、引号或原文：\n" + text)
+        try:
+            r = self.ai.chat_messages(
+                [{"role": "user", "content": prompt}],
+                route="text", timeout=15, max_tokens=1024)
+            return r if r and r.strip() else None
+        except Exception:
+            return None
 
     def _on_result(self, text):
         self.busy = False
