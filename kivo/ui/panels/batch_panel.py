@@ -139,7 +139,7 @@ class BatchPanel(QWidget):
     def _add_files(self):
         paths, _ = QFileDialog.getOpenFileNames(
             self, tr("batch.choose_images"), "",
-            "图片 (*.jpg *.jpeg *.png *.webp *.bmp *.gif *.tiff)")
+            tr("batch.image_filter"))
         for p in paths:
             if p not in self.files:
                 self.files.append(p)

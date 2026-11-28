@@ -64,7 +64,7 @@ class ClockPanel(QWidget):
         self._clear_grid()
         self._cards = []
         # 本地第一
-        entries = [("本地", None, 0)] + self.store.selected()
+        entries = [(tr("clock.local"), None, 0)] + self.store.selected()
         for idx, (name, tzname, stdh) in enumerate(entries):
             tz = None if tzname is None else make_tz(tzname, stdh)
             card = self._city_card(name, tz, idx == 0, tzname)

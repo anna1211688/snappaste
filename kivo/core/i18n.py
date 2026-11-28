@@ -504,6 +504,8 @@ _TABLE.update({
     "batch.processing": ("处理中 {i}/{total}", "Processing {i}/{total}"),
     "batch.done": ("批量处理完成：成功 {ok} 张", "Batch finished: {ok} succeeded"),
     "batch.failed_count": ("，失败 {n} 张", ", {n} failed"),
+    "batch.image_filter": ("图片 (*.jpg *.jpeg *.png *.webp *.bmp *.gif *.tiff)",
+                           "Images (*.jpg *.jpeg *.png *.webp *.bmp *.gif *.tiff)"),
 })
 
 # 开发者工具箱
@@ -528,6 +530,51 @@ _TABLE.update({
     "dev.enc_fail": ("编码失败", "Encoding failed"),
     "dev.dec_fail": ("解码失败", "Decoding failed"),
     "dev.copied": ("已复制", "Copied"),
+})
+
+# 设置面板
+_TABLE.update({
+    "set.general": ("通用", "General"),
+    "set.language": ("语言", "Language"),
+    "set.restart": ("(重启后生效)", "(takes effect after restart)"),
+    "set.appearance": ("外观", "Appearance"),
+    "set.light": ("浅色", "Light"),
+    "set.dark": ("深色", "Dark"),
+    "set.wave": ("提示音（复制/粘贴成功时响一声）", "Sound (beep on copy/paste)"),
+    "set.ai_center": ("AI 模型中心", "AI Model Center"),
+    "set.trans_service": ("翻译服务", "Translation Service"),
+    "set.hotkey": ("热键设置", "Hotkey Settings"),
+    "set.mini": ("迷你窗口（复制/粘贴时自动悬浮）",
+                 "Mini Window (auto popup on copy/paste)"),
+    "set.mini_time": ("悬浮显示时间(秒, 0=不显示)",
+                      "Popup duration (sec, 0 = no popup)"),
+    "set.always": ("常显", "Always show"),
+    "set.clip_history": ("剪贴板历史", "Clipboard History"),
+    "set.clip_watch": ("自动记录复制的文字到剪贴板历史（自动去重，单条上限 20 万字，最多 2000 条）",
+                       "Auto-record copied text (deduplicated; up to 200k chars each, 2000 items)"),
+    "set.proxy": ("网络代理", "Network Proxy"),
+    "set.follow_system": ("跟随系统(推荐)", "Use system (recommended)"),
+    "set.manual": ("手动代理", "Manual proxy"),
+    "set.direct": ("直连(不使用代理)", "Direct (no proxy)"),
+    "set.proxy_addr": ("代理地址", "Proxy address"),
+    "set.mirror": ("更新镜像", "Update Mirror"),
+    "set.mirror_addr": ("镜像地址", "Mirror address"),
+    "set.mirror_hint": ("留空 = 直连 GitHub；填写后优先走镜像，失败再回退。",
+                        "Blank = direct to GitHub; a mirror is tried first, then falls back."),
+    "set.bad_url": ("请输入合法的 http(s) 地址", "Enter a valid http(s) URL"),
+    "set.mirror_saved": ("更新镜像已保存", "Update mirror saved"),
+    "set.check_update": ("检查更新", "Check for Updates"),
+    "set.not_checked": ("尚未检查", "Not checked yet"),
+    "set.checking": ("正在检查更新…", "Checking for updates…"),
+    "set.check_fail": ("检查失败，请检查网络后重试",
+                       "Check failed; verify your network and retry"),
+    "set.new_version": ("发现新版本：", "New version found: "),
+    "set.view_page": ("查看发布页", "View release page"),
+    "set.up_to_date": ("已是最新版本", "You are up to date"),
+    "set.shot_history": ("截图历史", "Screenshot History"),
+    "set.save_shots": ("保存历史截图", "Save history screenshots"),
+    "set.keep_max": ("最多保留", "Keep up to"),
+    "set.zhang": ("张", "items"),
 })
 
 MESSAGES: dict[str, dict[str, str]] = {

@@ -15,6 +15,7 @@ from ..components import (
 from ..dialogs.base import show_toast
 from ...core.update import UpdateClient, is_newer
 from ...core.paths import VERSION
+from ...core.i18n import tr
 
 
 class _UpdEvent(QEvent):
@@ -37,7 +38,7 @@ class SettingsPanel(QWidget):
         outer.setContentsMargins(20, 18, 20, 18)
         outer.setSpacing(10)
 
-        title = QLabel("设置")
+        title = QLabel(tr("common.settings"))
         title.setObjectName("hero")
         outer.addWidget(title)
 
@@ -84,24 +85,24 @@ class SettingsPanel(QWidget):
 
     # ---------- 通用 ----------
     def _build_general(self):
-        lay = self._section("通用")
+        lay = self._section(tr("set.general"))
 
         lang_row = QHBoxLayout()
-        lang_row.addWidget(QLabel("语言"))
+        lang_row.addWidget(QLabel(tr("set.language")))
         self.lang = QComboBox()
         self.lang.addItems(["Chinese", "English"])
         self.lang.setCurrentText(self.config.get("Config", "Language", "Chinese"))
         self.lang.currentTextChanged.connect(self._on_lang)
         lang_row.addWidget(self.lang)
-        lang_row.addWidget(MutedLabel("(重启后生效)"))
+        lang_row.addWidget(MutedLabel(tr("set.restart")))
         lang_row.addStretch()
         lay.addLayout(lang_row)
 
         theme_row = QHBoxLayout()
-        theme_row.addWidget(QLabel("外观"))
+        theme_row.addWidget(QLabel(tr("set.appearance")))
         self.theme_group = QButtonGroup(self)
         cur_theme = self.config.get("Config", "Theme", "light")
-        for txt, val in (("浅色", "light"), ("深色", "dark")):
+        for txt, val in ((tr("set.light"), "light"), (tr("set.dark"), "dark")):
             rb = QRadioButton(txt)
             rb.setProperty("val", val)
             if val == cur_theme:
@@ -115,17 +116,17 @@ class SettingsPanel(QWidget):
         self.wave = Switch(self.config.get("Config", "WaveSet", "0") == "1")
         self.wave._on_color = self.theme.tokens["accent"]
         self.wave.toggled.connect(self._on_wave)
-        lay.addLayout(self._switch_row(self.wave, "提示音（复制/粘贴成功时响一声）"))
+        lay.addLayout(self._switch_row(self.wave, tr("set.wave")))
 
         entry_row = QHBoxLayout()
         entry_row.addStretch()
-        ai_btn = SecondaryButton("AI 模型中心", icon_name="ai")
+        ai_btn = SecondaryButton(tr("set.ai_center"), icon_name="ai")
         ai_btn.clicked.connect(self._open_ai_settings)
         entry_row.addWidget(ai_btn)
-        tr_btn = SecondaryButton("翻译服务", icon_name="translate")
+        tr_btn = SecondaryButton(tr("set.trans_service"), icon_name="translate")
         tr_btn.clicked.connect(self._open_translate_service)
         entry_row.addWidget(tr_btn)
-        hk_btn = SecondaryButton("热键设置", icon_name="gear")
+        hk_btn = SecondaryButton(tr("set.hotkey"), icon_name="gear")
         hk_btn.clicked.connect(self._open_hotkey)
         entry_row.addWidget(hk_btn)
         lay.addLayout(entry_row)
@@ -162,16 +163,16 @@ class SettingsPanel(QWidget):
 
     # ---------- 迷你窗口 ----------
     def _build_mini(self):
-        lay = self._section("迷你窗口（复制/粘贴时自动悬浮）")
+        lay = self._section(tr("set.mini"))
         row = QHBoxLayout()
-        row.addWidget(QLabel("悬浮显示时间(秒, 0=不显示)"))
+        row.addWidget(QLabel(tr("set.mini_time")))
         self.mini_time = QLineEdit(self.config.get("Config", "MiniFormTime", "5"))
         self.mini_time.setFixedWidth(70)
         row.addWidget(self.mini_time)
         self.mini_always = Switch(self.config.get("Config", "MiniFormSet", "0") == "1")
         self.mini_always._on_color = self.theme.tokens["accent"]
         row.addWidget(self.mini_always)
-        row.addWidget(MutedLabel("常显"))
+        row.addWidget(MutedLabel(tr("set.always")))
         row.addStretch()
         lay.addLayout(row)
         self.mini_time.editingFinished.connect(self._save_mini)
@@ -187,12 +188,12 @@ class SettingsPanel(QWidget):
 
     # ---------- 剪贴板历史 ----------
     def _build_clipwatch(self):
-        lay = self._section("剪贴板历史")
+        lay = self._section(tr("set.clip_history"))
         self.clip_watch = Switch(False)
         self.clip_watch._on_color = self.theme.tokens["accent"]
         self.clip_watch.toggled.connect(self._on_clip_watch)
         lay.addLayout(self._switch_row(
-            self.clip_watch, "自动记录复制的文字到剪贴板历史（自动去重，单条上限 20 万字，最多 2000 条）"))
+            self.clip_watch, tr("set.clip_watch")))
 
     def _on_clip_watch(self, on):
         self.config.set("Config", "ClipWatch", "1" if on else "0")
@@ -200,12 +201,13 @@ class SettingsPanel(QWidget):
 
     # ---------- 网络代理 ----------
     def _build_proxy(self):
-        lay = self._section("网络代理")
+        lay = self._section(tr("set.proxy"))
         self.proxy_group = QButtonGroup(self)
         cur = self.config.get("Network", "ProxyMode", "system")
         pr = QHBoxLayout()
-        for txt, val in (("跟随系统(推荐)", "system"), ("手动代理", "manual"),
-                         ("直连(不使用代理)", "off")):
+        for txt, val in ((tr("set.follow_system"), "system"),
+                         (tr("set.manual"), "manual"),
+                         (tr("set.direct"), "off")):
             rb = QRadioButton(txt)
             rb.setProperty("val", val)
             if val == cur:
@@ -216,7 +218,7 @@ class SettingsPanel(QWidget):
         lay.addLayout(pr)
 
         ar = QHBoxLayout()
-        ar.addWidget(QLabel("代理地址"))
+        ar.addWidget(QLabel(tr("set.proxy_addr")))
         self.proxy_server = QLineEdit(self.config.get("Network", "ProxyServer", ""))
         self.proxy_server.setPlaceholderText("127.0.0.1:7890")
         ar.addWidget(self.proxy_server, 1)
@@ -233,33 +235,33 @@ class SettingsPanel(QWidget):
 
     # ---------- 更新镜像 ----------
     def _build_mirror(self):
-        lay = self._section("更新镜像")
+        lay = self._section(tr("set.mirror"))
         row = QHBoxLayout()
-        row.addWidget(QLabel("镜像地址"))
+        row.addWidget(QLabel(tr("set.mirror_addr")))
         self.mirror = QLineEdit(self.config.get("Network", "UpdateMirror", ""))
         row.addWidget(self.mirror, 1)
-        save = QPushButton("保存")
+        save = QPushButton(tr("common.save"))
         save.clicked.connect(self._save_mirror)
         row.addWidget(save)
         lay.addLayout(row)
-        lay.addWidget(MutedLabel("留空 = 直连 GitHub；填写后优先走镜像，失败再回退。"))
+        lay.addWidget(MutedLabel(tr("set.mirror_hint")))
 
     def _save_mirror(self):
         v = self.mirror.text().strip().rstrip("/")
         if v and not v.startswith(("http://", "https://")):
-            show_toast(self, "请输入合法的 http(s) 地址")
+            show_toast(self, tr("set.bad_url"))
             return
         self.config.set("Network", "UpdateMirror", v)
         self._save()
-        show_toast(self, "更新镜像已保存")
+        show_toast(self, tr("set.mirror_saved"))
 
     # ---------- 检查更新 ----------
     def _build_update(self):
-        lay = self._section("检查更新")
-        self.upd_status = QLabel("尚未检查")
+        lay = self._section(tr("set.check_update"))
+        self.upd_status = QLabel(tr("set.not_checked"))
         self.upd_status.setObjectName("updMuted")
         row = QHBoxLayout()
-        check = PrimaryButton("检查更新", icon_name="refresh")
+        check = PrimaryButton(tr("set.check_update"), icon_name="refresh")
         check.clicked.connect(self._check_update)
         row.addWidget(check)
         row.addWidget(self.upd_status)
@@ -274,7 +276,7 @@ class SettingsPanel(QWidget):
         if self._upd_busy:
             return
         self._upd_busy = True
-        self.upd_status.setText("正在检查更新…")
+        self.upd_status.setText(tr("set.checking"))
         client = self.update_client
 
         def work():
@@ -299,20 +301,20 @@ class SettingsPanel(QWidget):
         self._upd_busy = False
         self._clear_upd_actions()
         if err:
-            self.upd_status.setText(err or "检查失败，请检查网络后重试")
+            self.upd_status.setText(err or tr("set.check_fail"))
             self.upd_status.setObjectName("updBad")
             self._restyle(self.upd_status)
             return
         tag, html_url = res[0], res[1]
         self._upd_html = html_url
         if is_newer(tag, VERSION):
-            self.upd_status.setText(f"发现新版本：{tag}")
+            self.upd_status.setText(tr("set.new_version") + tag)
             self.upd_status.setObjectName("updGood")
-            page = SecondaryButton("查看发布页", icon_name="browser")
+            page = SecondaryButton(tr("set.view_page"), icon_name="browser")
             page.clicked.connect(self._open_release_page)
             self.upd_actions.addWidget(page)
         else:
-            self.upd_status.setText("已是最新版本")
+            self.upd_status.setText(tr("set.up_to_date"))
             self.upd_status.setObjectName("updMuted")
         self._restyle(self.upd_status)
 
@@ -341,17 +343,17 @@ class SettingsPanel(QWidget):
 
     # ---------- 截图历史 ----------
     def _build_shots(self):
-        lay = self._section("截图历史")
+        lay = self._section(tr("set.shot_history"))
         row = QHBoxLayout()
         self.hist_save = Switch(self.config.get("Snip", "HistorySave", "1") == "1")
         self.hist_save._on_color = self.theme.tokens["accent"]
         row.addWidget(self.hist_save)
-        row.addWidget(MutedLabel("保存历史截图"))
-        row.addWidget(QLabel("最多保留"))
+        row.addWidget(MutedLabel(tr("set.save_shots")))
+        row.addWidget(QLabel(tr("set.keep_max")))
         self.hist_max = QLineEdit(self.config.get("Snip", "HistoryMax", "100"))
         self.hist_max.setFixedWidth(70)
         row.addWidget(self.hist_max)
-        row.addWidget(QLabel("张"))
+        row.addWidget(QLabel(tr("set.zhang")))
         row.addStretch()
         lay.addLayout(row)
         self.hist_save.toggled.connect(self._save_shots)
