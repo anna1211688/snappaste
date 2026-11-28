@@ -86,6 +86,16 @@ QTextEdit#resultBox {{
     font-size: {FONT_SIZE['md']}px; padding: 8px;
 }}
 QTextEdit#transBox {{ border: none; background: transparent; font-size: {FONT_SIZE['lg']}px; }}
+QListWidget#recordList {{
+    background: {t['surface']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px;
+    padding: 4px; font-size: {FONT_SIZE['md']}px; outline: none;
+}}
+QListWidget#recordList::item {{ padding: 6px 8px; border-radius: 6px; }}
+QListWidget#recordList::item:selected {{ background: {t['accent_tint']}; color: {t['accent']}; }}
+QTextEdit#phraseEditor {{
+    background: {t['stripe']}; border: 1px solid {t['border']}; border-radius: {RADIUS['sm']}px;
+    font-size: {FONT_SIZE['md']}px; padding: 8px;
+}}
 QLabel#swapIcon {{ background: transparent; font-size: 18px; color: {t['muted']}; padding: 0 4px; }}
 QLabel#mutedLabel {{ color: {t['text_2']}; background: transparent; }}
 QLabel#hero {{ font-size: {FONT_SIZE['hero']}px; font-weight: 700; background: transparent; }}
